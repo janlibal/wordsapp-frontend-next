@@ -1,0 +1,12 @@
+FROM node:20-slim
+
+WORKDIR /app
+
+COPY package.json yarn.lock ./
+RUN yarn install
+
+# Don't copy the rest, dev will use blind mount
+# COPY . .
+
+EXPOSE 3000
+CMD ["yarn", "dev"]

@@ -1,6 +1,18 @@
+"use client"
 import Image from "next/image";
+import { useState, useEffect } from "react";
 
 export default function Home() {
+  
+  const [message, setMessage] = useState('')
+  
+  useEffect(() => {
+    fetch('/api') // relative path if Nginx reverse proxy is configured
+      .then((res) => res.text())
+      .then((data) => setMessage(data))
+      .catch((err) => console.error(err))
+  }, [])
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
@@ -12,6 +24,11 @@ export default function Home() {
           height={20}
           priority
         />
+        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
+          <h1>The backend says:</h1>
+          <p>'Here is yet to appear what the backend has to say'</p> 
+          <p>And that is....whoa, {message}</p>
+        </div>
         <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
           <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
             To get started, edit the page.tsx file.

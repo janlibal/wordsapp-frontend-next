@@ -6,7 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "dev:up": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d",
+    "dev:down": "docker compose -f docker-compose.yml -f docker-compose.dev.yml down",
+    "nginx:up": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d nginx",
+    "nginx:down": "docker compose -f docker-compose.yml -f docker-compose.dev.yml down nginx",
+    "client:up": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d client",
+    "client:down": "docker compose -f docker-compose.yml -f docker-compose.dev.yml down client"
   },
   "dependencies": {
     "next": "16.1.1",

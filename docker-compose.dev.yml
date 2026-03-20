@@ -1,0 +1,37 @@
+name: frontend-dev
+services:
+  client:
+    container_name: client-dev
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    #build:
+    #  context: "."
+    #  dockerfile: Dockerfile.dev
+    volumes:
+      - ./:/app
+      - client-node-modules:/app/node_modules
+    expose:
+     - "3000"
+    environment:
+      NODE_ENV: development
+      CHOKIDAR_USEPOLLING: "true"
+
+  nginx:
+    container_name: nest-nginx-dev
+    platform: linux/amd64
+    build:
+      dockerfile: Dockerfile
+      context: "./nginx"
+    ports:
+      - "8080:8080"
+      # later: "443:443"
+    restart: unless-stopped
+
+volumes:
+  client-node-modules:
+    name: client-node-modules
+    labels:
+      app: nextjs
+      env: dev

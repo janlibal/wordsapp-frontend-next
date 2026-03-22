@@ -9,10 +9,10 @@
     "lint": "eslint",
     "dev:up": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d",
     "dev:down": "docker compose -f docker-compose.yml -f docker-compose.dev.yml down",
-    "nginx:up": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d nginx",
-    "nginx:down": "docker compose -f docker-compose.yml -f docker-compose.dev.yml down nginx",
-    "client:up": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d client",
-    "client:down": "docker compose -f docker-compose.yml -f docker-compose.dev.yml down client"
+    "client:up": "docker compose -p frontend -f docker-compose.yml -f docker-compose.dev.yml up -d --build",
+    "client:down": "docker compose -p frontend -f docker-compose.yml -f docker-compose.dev.yml down",
+    "client:logs": "docker compose -p frontend logs -f",
+    "client:shell": "docker compose -p frontend exec client sh"
   },
   "dependencies": {
     "next": "16.1.1",

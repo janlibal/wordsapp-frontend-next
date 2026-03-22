@@ -5,7 +5,7 @@ import Image from "next/image";
 export default function Home() {
   
   //const [message, setMessage] = useState('')
-  const message = 'fake message from react II'
+  const message = 'My name is React!'
   /*useEffect(() => {
     fetch('/api') // relative path if Nginx reverse proxy is configured
       .then((res) => res.text())

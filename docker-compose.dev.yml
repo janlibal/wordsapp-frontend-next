@@ -8,11 +8,11 @@ services:
       - ./:/app
       - client-node-modules:/app/node_modules
     expose:
-     - "3000"
+      - '3000'
     environment:
       NODE_ENV: development
-      CHOKIDAR_USEPOLLING: "true"
-      WATCHPACK_POLLING: "true"
+      CHOKIDAR_USEPOLLING: 'true'
+      WATCHPACK_POLLING: 'true'
 volumes:
   client-node-modules:
     name: client-node-modules

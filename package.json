@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "format": "prettier --write .",
     "dev:up": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d",
     "dev:down": "docker compose -f docker-compose.yml -f docker-compose.dev.yml down",
     "client:up": "docker compose -p frontend -f docker-compose.yml -f docker-compose.dev.yml up -d --build",
@@ -15,11 +16,16 @@
     "client:shell": "docker compose -p frontend exec client sh"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^6.4.5",
+    "@mui/material": "^6.4.5",
     "next": "16.1.1",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -27,6 +33,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "tailwindcss": "^4",
+    "prettier": "^3.4.2",
     "typescript": "^5"
   }
 }

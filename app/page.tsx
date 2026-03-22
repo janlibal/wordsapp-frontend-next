@@ -1,17 +1,16 @@
 "use client"
 import Image from "next/image";
-//import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 export default function Home() {
   
-  //const [message, setMessage] = useState('')
-  const message = 'My name is React!'
-  /*useEffect(() => {
-    fetch('/api') // relative path if Nginx reverse proxy is configured
+  const [message, setMessage] = useState('')
+  useEffect(() => {
+    fetch('/api/v1/app/info') //relative path if Nginx reverse proxy is configured
       .then((res) => res.text())
       .then((data) => setMessage(data))
       .catch((err) => console.error(err))
-  }, [])*/
+  }, [])
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">

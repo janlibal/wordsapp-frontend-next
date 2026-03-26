@@ -1,37 +1,35 @@
-'use client'
-import { useEffect, useState } from 'react'
-import {
-  Button,
-  Container,
-  TextField,
+// /app/page.tsx
 
-} from '@mui/material'
+import { Box } from '@mui/material'
+import QuoteCard from './components/QuoteCard'
 
-
-export default function ApiPage() {
-  const message = 'My message'
-  //const [message, setMessage] = useState('')
-  /*useEffect(() => {
-    fetch('/api/v1/app/info') //relative path if Nginx reverse proxy is configured
-      .then((res) => res.text())
-      .then((data) => setMessage(data))
-      .catch((err) => console.error(err))
-  }, [])*/
+export default function Homex() {
+  const quotes = [
+    {
+      content: 'People see what they want to see.',
+      author: 'Dan Brown',
+      source: 'The Da Vinci Code',
+      tags: ['dan brown', 'perception'],
+    },
+    {
+      content: 'The truth is rarely pure and never simple.',
+      author: 'Oscar Wilde',
+      source: '',
+      tags: ['truth', 'philosophy'],
+    },
+    {
+      content: 'Not all those who wander are lost.',
+      author: 'J.R.R. Tolkien',
+      source: 'The Lord of the Rings',
+      tags: ['adventure', 'life'],
+    },
+  ]
 
   return (
-    <Container>
-      <TextField
-        label="Search"
-        variant="outlined"
-        style={{ width: 320, margin: 13 }}
-        size="small"
-        sx={{ marginLeft: 2, backgroundColor: 'white' }}
-        type="yet to be defined"
-        placeholder="Search products (e.g., iPhone, Macbook)"
-      />
-      <Button variant="contained" color="primary" style={{ margin: 13 }}>
-        Search
-      </Button>
-    </Container>
+    <Box>
+      {quotes.map((quote, index) => (
+        <QuoteCard key={index} {...quote} />
+      ))}
+    </Box>
   )
 }

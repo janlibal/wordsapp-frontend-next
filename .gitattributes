@@ -1,0 +1,10 @@
+* text=auto eol=lf
+
+# Explicitly enforce LF for code files
+*.ts eol=lf
+*.tsx eol=lf
+*.js eol=lf
+*.jsx eol=lf
+*.json eol=lf
+*.css eol=lf
+*.md eol=lf

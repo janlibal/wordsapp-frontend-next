@@ -27,7 +27,7 @@ import Link from 'next/link'
 import { useAuth } from '../context/authContext'
 import { useRouter } from 'next/navigation'
 import LoginIcon from '@mui/icons-material/Login'
-import LogoutIcon from '@mui/icons-material/Logout' 
+import LogoutIcon from '@mui/icons-material/Logout'
 
 const drawerWidth = 240
 
@@ -41,159 +41,158 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     setMobileOpen(!mobileOpen)
   }
 
-
   const { token, logout } = useAuth()
-const router = useRouter()
+  const router = useRouter()
 
- const drawerContent = (
-  <List>
-    <ListItem disablePadding>
-      <ListItemButton
-        component={Link}
-        href="/"
-        onClick={() => setMobileOpen(false)}
-      >
-        <FormatQuoteIcon sx={{ mr: 2 }} />
-        <ListItemText primary="All Quotes" />
-      </ListItemButton>
-    </ListItem>
-
-    {token && (
+  const drawerContent = (
+    <List>
       <ListItem disablePadding>
         <ListItemButton
           component={Link}
-          href="/favorites"
+          href="/"
           onClick={() => setMobileOpen(false)}
         >
-          <FavoriteIcon sx={{ mr: 2 }} />
-          <ListItemText primary="Favorites" />
+          <FormatQuoteIcon sx={{ mr: 2 }} />
+          <ListItemText primary="All Quotes" />
         </ListItemButton>
       </ListItem>
-    )}
-  </List>
-)
 
- return (
-  <Box sx={{ display: 'flex' }}>
-    {/* 🔝 APP BAR */}
-    <AppBar position="fixed">
-      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        {/* 🔹 LEFT */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          {isMobile && (
-            <IconButton color="inherit" onClick={handleDrawerToggle}>
-              <MenuIcon />
-            </IconButton>
-          )}
-
-          <Typography
-            variant="h6"
-            sx={{ cursor: 'pointer' }}
-            onClick={() => router.push('/')}
+      {token && (
+        <ListItem disablePadding>
+          <ListItemButton
+            component={Link}
+            href="/favorites"
+            onClick={() => setMobileOpen(false)}
           >
-            QuoteKeeper
-          </Typography>
-        </Box>
+            <FavoriteIcon sx={{ mr: 2 }} />
+            <ListItemText primary="Favorites" />
+          </ListItemButton>
+        </ListItem>
+      )}
+    </List>
+  )
 
-        {/* 🔹 CENTER */}
-        {!isMobile && token && (
-          <InputBase
-            placeholder="Search quotes..."
-            sx={{
-              background: 'rgba(255,255,255,0.15)',
-              px: 2,
-              py: 0.5,
-              borderRadius: 1,
-              width: 300,
-              color: 'white',
-            }}
-          />
-        )}
+  return (
+    <Box sx={{ display: 'flex' }}>
+      {/* 🔝 APP BAR */}
+      <AppBar position="fixed">
+        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          {/* 🔹 LEFT */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {isMobile && (
+              <IconButton color="inherit" onClick={handleDrawerToggle}>
+                <MenuIcon />
+              </IconButton>
+            )}
 
-        {/* 🔹 RIGHT */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          {token ? (
-            <>
-              <Button
-                color="inherit"
-                startIcon={<AddIcon />}
-                onClick={() => router.push('/quotes/new')}
-              >
-                {isMobile ? '' : 'Add'}
-              </Button>
+            <Typography
+              variant="h6"
+              sx={{ cursor: 'pointer' }}
+              onClick={() => router.push('/')}
+            >
+              QuoteKeeper
+            </Typography>
+          </Box>
 
-              <Button
-                color="inherit"
-                startIcon={<LogoutIcon />}
-                onClick={() => {
-                  logout()
-                  router.push('/login')
-                }}
-              >
-                {isMobile ? '' : 'Logout'}
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                color="inherit"
-                startIcon={<LoginIcon />}
-                onClick={() => router.push('/login')}
-              >
-                {isMobile ? '' : 'Login'}
-              </Button>
-
-              <Button
-                color="inherit"
-                onClick={() => router.push('/register')}
-              >
-                {isMobile ? '' : 'Sign Up'}
-              </Button>
-            </>
+          {/* 🔹 CENTER */}
+          {!isMobile && token && (
+            <InputBase
+              placeholder="Search quotes..."
+              sx={{
+                background: 'rgba(255,255,255,0.15)',
+                px: 2,
+                py: 0.5,
+                borderRadius: 1,
+                width: 300,
+                color: 'white',
+              }}
+            />
           )}
-        </Box>
-      </Toolbar>
-    </AppBar>
 
-    {/* 📂 SIDEBAR */}
-    {isMobile ? (
-      <Drawer
-        variant="temporary"
-        open={mobileOpen}
-        onClose={handleDrawerToggle}
-        ModalProps={{ keepMounted: true }}
-      >
-        {drawerContent}
-      </Drawer>
-    ) : (
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: {
+          {/* 🔹 RIGHT */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {token ? (
+              <>
+                <Button
+                  color="inherit"
+                  startIcon={<AddIcon />}
+                  onClick={() => router.push('/quotes/new')}
+                >
+                  {isMobile ? '' : 'Add'}
+                </Button>
+
+                <Button
+                  color="inherit"
+                  startIcon={<LogoutIcon />}
+                  onClick={() => {
+                    logout()
+                    router.push('/login')
+                  }}
+                >
+                  {isMobile ? '' : 'Logout'}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  color="inherit"
+                  startIcon={<LoginIcon />}
+                  onClick={() => router.push('/login')}
+                >
+                  {isMobile ? '' : 'Login'}
+                </Button>
+
+                <Button
+                  color="inherit"
+                  onClick={() => router.push('/register')}
+                >
+                  {isMobile ? '' : 'Sign Up'}
+                </Button>
+              </>
+            )}
+          </Box>
+        </Toolbar>
+      </AppBar>
+
+      {/* 📂 SIDEBAR */}
+      {isMobile ? (
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{ keepMounted: true }}
+        >
+          {drawerContent}
+        </Drawer>
+      ) : (
+        <Drawer
+          variant="permanent"
+          sx={{
             width: drawerWidth,
-            boxSizing: 'border-box',
-            mt: 8,
-          },
+            flexShrink: 0,
+            [`& .MuiDrawer-paper`]: {
+              width: drawerWidth,
+              boxSizing: 'border-box',
+              mt: 8,
+            },
+          }}
+        >
+          {drawerContent}
+        </Drawer>
+      )}
+
+      {/* 📄 MAIN CONTENT */}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 2,
+          mt: 8,
+          ml: isMobile ? 0 : `${drawerWidth}px`,
         }}
       >
-        {drawerContent}
-      </Drawer>
-    )}
-
-    {/* 📄 MAIN CONTENT */}
-    <Box
-      component="main"
-      sx={{
-        flexGrow: 1,
-        p: 2,
-        mt: 8,
-        ml: isMobile ? 0 : `${drawerWidth}px`,
-      }}
-    >
-      {children}
+        {children}
+      </Box>
     </Box>
-  </Box>
-)
+  )
 }

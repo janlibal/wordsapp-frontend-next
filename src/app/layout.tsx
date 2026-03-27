@@ -15,10 +15,10 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AuthProvider>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <AppLayout>{children}</AppLayout>
-        </ThemeProvider>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <AppLayout>{children}</AppLayout>
+          </ThemeProvider>
         </AuthProvider>
       </body>
     </html>

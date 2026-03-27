@@ -2,8 +2,9 @@
 
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { CssBaseline } from '@mui/material'
-import Layout from './components/Layout'
+import AppLayout from './components/AppLayout'
 import theme from './theme'
+import { AuthProvider } from './context/authContext'
 
 export default function RootLayout({
   children,
@@ -13,10 +14,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <AuthProvider>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <Layout>{children}</Layout>
+          <AppLayout>{children}</AppLayout>
         </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   )

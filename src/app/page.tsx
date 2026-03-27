@@ -1,9 +1,9 @@
 'use client'
 import { Suspense } from 'react'
-import ApiPage from './ApiPage'
+import ApiPage from './components/quotes/QuotesList'
 //import { useState, useEffect } from 'react'
 
-export default function Homes() {
+export default function Home() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <ApiPage />

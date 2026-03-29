@@ -1,10 +1,10 @@
 'use client'
 
-import { ThemeProvider, createTheme } from '@mui/material/styles'
+import { ThemeProvider } from '@mui/material/styles'
 import { CssBaseline } from '@mui/material'
 import AppLayout from './components/AppLayout'
 import theme from './theme'
-import { AuthProvider } from './context/authContext'
+import { AuthProvider } from './context/AuthContext'
 
 export default function RootLayout({
   children,

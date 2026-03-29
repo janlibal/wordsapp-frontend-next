@@ -22,12 +22,14 @@ import MenuIcon from '@mui/icons-material/Menu'
 import AddIcon from '@mui/icons-material/Add'
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote'
 import FavoriteIcon from '@mui/icons-material/Favorite'
+import ComputerIcon from '@mui/icons-material/Computer'
 
 import Link from 'next/link'
-import { useAuth } from '../context/authContext'
+
 import { useRouter } from 'next/navigation'
 import LoginIcon from '@mui/icons-material/Login'
 import LogoutIcon from '@mui/icons-material/Logout'
+import { useAuth } from '../context/AuthContext'
 
 const drawerWidth = 240
 
@@ -41,7 +43,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     setMobileOpen(!mobileOpen)
   }
 
-  const { token, logout } = useAuth()
+  const { user, logout } = useAuth()
   const router = useRouter()
 
   const drawerContent = (
@@ -57,7 +59,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </ListItemButton>
       </ListItem>
 
-      {token && (
+      {user && (
         <ListItem disablePadding>
           <ListItemButton
             component={Link}
@@ -66,6 +68,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           >
             <FavoriteIcon sx={{ mr: 2 }} />
             <ListItemText primary="Favorites" />
+          </ListItemButton>
+        </ListItem>
+      )}
+
+      {user && (
+        <ListItem disablePadding>
+          <ListItemButton
+            component={Link}
+            href="/system"
+            onClick={() => setMobileOpen(false)}
+          >
+            <ComputerIcon sx={{ mr: 2 }} />
+            <ListItemText primary="System" />
           </ListItemButton>
         </ListItem>
       )}
@@ -90,14 +105,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               sx={{ cursor: 'pointer' }}
               onClick={() => router.push('/')}
             >
-              QuoteKeeper
+              WordsApp - III
             </Typography>
           </Box>
 
           {/* 🔹 CENTER */}
-          {!isMobile && token && (
+          {!isMobile && user && (
             <InputBase
-              placeholder="Search quotes..."
+              placeholder="Search words..."
               sx={{
                 background: 'rgba(255,255,255,0.15)',
                 px: 2,
@@ -111,7 +126,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
           {/* 🔹 RIGHT */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {token ? (
+            {user ? (
               <>
                 <Button
                   color="inherit"
@@ -124,8 +139,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <Button
                   color="inherit"
                   startIcon={<LogoutIcon />}
-                  onClick={() => {
-                    logout()
+                  onClick={async () => {
+                    await logout()
                     router.push('/login')
                   }}
                 >
@@ -134,11 +149,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </>
             ) : (
               <>
-                <Button
-                  color="inherit"
-                  startIcon={<LoginIcon />}
-                  onClick={() => router.push('/login')}
-                >
+                <Button color="inherit" onClick={() => router.push('/login')}>
                   {isMobile ? '' : 'Login'}
                 </Button>
 

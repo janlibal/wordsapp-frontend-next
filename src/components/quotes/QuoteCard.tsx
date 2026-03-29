@@ -1,5 +1,3 @@
-// /components/QuoteCard.tsx
-
 import { Card, CardContent, Typography, Chip, Stack } from '@mui/material'
 
 type QuoteCardProps = {

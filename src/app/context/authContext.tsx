@@ -3,6 +3,71 @@
 
 import { createContext, useContext, useState, useEffect } from 'react'
 
+import { logout as logoutService } from '@/src/services/auth.service'
+import { fetcher } from '@/src/lib/fetcher'
+
+type User = {
+  id: string
+  name: string
+  role: string
+}
+
+type AuthContextType = {
+  user: User | null
+  loading: boolean
+  logout: () => Promise<void>
+  refetchUser: () => Promise<void>
+}
+
+const AuthContext = createContext<AuthContextType | null>(null)
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  const fetchUser = async () => {
+    try {
+      const res = await fetcher<User>('/api/v1/auth/me', {
+        credentials: 'include',
+      })
+      setUser(res)
+    } catch {
+      setUser(null)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchUser()
+    console.log('here ', user)
+  }, [])
+
+  const logout = async () => {
+    await logoutService()
+    setUser(null)
+  }
+
+  return (
+    <AuthContext.Provider
+      value={{ user, loading, logout, refetchUser: fetchUser }}
+    >
+      {children}
+    </AuthContext.Provider>
+  )
+}
+
+export const useAuth = () => {
+  const ctx = useContext(AuthContext)
+  if (!ctx) throw new Error('useAuth must be used inside AuthProvider')
+  return ctx
+}
+
+/*
+'use client'
+
+import { createContext, useContext, useState, useEffect } from 'react'
+
 type AuthContextType = {
   token: string | null
   loginUser: (token: string) => void
@@ -41,3 +106,4 @@ export const useAuth = () => {
   if (!ctx) throw new Error('useAuth must be used inside AuthProvider')
   return ctx
 }
+*/

@@ -30,6 +30,7 @@ import { useRouter } from 'next/navigation'
 import LoginIcon from '@mui/icons-material/Login'
 import LogoutIcon from '@mui/icons-material/Logout'
 import { useAuth } from '../context/AuthContext'
+import Person from '@mui/icons-material/Person'
 
 const drawerWidth = 240
 
@@ -93,21 +94,40 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <AppBar position="fixed">
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
           {/* 🔹 LEFT */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            {isMobile && (
-              <IconButton color="inherit" onClick={handleDrawerToggle}>
-                <MenuIcon />
-              </IconButton>
-            )}
 
-            <Typography
-              variant="h6"
-              sx={{ cursor: 'pointer' }}
-              onClick={() => router.push('/')}
-            >
-              WordsApp - III
-            </Typography>
-          </Box>
+          {user ? (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              {isMobile && (
+                <IconButton color="inherit" onClick={handleDrawerToggle}>
+                  <MenuIcon />
+                </IconButton>
+              )}
+
+              <Typography
+                variant="h6"
+                sx={{ cursor: 'pointer' }}
+                onClick={() => router.push('/')}
+              >
+                WordsApp - III
+              </Typography>
+            </Box>
+          ) : (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              {isMobile && (
+                <IconButton color="inherit" onClick={handleDrawerToggle}>
+                  <MenuIcon />
+                </IconButton>
+              )}
+
+              <Typography
+                variant="h6"
+                sx={{ cursor: 'pointer' }}
+                onClick={() => router.push('/')}
+              >
+                WordsApp
+              </Typography>
+            </Box>
+          )}
 
           {/* 🔹 CENTER */}
           {!isMobile && user && (
@@ -145,6 +165,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   }}
                 >
                   {isMobile ? '' : 'Logout'}
+                </Button>
+
+                <Button
+                  color="inherit"
+                  startIcon={<Person />}
+                  onClick={() => router.push('/me')}
+                >
+                  {isMobile ? '' : 'Me'}
                 </Button>
               </>
             ) : (

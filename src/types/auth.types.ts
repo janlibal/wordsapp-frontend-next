@@ -3,6 +3,23 @@ export type LoginDto = {
   password: string
 }
 
+export type RegisterDto = {
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+}
+
 export type LoginResponse = {
   accessToken: string
+}
+
+export type UserResponse = {
+  id?: string
+  firstName: string
+}
+
+export type User = {
+  id?: string
+  firstName: string
 }

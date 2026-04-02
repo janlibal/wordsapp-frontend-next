@@ -4,7 +4,7 @@ import { ThemeProvider } from '@mui/material/styles'
 import { CssBaseline } from '@mui/material'
 import AppLayout from './components/AppLayout'
 import theme from './theme'
-import { AuthProvider } from './context/AuthContext'
+import { AuthProvider } from './context/authContext'
 
 export default function RootLayout({
   children,

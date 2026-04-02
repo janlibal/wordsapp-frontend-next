@@ -1,31 +1,19 @@
+import { apiFetch } from '../lib/fetcher'
 import { LoginDto, LoginResponse, RegisterDto, User } from '../types/auth.types'
 
-export async function getUserInfo(): Promise<User> {
-  const res = await fetch('http://localhost:80/api/v1/auth/me', {
+export function getCurrentUser(): Promise<User> {
+  return apiFetch<User>('/api/v1/auth/me', {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    //body: JSON.stringify(data),
-    credentials: 'include',
   })
-
-  if (!res.ok) {
-    const err = await res.json()
-    throw new Error(err.message || 'Failed gathering data')
-  }
-
-  return res.json()
 }
 
+
 export async function login(data: LoginDto): Promise<LoginResponse> {
-  const res = await fetch('http://localhost:80/api/v1/auth/email/login', {
+  const res = await fetch('/api/v1/auth/email/login', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
-    credentials: 'include',
+    credentials: 'include', // cookies are sent automatically
   })
 
   if (!res.ok) {

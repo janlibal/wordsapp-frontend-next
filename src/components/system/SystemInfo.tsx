@@ -1,11 +1,11 @@
 import { Box, Typography } from '@mui/material'
-import { AppInfo } from '../../types/app.info.response'
+import { SystemInfo } from '../../types/app/system.info.types'
 
 type Props = {
-  data: AppInfo
+  data: SystemInfo
 }
 
-export default function SystemInfo({ data }: Props) {
+export default function SystemInfoPage({ data }: Props) {
   return (
     <Box
       sx={{

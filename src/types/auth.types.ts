@@ -14,12 +14,10 @@ export type LoginResponse = {
   accessToken: string
 }
 
-export type UserResponse = {
-  id?: string
-  firstName: string
-}
-
 export type User = {
-  id?: string
+  id: string,
   firstName: string
+  lastName: string
+  email: string
+  password: string
 }

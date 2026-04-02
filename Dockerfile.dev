@@ -2,11 +2,22 @@ FROM node:20-slim
 
 WORKDIR /app
 
-COPY package.json yarn.lock ./
+RUN corepack enable
+
+# Copy only dependency files first
+COPY package.json yarn.lock .yarnrc.yml ./
+
+# If using Yarn Berry, you likely also need:
+COPY .yarn .yarn
+
 RUN yarn install
 
 # Don't copy the rest, dev will use blind mount
 # COPY . .
+COPY next.config.mjs ./next.config.mjs
 
 EXPOSE 3000
+
+ENV CHOKIDAR_USEPOLLING=true
+
 CMD ["yarn", "dev"]

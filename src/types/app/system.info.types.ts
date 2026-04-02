@@ -1,4 +1,4 @@
-export type AppInfo = {
+export type SystemInfo = {
   name: string
   version: string
   description: string

@@ -1,10 +1,24 @@
-import { AppInfo } from '../../types/app.info.response'
-import { UserResponse } from '@/src/types/auth.types'
+import { Box, Typography } from '@mui/material'
+import { User } from '@/src/types/auth.types'
 
 type Props = {
-  data: UserResponse
+  data: User
 }
 
 export default function MeInfo({ data }: Props) {
-  return <p>{data.id}</p>
+  return ( <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 2,
+      }}
+    >
+      <Typography>{data.firstName} {data.lastName}</Typography>
+      <Typography>{data.email}</Typography>
+
+      
+    </Box>)
 }

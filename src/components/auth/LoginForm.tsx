@@ -4,7 +4,7 @@ import { Box, Paper, Typography, TextField, Button, Alert } from '@mui/material'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { login } from '@/src/services/auth.service'
-import { useAuth } from '@/src/app/context/AuthContext'
+import { useAuth } from '@/src/app/context/authContext'
 
 export default function LoginForm() {
   const router = useRouter()
@@ -21,10 +21,13 @@ export default function LoginForm() {
     setLoading(true)
 
     try {
+      // login call sets cookie
       await login({ email, password })
 
-      await refetchUser() // ✅ fetch user after cookie is set
+      // fetch user info and update context
+      await refetchUser()
 
+      // redirect after user is fetched
       router.push('/system')
     } catch (err: any) {
       setError(err.message || 'Invalid credentials')

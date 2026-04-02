@@ -29,7 +29,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import LoginIcon from '@mui/icons-material/Login'
 import LogoutIcon from '@mui/icons-material/Logout'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../context/authContext'
 import Person from '@mui/icons-material/Person'
 
 const drawerWidth = 240

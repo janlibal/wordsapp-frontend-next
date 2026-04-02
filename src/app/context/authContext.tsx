@@ -1,12 +1,9 @@
 // /context/AuthContext.tsx
 'use client'
 
-import { createContext, useContext, useState, useEffect } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
 
-import { logout as logoutService } from '@/src/services/auth.service'
-import { fetcher } from '@/src/lib/fetcher'
-
-type User = {
+export type User = {
   id: string
   name: string
   role: string
@@ -25,12 +22,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
+  // Fetch current user from backend
   const fetchUser = async () => {
+    setLoading(true)
     try {
-      const res = await fetcher<User>('/api/v1/auth/me', {
-        credentials: 'include',
+      const res = await fetch('/api/v1/auth/me', {
+        credentials: 'include', // important for sending cookies
       })
-      setUser(res)
+
+      if (!res.ok) throw new Error('Failed to fetch user')
+
+      const data: User = await res.json()
+      setUser(data)
     } catch {
       setUser(null)
     } finally {
@@ -40,18 +43,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     fetchUser()
-    console.log('here ', user)
   }, [])
 
   const logout = async () => {
-    await logoutService()
+    await fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'include' })
     setUser(null)
   }
 
   return (
-    <AuthContext.Provider
-      value={{ user, loading, logout, refetchUser: fetchUser }}
-    >
+    <AuthContext.Provider value={{ user, loading, logout, refetchUser: fetchUser }}>
       {children}
     </AuthContext.Provider>
   )

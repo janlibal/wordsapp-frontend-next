@@ -1,5 +1,5 @@
-import { fetcher } from '../lib/fetcher'
-import { AppInfoResponse } from '../types/app.types'
+import {  fetcher } from '../lib/fetcher'
+import { AppInfoResponse } from '../types/app/app.types'
 
 /*export async function getAppInfo(): Promise<AppInfoResponse> {
   const res = await fetch('http://api:5000/api/v1/app/info', {
@@ -14,6 +14,6 @@ import { AppInfoResponse } from '../types/app.types'
 }*/
 
 export function getAppInfo() {
-  //return fetcher<AppInfoResponse>(`${config.apiUrl}/api/v1/app/info`)
-  return fetcher<AppInfoResponse>('http://api:5000/api/v1/app/info')
+  return fetcher<AppInfoResponse>('/api/v1/app/info')
+
 }

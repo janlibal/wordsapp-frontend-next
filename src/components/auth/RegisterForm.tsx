@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuth } from '@/src/app/context/AuthContext'
+import { useAuth } from '@/src/app/context/authContext'
 import { register } from '@/src/services/auth.service'
 import { Alert, Box, Button, Paper, TextField, Typography } from '@mui/material'
 import { useRouter } from 'next/navigation'

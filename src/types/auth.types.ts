@@ -10,12 +10,16 @@ export type RegisterDto = {
   password: string
 }
 
-export type LoginResponse = {
+export type LoginResponse2 = {
   accessToken: string
 }
 
+export type LoginResponse = {
+  success: boolean
+}
+
 export type User = {
-  id: string,
+  id: string
   firstName: string
   lastName: string
   email: string

@@ -6,7 +6,8 @@ type Props = {
 }
 
 export default function MeInfo({ data }: Props) {
-  return ( <Box
+  return (
+    <Box
       sx={{
         minHeight: '100vh',
         display: 'flex',
@@ -16,9 +17,10 @@ export default function MeInfo({ data }: Props) {
         gap: 2,
       }}
     >
-      <Typography>{data.firstName} {data.lastName}</Typography>
+      <Typography>
+        {data.firstName} {data.lastName}
+      </Typography>
       <Typography>{data.email}</Typography>
-
-      
-    </Box>)
+    </Box>
+  )
 }

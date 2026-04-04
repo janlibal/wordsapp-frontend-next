@@ -1,82 +1,122 @@
-type ApiResponse<T> = {
-  status: boolean
-  statusCode: number
-  path: string
-  result: T
-  message?: string
-}
-
 export async function apiFetch<T>(
   url: string,
-  options?: RequestInit
+  options: RequestInit = {}
 ): Promise<T> {
-  const res = await fetch(url, {
-    credentials: 'include',
+  let res = await fetch(url, {
+    ...options,
     headers: {
       'Content-Type': 'application/json',
-      ...(options?.headers || {}),
+      ...(options.headers || {}),
     },
-    ...options,
-  })
-
-  const data: ApiResponse<T> = await res.json()
-
-  if (!res.ok || !data.status) {
-    throw new Error(data.message || 'API Error')
-  }
-
-  return data.result // ✅ always return clean data
-}
-
-export async function fetcher<T>(
-  url: string,
-  options?: RequestInit
-): Promise<T> {
-  const res = await fetch(url, {
-    ...options,
     credentials: 'include',
-    cache: 'no-store',
   })
 
-  if (!res.ok) {
-    throw new Error(`Fetch error: ${res.status}`)
+  if (res.status === 401) {
+    const refreshRes = await fetch('api/api/v1/auth/refresh', {
+      method: 'POST',
+      credentials: 'include',
+    })
+
+    if (!refreshRes.ok) {
+      // 🔥 GLOBAL LOGOUT TRIGGER
+      window.dispatchEvent(new Event('auth:logout'))
+      throw new Error('Unauthorized')
+    }
+
+    // retry original request
+    res = await fetch(url, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(options.headers || {}),
+      },
+      credentials: 'include',
+    })
   }
 
-  return res.json()
-}
-
-
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || ''
-
-export async function fetcher2<T>(
-  url: string,
-  options?: RequestInit
-): Promise<T> {
-  const token =
-    typeof window !== 'undefined' ? localStorage.getItem('token') : null
-
-  const res = await fetch(`${BASE_URL}${url}`, {
-    ...options,
-    cache: 'no-store',
-    credentials: 'include', // future-proof for cookies
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...(options?.headers || {}),
-    },
-  })
-
   if (!res.ok) {
-    let message = `Fetch error: ${res.status}`
-
+    let message = 'Request failed'
     try {
-      const data = await res.json()
-      message = data.message || message
+      const err = await res.json()
+      message = err.message || message
     } catch {}
-
     throw new Error(message)
   }
 
-  return res.json()
+  const text = await res.text()
+  return text ? JSON.parse(text) : (undefined as T)
+}
+
+export async function apiFetch1<T>(
+  url: string,
+  options: RequestInit = {}
+): Promise<T> {
+  let res = await fetch(url, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options.headers || {}),
+    },
+    credentials: 'include',
+  })
+
+  if (res.status === 401) {
+    // 🔥 try refresh
+    const refreshRes = await fetch('/api/v1/auth/refresh', {
+      method: 'POST',
+      credentials: 'include',
+    })
+
+    if (!refreshRes.ok) {
+      throw new Error('Unauthorized')
+    }
+
+    // 🔁 retry original request
+    res = await fetch(url, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(options.headers || {}),
+      },
+      credentials: 'include',
+    })
+  }
+
+  if (!res.ok) {
+    let message = 'Request failed'
+    try {
+      const err = await res.json()
+      message = err.message || message
+    } catch {}
+    throw new Error(message)
+  }
+
+  const text = await res.text()
+  return text ? JSON.parse(text) : (undefined as T)
+}
+
+export async function apiFetch2<T>(
+  url: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const res = await fetch(url, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options.headers || {}),
+    },
+    credentials: 'include',
+  })
+
+  if (!res.ok) {
+    let message = 'Request failed'
+    try {
+      const err = await res.json()
+      message = err.message || message
+    } catch {}
+    throw new Error(message)
+  }
+
+  const text = await res.text()
+  return text ? JSON.parse(text) : (undefined as T)
 }

@@ -1,8 +1,11 @@
 import SystemInfo from '@/src/components/system/SystemInfo'
-import { getAppInfo } from '@/src/services/app.service'
+import {
+  getAppInfo,
+  getAppInfo2,
+  getAppInfo3,
+} from '@/src/services/app.service'
 
 export default async function Page() {
-  const data = await getAppInfo()
-
+  const data = await getAppInfo3()
   return <SystemInfo data={data.result} />
 }

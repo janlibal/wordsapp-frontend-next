@@ -1,65 +1,33 @@
 import { apiFetch } from '../lib/fetcher'
 import { LoginDto, LoginResponse, RegisterDto, User } from '../types/auth.types'
 
-export function getCurrentUser(): Promise<User> {
-  return apiFetch<User>('/api/v1/auth/me', {
+export async function getCurrentUser(): Promise<User> {
+  const res = await apiFetch<{ result: User }>('/api/api/v1/auth/me', {
     method: 'GET',
   })
+  return res.result
 }
 
-
-export async function login(data: LoginDto): Promise<LoginResponse> {
-  const res = await fetch('/api/v1/auth/email/login', {
+export function login(data: LoginDto): Promise<void> {
+  return apiFetch<void>('api/api/v1/auth/email/login', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
-    credentials: 'include', // cookies are sent automatically
   })
-
-  if (!res.ok) {
-    const err = await res.json()
-    throw new Error(err.message || 'Login failed')
-  }
-
-  return res.json()
 }
 
-export async function register(data: RegisterDto): Promise<boolean> {
-  const res = await fetch('http://localhost:80/api/v1/auth/email/register', {
+export function register(data: RegisterDto): Promise<void> {
+  return apiFetch<void>('api/api/v1/auth/email/register', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(data),
-    //credentials: 'include',
   })
-
-  if (!res.ok) {
-    throw new Error('Registration failed')
-  }
-
-  return true // ✅ don't parse anything
 }
 
-export async function login2(data: LoginDto): Promise<LoginResponse> {
-  const res = await fetch('http://api:5000/api/v1/auth/email/login', {
+export function logout() {
+  return apiFetch<void>('api/api/v1/auth/logout', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-    credentials: 'include', // ✅ important! send cookies automatically
-  })
-
-  if (!res.ok) {
-    const err = await res.json()
-    throw new Error(err.message || 'Login failed')
-  }
-
-  return res.json() // maybe contains message only
-}
-
-export async function logout() {
-  await fetch('http://localhost:80/api/v1/auth/logout', {
-    method: 'POST',
-    credentials: 'include', // include cookie
+    credentials: 'include',
   })
 }

@@ -1,4 +1,11 @@
-//'use client'
+import FavoritesPage from '@/src/components/favorites/Favorites'
+
+export default async function Page() {
+  // optionally pass user to component
+  return <FavoritesPage />
+}
+
+/*//'use client'
 
 import { Box } from '@mui/material'
 
@@ -17,3 +24,4 @@ export default async function Page() {
     </Box>
   )
 }
+*/

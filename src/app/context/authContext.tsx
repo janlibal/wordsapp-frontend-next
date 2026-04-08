@@ -2,8 +2,8 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getCurrentUser, logout } from '@/src/services/auth.service'
-import { User } from '@/src/types/auth.types'
+import { getCurrentUser, logout } from '@/src/services/auth/auth.service'
+import { User } from '@/src/types/auth/auth.types'
 
 type AuthContextType = {
   user: User | null

@@ -3,7 +3,7 @@
 import { Box, Paper, Typography, TextField, Button, Alert } from '@mui/material'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { login } from '@/src/services/auth.service'
+import { login } from '@/src/services/auth/auth.service'
 import { useAuth } from '@/src/app/context/authContext'
 
 export default function LoginForm() {
@@ -28,7 +28,7 @@ export default function LoginForm() {
       await refetchUser()
 
       // redirect after user is fetched
-      router.push('/system')
+      router.push('/')
     } catch (err: any) {
       setError(err.message || 'Invalid credentials')
     } finally {

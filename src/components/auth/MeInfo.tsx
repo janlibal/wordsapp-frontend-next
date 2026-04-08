@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material'
-import { User } from '@/src/types/auth.types'
+import { User } from '@/src/types/auth/auth.types'
 
 type Props = {
   data: User

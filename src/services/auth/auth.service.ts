@@ -1,5 +1,10 @@
-import { apiFetch } from '../lib/fetcher'
-import { LoginDto, LoginResponse, RegisterDto, User } from '../types/auth.types'
+import { apiFetch } from '../../lib/fetcher'
+import {
+  LoginDto,
+  LoginResponse,
+  RegisterDto,
+  User,
+} from '../../types/auth/auth.types'
 
 export async function getCurrentUser(): Promise<User> {
   const res = await apiFetch<{ result: User }>('/api/api/v1/auth/me', {

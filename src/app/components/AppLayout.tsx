@@ -23,20 +23,26 @@ import AddIcon from '@mui/icons-material/Add'
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import ComputerIcon from '@mui/icons-material/Computer'
+import LocalOfferIcon from '@mui/icons-material/Sell'
 
 import Link from 'next/link'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import LoginIcon from '@mui/icons-material/Login'
 import LogoutIcon from '@mui/icons-material/Logout'
 import { useAuth } from '../context/authContext'
 import Person from '@mui/icons-material/Person'
+import TagsSidebar from '@/src/components/tags/TagsSidebar'
 
 const drawerWidth = 240
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+
+  const [value, setValue] = useState(searchParams.get('search') || '')
 
   const [mobileOpen, setMobileOpen] = useState(false)
 
@@ -44,21 +50,37 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     setMobileOpen(!mobileOpen)
   }
 
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value
+    setValue(val)
+
+    const params = new URLSearchParams(searchParams.toString())
+
+    if (val) {
+      params.set('search', val)
+    } else {
+      params.delete('search')
+    }
+
+    router.push(`/?${params.toString()}`)
+  }
+
   const { user, logout } = useAuth()
-  const router = useRouter()
 
   const drawerContent = (
     <List>
-      <ListItem disablePadding>
-        <ListItemButton
-          component={Link}
-          href="/"
-          onClick={() => setMobileOpen(false)}
-        >
-          <FormatQuoteIcon sx={{ mr: 2 }} />
-          <ListItemText primary="All Quotes" />
-        </ListItemButton>
-      </ListItem>
+      {user && (
+        <ListItem disablePadding>
+          <ListItemButton
+            component={Link}
+            href="/"
+            onClick={() => setMobileOpen(false)}
+          >
+            <FormatQuoteIcon sx={{ mr: 2 }} />
+            <ListItemText primary="All Words" />
+          </ListItemButton>
+        </ListItem>
+      )}
 
       {user && (
         <ListItem disablePadding>
@@ -85,6 +107,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </ListItemButton>
         </ListItem>
       )}
+      {user && (
+        <ListItem disablePadding>
+          <ListItemButton
+            component={Link}
+            href="/tags"
+            onClick={() => setMobileOpen(false)}
+          >
+            <LocalOfferIcon sx={{ mr: 2 }} />
+            <ListItemText primary="Tags" />
+          </ListItemButton>
+        </ListItem>
+      )}
+      {user && <TagsSidebar />}
     </List>
   )
 
@@ -108,7 +143,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 sx={{ cursor: 'pointer' }}
                 onClick={() => router.push('/')}
               >
-                WordsApp - III
+                WordsApp
               </Typography>
             </Box>
           ) : (
@@ -132,6 +167,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           {/* 🔹 CENTER */}
           {!isMobile && user && (
             <InputBase
+              value={value}
+              onChange={handleSearch}
               placeholder="Search words..."
               sx={{
                 background: 'rgba(255,255,255,0.15)',
@@ -151,7 +188,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <Button
                   color="inherit"
                   startIcon={<AddIcon />}
-                  onClick={() => router.push('/quotes/new')}
+                  onClick={() => router.push('/words/new')}
                 >
                   {isMobile ? '' : 'Add'}
                 </Button>

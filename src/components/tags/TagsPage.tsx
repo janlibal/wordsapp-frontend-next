@@ -1,8 +1,6 @@
-// app/favorites/FavoritesPage.tsx
-import { User } from '@/src/types/auth/auth.types'
 import { Box } from '@mui/material'
 
-export default function FavoritesPage() {
+export default function TagsPage() {
   return (
     <Box
       sx={{
@@ -15,7 +13,7 @@ export default function FavoritesPage() {
         gap: 2,
       }}
     >
-      <h1>Favorites</h1>
+      <h1>Tags</h1>
     </Box>
   )
 }

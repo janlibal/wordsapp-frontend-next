@@ -1,6 +1,6 @@
 services:
   client:
-    image: nest-frontend
+    image: next-frontend
     networks:
       - api-network
 

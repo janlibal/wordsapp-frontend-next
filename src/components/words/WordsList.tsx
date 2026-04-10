@@ -9,6 +9,34 @@ import WordCard from './WordCard'
 
 export default function WordsList() {
   const searchParams = useSearchParams()
+
+  const rawSearch = searchParams.get('search') || ''
+  const rawTags = searchParams.get('tags') || ''
+
+  const tags = rawTags ? rawTags.split(',') : []
+
+  // debounce only search
+  const [search] = useDebounce(rawSearch, 400)
+
+  const { data: words = [], isFetching } = useQuery({
+    queryKey: ['words', search, tags],
+    queryFn: () => getWords(search, tags),
+    placeholderData: (prev) => prev,
+  })
+
+  return (
+    <Box>
+      {isFetching && <p style={{ opacity: 0.5 }}>Updating...</p>}
+
+      {words.map((word) => (
+        <WordCard key={word.id} {...word} />
+      ))}
+    </Box>
+  )
+}
+
+/*export default function WordsList() {
+  const searchParams = useSearchParams()
   const rawSearch = searchParams.get('search') || ''
 
   // 🧠 debounce here
@@ -34,6 +62,7 @@ export default function WordsList() {
     </Box>
   )
 }
+  */
 
 /*'use client'
 

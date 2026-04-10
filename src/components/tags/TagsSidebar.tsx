@@ -1,63 +1,117 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Box, Typography, Chip, Collapse, IconButton } from '@mui/material'
-import ExpandLess from '@mui/icons-material/ExpandLess'
-import ExpandMore from '@mui/icons-material/ExpandMore'
+import { Box, Chip } from '@mui/material'
+import { useQuery } from '@tanstack/react-query'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useTheme, useMediaQuery } from '@mui/material'
 
 export default function TagsSidebar() {
-  const tags = ['caitlin', 'abcnews']
-  const [open, setOpen] = useState(false)
-
   const router = useRouter()
   const searchParams = useSearchParams()
-  const activeTag = searchParams.get('tag')
 
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const rawTags = searchParams.get('tags') || ''
+  const activeTags = rawTags ? rawTags.split(',') : []
 
+  // 🔥 fetch tags from backend
+  const { data: tags = [], isLoading } = useQuery({
+    queryKey: ['tags'],
+    queryFn: async () => {
+      const res = await fetch('/api/api/v1/tags')
+      const data = await res.json()
+      return data.result as { id: string; name: string }[]
+    },
+  })
+
+  const toggleTag = (tag: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+
+    let newTags = [...activeTags]
+
+    if (newTags.includes(tag)) {
+      newTags = newTags.filter((t) => t !== tag)
+    } else {
+      newTags.push(tag)
+    }
+
+    if (newTags.length) {
+      params.set('tags', newTags.join(','))
+    } else {
+      params.delete('tags')
+    }
+
+    router.replace(`/?${params.toString()}`)
+  }
+
+  if (isLoading) return <p>Loading tags...</p>
   if (!tags.length) return null
 
   return (
     <Box sx={{ px: 2, mt: 2 }}>
-      {/* HEADER */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          cursor: 'pointer',
-        }}
-        onClick={() => setOpen(!open)}
-      >
-        <Typography variant="subtitle2">Tags</Typography>
-        {isMobile && (open ? <ExpandLess /> : <ExpandMore />)}
-      </Box>
+      {tags.map((tag) => {
+        const isActive = activeTags.includes(tag.name)
 
-      {/* CHIP LIST */}
-      <Collapse in={open || !isMobile}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 1,
-            mt: 1,
-          }}
-        >
-          {tags.map((tag) => (
-            <Chip
-              key={tag}
-              label={`#${tag}`}
-              clickable
-              color={tag === activeTag ? 'primary' : 'default'}
-              variant={tag === activeTag ? 'filled' : 'outlined'}
-              onClick={() => router.push(`/?tag=${tag}`)}
-            />
-          ))}
-        </Box>
-      </Collapse>
+        return (
+          <Chip
+            key={tag.id}
+            label={`#${tag.name}`}
+            clickable
+            color={isActive ? 'primary' : 'default'}
+            variant={isActive ? 'filled' : 'outlined'}
+            onClick={() => toggleTag(tag.name)}
+          />
+        )
+      })}
     </Box>
   )
 }
+
+/*
+export default function TagsSidebar() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  const rawTags = searchParams.get('tags') || ''
+  const activeTags = rawTags ? rawTags.split(',') : []
+
+  const toggleTag = (tag: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+
+    let newTags = [...activeTags]
+
+    if (newTags.includes(tag)) {
+      newTags = newTags.filter((t) => t !== tag)
+    } else {
+      newTags.push(tag)
+    }
+
+    if (newTags.length) {
+      params.set('tags', newTags.join(','))
+    } else {
+      params.delete('tags')
+    }
+
+    router.replace(`/?${params.toString()}`)
+  }
+
+  // example static tags for now
+  const tags = ['caitlin', 'abcnews']
+
+  return (
+    <Box>
+      {tags.map((tag) => {
+        const isActive = activeTags.includes(tag)
+
+        return (
+          <Chip
+            key={tag}
+            label={`#${tag}`}
+            clickable
+            color={isActive ? 'primary' : 'default'}
+            variant={isActive ? 'filled' : 'outlined'}
+            onClick={() => toggleTag(tag)}
+          />
+        )
+      })}
+    </Box>
+  )
+}
+ */

@@ -16,12 +16,28 @@ export function createWord(data: CreateWordDto): Promise<void> {
   return res.result
 }*/
 
-export async function getWords(search?: string): Promise<Word[]> {
+/*export async function getWords(search?: string): Promise<Word[]> {
   const query = search ? `?search=${encodeURIComponent(search)}` : ''
 
   const res = await apiFetch<{ result: Word[] }>(`/api/api/v1/words${query}`, {
     method: 'GET',
   })
+  return res.result
+}*/
+
+export async function getWords(
+  search?: string,
+  tags: string[] = []
+): Promise<Word[]> {
+  const params = new URLSearchParams()
+
+  if (search) params.set('search', search)
+  if (tags.length) params.set('tags', tags.join(','))
+
+  const res = await apiFetch<{ result: Word[] }>(
+    `/api/api/v1/words?${params.toString()}`
+  )
+
   return res.result
 }
 

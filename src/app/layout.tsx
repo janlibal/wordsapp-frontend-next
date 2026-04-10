@@ -5,6 +5,7 @@ import { CssBaseline } from '@mui/material'
 import AppLayout from './components/AppLayout'
 import theme from './theme'
 import { AuthProvider } from './context/authContext'
+import Providers from './providers'
 
 export default function RootLayout({
   children,
@@ -17,7 +18,9 @@ export default function RootLayout({
         <AuthProvider>
           <ThemeProvider theme={theme}>
             <CssBaseline />
-            <AppLayout>{children}</AppLayout>
+            <Providers>
+              <AppLayout>{children}</AppLayout>
+            </Providers>
           </ThemeProvider>
         </AuthProvider>
       </body>

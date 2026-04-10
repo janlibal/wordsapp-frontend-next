@@ -9,12 +9,12 @@ export function createWord(data: CreateWordDto): Promise<void> {
   })
 }
 
-export async function getWords1(): Promise<Word[]> {
+/*export async function getWords(): Promise<Word[]> {
   const res = await apiFetch<{ result: Word[] }>('/api/api/v1/words', {
     method: 'GET',
   })
   return res.result
-}
+}*/
 
 export async function getWords(search?: string): Promise<Word[]> {
   const query = search ? `?search=${encodeURIComponent(search)}` : ''
@@ -22,7 +22,6 @@ export async function getWords(search?: string): Promise<Word[]> {
   const res = await apiFetch<{ result: Word[] }>(`/api/api/v1/words${query}`, {
     method: 'GET',
   })
-
   return res.result
 }
 

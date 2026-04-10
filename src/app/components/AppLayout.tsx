@@ -62,7 +62,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       params.delete('search')
     }
 
-    router.push(`/?${params.toString()}`)
+    router.replace(params.toString() ? `/?${params}` : '/')
   }
 
   const { user, logout } = useAuth()

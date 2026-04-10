@@ -1,5 +1,5 @@
 export type Word = {
-  id?: string
+  id: string
   content: string
-  tags?: string[]
+  tags: string[]
 }

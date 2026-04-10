@@ -1,5 +1,6 @@
 'use client'
 
+import { Tag } from '@/src/types/tags/tag.type'
 import { Box, Chip } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -11,13 +12,12 @@ export default function TagsSidebar() {
   const rawTags = searchParams.get('tags') || ''
   const activeTags = rawTags ? rawTags.split(',') : []
 
-  // 🔥 fetch tags from backend
-  const { data: tags = [], isLoading } = useQuery({
+  const { data: tags = [], isLoading } = useQuery<Tag[]>({
     queryKey: ['tags'],
     queryFn: async () => {
       const res = await fetch('/api/api/v1/tags')
       const data = await res.json()
-      return data.result as { id: string; name: string }[]
+      return data.result
     },
   })
 
@@ -46,20 +46,22 @@ export default function TagsSidebar() {
 
   return (
     <Box sx={{ px: 2, mt: 2 }}>
-      {tags.map((tag) => {
-        const isActive = activeTags.includes(tag.name)
+      {tags
+        .filter((tag) => tag.count > 0)
+        .map((tag) => {
+          const isActive = activeTags.includes(tag.name)
 
-        return (
-          <Chip
-            key={tag.id}
-            label={`#${tag.name}`}
-            clickable
-            color={isActive ? 'primary' : 'default'}
-            variant={isActive ? 'filled' : 'outlined'}
-            onClick={() => toggleTag(tag.name)}
-          />
-        )
-      })}
+          return (
+            <Chip
+              key={tag.id}
+              label={`#${tag.name} (${tag.count})`}
+              clickable
+              color={isActive ? 'primary' : 'default'}
+              variant={isActive ? 'filled' : 'outlined'}
+              onClick={() => toggleTag(tag.name)}
+            />
+          )
+        })}
     </Box>
   )
 }

@@ -10,7 +10,7 @@ export default function TagsSidebar() {
   const searchParams = useSearchParams()
 
   const rawTags = searchParams.get('tags') || ''
-  const activeTags = rawTags ? rawTags.split(',') : []
+  const activeTagIds = rawTags ? rawTags.split(',') : []
 
   const { data: tags = [], isLoading } = useQuery<Tag[]>({
     queryKey: ['tags'],
@@ -19,17 +19,18 @@ export default function TagsSidebar() {
       const data = await res.json()
       return data.result
     },
+    staleTime: 30_000, // optional
   })
 
-  const toggleTag = (tag: string) => {
+  const toggleTag = (tagId: string) => {
     const params = new URLSearchParams(searchParams.toString())
 
-    let newTags = [...activeTags]
+    let newTags = [...activeTagIds]
 
-    if (newTags.includes(tag)) {
-      newTags = newTags.filter((t) => t !== tag)
+    if (newTags.includes(tagId)) {
+      newTags = newTags.filter((t) => t !== tagId)
     } else {
-      newTags.push(tag)
+      newTags.push(tagId)
     }
 
     if (newTags.length) {
@@ -49,7 +50,7 @@ export default function TagsSidebar() {
       {tags
         .filter((tag) => tag.count > 0)
         .map((tag) => {
-          const isActive = activeTags.includes(tag.name)
+          const isActive = activeTagIds.includes(tag.id)
 
           return (
             <Chip
@@ -58,7 +59,7 @@ export default function TagsSidebar() {
               clickable
               color={isActive ? 'primary' : 'default'}
               variant={isActive ? 'filled' : 'outlined'}
-              onClick={() => toggleTag(tag.name)}
+              onClick={() => toggleTag(tag.id)}
             />
           )
         })}

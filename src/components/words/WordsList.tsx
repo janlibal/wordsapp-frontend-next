@@ -10,6 +10,34 @@ import WordCard from './WordCard'
 export default function WordsList() {
   const searchParams = useSearchParams()
 
+  // 🔍 read from URL (single source of truth)
+  const search = searchParams.get('search') || ''
+  const rawTags = searchParams.get('tags') || ''
+  const tagIds = rawTags ? rawTags.split(',') : []
+
+  // 📦 fetch data
+  const { data: words = [], isFetching } = useQuery({
+    queryKey: ['words', search, tagIds],
+    queryFn: () => getWords(search, tagIds),
+    staleTime: 30_000,
+  })
+
+  return (
+    <Box>
+      {isFetching && <p style={{ opacity: 0.5 }}>Updating...</p>}
+
+      {!words.length && !isFetching && <p>No words found</p>}
+
+      {words.map((word) => (
+        <WordCard key={word.id} {...word} search={search} />
+      ))}
+    </Box>
+  )
+}
+
+/*export default function WordsList() {
+  const searchParams = useSearchParams()
+
   const rawSearch = searchParams.get('search') || ''
   const rawTags = searchParams.get('tags') || ''
 
@@ -33,7 +61,7 @@ export default function WordsList() {
       ))}
     </Box>
   )
-}
+}*/
 
 /*export default function WordsList() {
   const searchParams = useSearchParams()

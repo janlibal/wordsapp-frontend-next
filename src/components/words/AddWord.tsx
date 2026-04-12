@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Box, TextField, Button, Chip, Stack } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { createWord } from '@/src/services/words/word.service'
+import { useQueryClient } from '@tanstack/react-query'
 
 export default function AddWord() {
   const router = useRouter()
@@ -13,6 +14,7 @@ export default function AddWord() {
   const [tags, setTags] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const queryClient = useQueryClient()
 
   const addTag = () => {
     if (!tagInput.trim()) return
@@ -34,6 +36,10 @@ export default function AddWord() {
         content,
         tags,
       })
+
+      queryClient.invalidateQueries({ queryKey: ['words'] })
+      queryClient.invalidateQueries({ queryKey: ['tags'] })
+      queryClient.refetchQueries({ queryKey: ['tags'] })
 
       router.push('/') // redirect after success
     } catch (err: any) {

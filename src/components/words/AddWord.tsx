@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Box, TextField, Button, Chip, Stack } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { createWord } from '@/src/services/words/word.service'
@@ -15,6 +15,7 @@ export default function AddWord() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const queryClient = useQueryClient()
+  const inputRef = useRef<HTMLInputElement | null>(null)
 
   const addTag = () => {
     if (!tagInput.trim()) return
@@ -49,6 +50,10 @@ export default function AddWord() {
     }
   }
 
+  useEffect(() => {
+    inputRef.current?.focus()
+  }, [])
+
   return (
     <Box
       sx={{
@@ -71,6 +76,7 @@ export default function AddWord() {
           value={content}
           onChange={(e) => setContent(e.target.value)}
           required
+          inputRef={inputRef}
         />
 
         {/* TAG INPUT */}

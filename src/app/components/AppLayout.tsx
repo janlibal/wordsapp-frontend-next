@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
 import {
   AppBar,
   Toolbar,
   Typography,
   IconButton,
+  Button,
   Box,
   Drawer,
   List,
@@ -13,28 +13,40 @@ import {
   ListItemButton,
   ListItemText,
   InputBase,
-  Button,
   useTheme,
   useMediaQuery,
+  Menu,
+  MenuItem,
+  Divider,
 } from '@mui/material'
 
 import MenuIcon from '@mui/icons-material/Menu'
 import AddIcon from '@mui/icons-material/Add'
-import FormatQuoteIcon from '@mui/icons-material/FormatQuote'
+import LogoutIcon from '@mui/icons-material/Logout'
+import Person from '@mui/icons-material/Person'
 import FavoriteIcon from '@mui/icons-material/Favorite'
+import FormatQuoteIcon from '@mui/icons-material/FormatQuote'
 import ComputerIcon from '@mui/icons-material/Computer'
-import LocalOfferIcon from '@mui/icons-material/Sell'
-
-import Link from 'next/link'
+import LocalOfferIcon from '@mui/icons-material/LocalOffer'
+import SearchIcon from '@mui/icons-material/Search'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import LoginIcon from '@mui/icons-material/Login'
-import LogoutIcon from '@mui/icons-material/Logout'
+import { useState, useMemo } from 'react'
+import Link from 'next/link'
 import { useAuth } from '../context/authContext'
-import Person from '@mui/icons-material/Person'
 import TagsSidebar from '@/src/components/tags/TagsSidebar'
 
 const drawerWidth = 240
+
+type NavItem = {
+  label: string
+  icon: React.ReactNode
+  href?: string
+  action?: () => void
+  showInDrawer?: boolean
+  showInMenu?: boolean
+  mobileMenu?: boolean
+}
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -42,13 +54,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
+  const { user, logout } = useAuth()
+
   const [value, setValue] = useState(searchParams.get('search') || '')
-
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen)
-  }
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) =>
+    setAnchorEl(event.currentTarget)
+
+  const handleMenuClose = () => setAnchorEl(null)
+
+  const handleDrawerToggle = () => setMobileOpen(!mobileOpen)
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value
@@ -56,69 +73,92 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
     const params = new URLSearchParams(searchParams.toString())
 
-    if (val) {
-      params.set('search', val)
-    } else {
-      params.delete('search')
-    }
+    if (val) params.set('search', val)
+    else params.delete('search')
 
     router.replace(params.toString() ? `/?${params}` : '/')
   }
 
-  const { user, logout } = useAuth()
+  // 🔥 SINGLE SOURCE OF TRUTH
+  const navItems: NavItem[] = useMemo(() => {
+    if (!user) return []
 
+    return [
+      {
+        label: 'All Words',
+        icon: <FormatQuoteIcon />,
+        href: '/',
+        showInDrawer: true,
+      },
+      {
+        label: 'Favorites',
+        icon: <FavoriteIcon />,
+        href: '/favorites',
+        showInDrawer: true,
+      },
+      {
+        label: 'System',
+        icon: <ComputerIcon />,
+        href: '/system',
+        showInDrawer: true,
+        showInMenu: true,
+        mobileMenu: false,
+      },
+      {
+        label: 'Tags',
+        icon: <LocalOfferIcon />,
+        href: '/tags',
+        showInDrawer: true,
+      },
+      {
+        label: 'Me',
+        icon: <Person />,
+        href: '/me',
+        showInMenu: true,
+        mobileMenu: true,
+      },
+      {
+        label: 'Logout',
+        icon: <LogoutIcon />,
+        action: async () => {
+          await logout()
+          router.push('/login')
+        },
+        showInMenu: true,
+        mobileMenu: true,
+      },
+    ]
+  }, [user, logout, router])
+
+  // 🎯 FILTERED VIEWS
+  const drawerItems = navItems.filter((i) => i.showInDrawer)
+
+  const menuItems = navItems.filter(
+    (i) => i.showInMenu && (!isMobile || i.mobileMenu)
+  )
+
+  const regularMenuItems = menuItems.filter((i) => i.label !== 'Logout')
+  const logoutItem = menuItems.find((i) => i.label === 'Logout')
+
+  // 📂 DRAWER
   const drawerContent = (
     <List>
-      {user && (
-        <ListItem disablePadding>
+      {drawerItems.map((item) => (
+        <ListItem key={item.label} disablePadding>
           <ListItemButton
-            component={Link}
-            href="/"
-            onClick={() => setMobileOpen(false)}
+            component={item.href ? Link : 'button'}
+            href={item.href}
+            onClick={() => {
+              setMobileOpen(false)
+              if (item.action) item.action()
+            }}
           >
-            <FormatQuoteIcon sx={{ mr: 2 }} />
-            <ListItemText primary="All Words" />
+            <Box sx={{ mr: 2 }}>{item.icon}</Box>
+            <ListItemText primary={item.label} />
           </ListItemButton>
         </ListItem>
-      )}
+      ))}
 
-      {user && (
-        <ListItem disablePadding>
-          <ListItemButton
-            component={Link}
-            href="/favorites"
-            onClick={() => setMobileOpen(false)}
-          >
-            <FavoriteIcon sx={{ mr: 2 }} />
-            <ListItemText primary="Favorites" />
-          </ListItemButton>
-        </ListItem>
-      )}
-
-      {user && (
-        <ListItem disablePadding>
-          <ListItemButton
-            component={Link}
-            href="/system"
-            onClick={() => setMobileOpen(false)}
-          >
-            <ComputerIcon sx={{ mr: 2 }} />
-            <ListItemText primary="System" />
-          </ListItemButton>
-        </ListItem>
-      )}
-      {user && (
-        <ListItem disablePadding>
-          <ListItemButton
-            component={Link}
-            href="/tags"
-            onClick={() => setMobileOpen(false)}
-          >
-            <LocalOfferIcon sx={{ mr: 2 }} />
-            <ListItemText primary="Tags" />
-          </ListItemButton>
-        </ListItem>
-      )}
       {user && <TagsSidebar />}
     </List>
   )
@@ -128,43 +168,24 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       {/* 🔝 APP BAR */}
       <AppBar position="fixed">
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          {/* 🔹 LEFT */}
+          {/* LEFT */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {isMobile && (
+              <IconButton color="inherit" onClick={handleDrawerToggle}>
+                <MenuIcon />
+              </IconButton>
+            )}
 
-          {user ? (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              {isMobile && (
-                <IconButton color="inherit" onClick={handleDrawerToggle}>
-                  <MenuIcon />
-                </IconButton>
-              )}
+            <Typography
+              variant="h6"
+              sx={{ cursor: 'pointer' }}
+              onClick={() => router.push('/')}
+            >
+              WordsApp
+            </Typography>
+          </Box>
 
-              <Typography
-                variant="h6"
-                sx={{ cursor: 'pointer' }}
-                onClick={() => router.push('/')}
-              >
-                WordsApp
-              </Typography>
-            </Box>
-          ) : (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              {isMobile && (
-                <IconButton color="inherit" onClick={handleDrawerToggle}>
-                  <MenuIcon />
-                </IconButton>
-              )}
-
-              <Typography
-                variant="h6"
-                sx={{ cursor: 'pointer' }}
-                onClick={() => router.push('/')}
-              >
-                WordsApp
-              </Typography>
-            </Box>
-          )}
-
-          {/* 🔹 CENTER */}
+          {/* CENTER */}
           {!isMobile && user && (
             <InputBase
               value={value}
@@ -181,36 +202,81 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             />
           )}
 
-          {/* 🔹 RIGHT */}
+          {/* RIGHT */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {user ? (
               <>
-                <Button
-                  color="inherit"
-                  startIcon={<AddIcon />}
-                  onClick={() => router.push('/words/new')}
-                >
-                  {isMobile ? '' : 'Add'}
-                </Button>
+                {isMobile && (
+                  <IconButton
+                    color="inherit"
+                    onClick={() => router.push('/search')}
+                  >
+                    <SearchIcon />
+                  </IconButton>
+                )}
 
-                <Button
-                  color="inherit"
-                  startIcon={<LogoutIcon />}
-                  onClick={async () => {
-                    await logout()
-                    router.push('/login')
-                  }}
-                >
-                  {isMobile ? '' : 'Logout'}
-                </Button>
+                {isMobile ? (
+                  <IconButton
+                    color="inherit"
+                    onClick={() => router.push('/words/new')}
+                  >
+                    <AddIcon />
+                  </IconButton>
+                ) : (
+                  <Button
+                    color="inherit"
+                    startIcon={<AddIcon />}
+                    onClick={() => router.push('/words/new')}
+                  >
+                    Add
+                  </Button>
+                )}
 
-                <Button
-                  color="inherit"
-                  startIcon={<Person />}
-                  onClick={() => router.push('/me')}
+                <IconButton color="inherit" onClick={handleMenuOpen}>
+                  <Person />
+                </IconButton>
+
+                {/* 🔽 DROPDOWN */}
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleMenuClose}
+                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                  transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                  PaperProps={{ sx: { minWidth: 180, mt: 1 } }}
                 >
-                  {isMobile ? '' : 'Me'}
-                </Button>
+                  {/* Regular items */}
+                  {regularMenuItems.map((item) => (
+                    <MenuItem
+                      key={item.label}
+                      sx={{ py: 1.5 }}
+                      onClick={async () => {
+                        handleMenuClose()
+                        if (item.href) router.push(item.href)
+                        if (item.action) await item.action()
+                      }}
+                    >
+                      <Box sx={{ mr: 1 }}>{item.icon}</Box>
+                      {item.label}
+                    </MenuItem>
+                  ))}
+
+                  {/* Logout separated */}
+                  {logoutItem && [
+                    <Divider key="divider" />,
+                    <MenuItem
+                      key="logout"
+                      sx={{ py: 1.5, color: 'error.main' }}
+                      onClick={async () => {
+                        handleMenuClose()
+                        if (logoutItem.action) await logoutItem.action()
+                      }}
+                    >
+                      <Box sx={{ mr: 1 }}>{logoutItem.icon}</Box>
+                      {logoutItem.label}
+                    </MenuItem>,
+                  ]}
+                </Menu>
               </>
             ) : (
               <>
@@ -237,6 +303,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           open={mobileOpen}
           onClose={handleDrawerToggle}
           ModalProps={{ keepMounted: true }}
+          PaperProps={{ sx: { width: drawerWidth } }}
         >
           {drawerContent}
         </Drawer>
@@ -257,7 +324,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </Drawer>
       )}
 
-      {/* 📄 MAIN CONTENT */}
+      {/* MAIN */}
       <Box
         component="main"
         sx={{

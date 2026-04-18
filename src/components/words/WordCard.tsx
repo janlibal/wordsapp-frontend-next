@@ -20,8 +20,6 @@ import { useUpdateWord } from '@/src/hooks/useUpdateHook'
 type WordCardProps = {
   id: string
   content: string
-  author?: string
-  source?: string
   tags: string[]
   search?: string
   onUpdate?: (
@@ -30,14 +28,7 @@ type WordCardProps = {
   ) => Promise<void>
 }
 
-export default function WordCard({
-  id,
-  content,
-  author,
-  source,
-  search,
-  tags,
-}: WordCardProps) {
+export default function WordCard({ id, content, search, tags }: WordCardProps) {
   const [editing, setEditing] = useState(false)
   const [editedContent, setEditedContent] = useState(content)
   const [editedTags, setEditedTags] = useState(tags)
@@ -104,9 +95,9 @@ export default function WordCard({
           </IconButton>
         </Box>
 
-        {(author || source) && !editing && (
+        {tags && !editing && (
           <Typography variant="body2" color="text.secondary">
-            — {author} {source ? `, ${source}` : ''}
+            — {tags.map((f) => f)} {/*{source ? `, ${source}` : ''}*/}
           </Typography>
         )}
 
@@ -162,8 +153,8 @@ export default function WordCard({
 export function WordCardNEw({
   id,
   content,
-  author,
-  source,
+  //author,
+  //source,
   tags,
   search,
   onUpdate,
@@ -235,12 +226,12 @@ export function WordCardNEw({
           </IconButton>
         </Box>
 
-        {/* 👤 metadata */}
+        {/* 👤 metadata 
         {(author || source) && !editing && (
           <Typography variant="caption" color="text.secondary">
             {author && `— ${author}`} {source && `(${source})`}
           </Typography>
-        )}
+        )}*/}
 
         {/* 🏷️ tags */}
         <Stack direction="row" spacing={1} mt={2} flexWrap="wrap">

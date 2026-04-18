@@ -1,5 +1,6 @@
 'use client'
 
+import { getTags } from '@/src/services/tags/tag.service'
 import { Tag } from '@/src/types/tags/tag.type'
 import { Box, Chip } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
@@ -12,7 +13,7 @@ export default function TagsSidebar() {
   const rawTags = searchParams.get('tags') || ''
   const activeTagIds = rawTags ? rawTags.split(',') : []
 
-  const { data: tags = [], isLoading } = useQuery<Tag[]>({
+  /*const { data: tags = [], isLoading } = useQuery<Tag[]>({
     queryKey: ['tags'],
     queryFn: async () => {
       const res = await fetch('/api/api/v1/tags')
@@ -20,6 +21,13 @@ export default function TagsSidebar() {
       return data.result
     },
     staleTime: 30_000, // optional
+  })*/
+
+  // 📦 fetch data
+  const { data: tags = [], isLoading } = useQuery<Tag[]>({
+    queryKey: ['tags'],
+    queryFn: () => getTags(),
+    staleTime: 30_000,
   })
 
   const toggleTag = (tagId: string) => {

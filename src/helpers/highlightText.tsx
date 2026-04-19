@@ -1,26 +1,28 @@
-export function highlightText(text: string, query: string) {
-  if (!query) return text
+export function highlightText(content: string, search?: string) {
+  if (!search) return content
 
-  // escape regex special chars
-  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const terms = search.toLowerCase().split(' ').filter(Boolean)
 
-  const regex = new RegExp(`(${escaped})`, 'gi')
-  const parts = text.split(regex)
+  if (!terms.length) return content
 
-  return parts.map((part, i) =>
-    part.toLowerCase() === query.toLowerCase() ? (
-      <mark
+  const regex = new RegExp(`(${terms.join('|')})`, 'gi')
+
+  return content.split(regex).map((part, i) => {
+    const match = terms.includes(part.toLowerCase())
+
+    return match ? (
+      <span
         key={i}
         style={{
-          backgroundColor: '#ffe58a',
+          backgroundColor: '#ffe58f',
           padding: '0 2px',
           borderRadius: '2px',
         }}
       >
         {part}
-      </mark>
+      </span>
     ) : (
       part
     )
-  )
+  })
 }

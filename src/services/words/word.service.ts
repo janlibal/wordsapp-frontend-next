@@ -61,12 +61,9 @@ export async function updateWord(
   id: string,
   data: {
     content?: string
-    //tags?: string[]
+    tags?: string[]
   }
 ) {
-  console.log('id ', id)
-  console.log('content ', data.content)
-  //console.log('tags ', data.tags)
   return apiFetch<Omit<Word, 'userId'>>(`/api/api/v1/words/${id}`, {
     method: 'PATCH',
     body: JSON.stringify(data),

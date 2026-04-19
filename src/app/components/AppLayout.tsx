@@ -31,10 +31,11 @@ import LocalOfferIcon from '@mui/icons-material/LocalOffer'
 import SearchIcon from '@mui/icons-material/Search'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import { useAuth } from '../context/authContext'
 import TagsSidebar from '@/src/components/tags/TagsSidebar'
+import { useDebouncedValue } from '@/src/hooks/useDebounceValue'
 
 const drawerWidth = 240
 
@@ -59,6 +60,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [value, setValue] = useState(searchParams.get('search') || '')
   const [mobileOpen, setMobileOpen] = useState(false)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+
+  const debounced = useDebouncedValue(value, 400)
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString())
+
+    if (debounced) params.set('search', debounced)
+    else params.delete('search')
+
+    router.replace(`/?${params.toString()}`)
+  }, [debounced])
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) =>
     setAnchorEl(event.currentTarget)

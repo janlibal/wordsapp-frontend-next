@@ -1,64 +1,39 @@
 'use client'
 
-import { getTags } from '@/src/services/tags/tag.service'
-import { Tag } from '@/src/types/tags/tag.type'
-import { Box, Chip } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { Box, Chip } from '@mui/material'
+import { useUrlFilters } from '@/src/hooks/useFilters'
+import { Tag } from '@/src/types/tags/tag.type'
+import { getTags } from '@/src/services/tags/tag.service'
 
 export default function TagsSidebar() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+  const { tags: activeTags, toggleTag } = useUrlFilters()
 
-  const rawTags = searchParams.get('tags') || ''
-  const activeTagIds = rawTags ? rawTags.split(',') : []
+  // 📦 fetch tags
 
-  /*const { data: tags = [], isLoading } = useQuery<Tag[]>({
-    queryKey: ['tags'],
-    queryFn: async () => {
-      const res = await fetch('/api/api/v1/tags')
-      const data = await res.json()
-      return data.result
-    },
-    staleTime: 30_000, // optional
-  })*/
-
-  // 📦 fetch data
   const { data: tags = [], isLoading } = useQuery<Tag[]>({
     queryKey: ['tags'],
     queryFn: () => getTags(),
     staleTime: 30_000,
   })
 
-  const toggleTag = (tagId: string) => {
-    const params = new URLSearchParams(searchParams.toString())
-
-    let newTags = [...activeTagIds]
-
-    if (newTags.includes(tagId)) {
-      newTags = newTags.filter((t) => t !== tagId)
-    } else {
-      newTags.push(tagId)
-    }
-
-    if (newTags.length) {
-      params.set('tags', newTags.join(','))
-    } else {
-      params.delete('tags')
-    }
-
-    router.replace(`/?${params.toString()}`)
-  }
-
   if (isLoading) return <p>Loading tags...</p>
   if (!tags.length) return null
 
   return (
-    <Box sx={{ px: 2, mt: 2 }}>
+    <Box
+      sx={{
+        px: 2,
+        mt: 2,
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: 1,
+      }}
+    >
       {tags
         .filter((tag) => tag.count > 0)
         .map((tag) => {
-          const isActive = activeTagIds.includes(tag.id)
+          const isActive = activeTags.includes(tag.id)
 
           return (
             <Chip

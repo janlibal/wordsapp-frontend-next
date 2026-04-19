@@ -11,6 +11,5 @@ export async function getTags(
   if (tagIds.length) params.set('tags', tagIds.join(','))
 
   const res = await apiFetch<{ result: Tag[] }>(`/api/api/v1/tags`)
-  console.log('results: ', res.result)
   return res.result
 }

@@ -1,22 +1,22 @@
-import { useUpdateWord } from '@/src/hooks/useUpdateHook'
-import { Tag } from '@/src/types/tags/tag.type'
 import {
-  Autocomplete,
-  Box,
-  Button,
   Card,
   CardContent,
-  Chip,
-  IconButton,
-  TextField,
   Typography,
+  Box,
+  TextField,
+  IconButton,
+  Button,
+  Chip,
+  Autocomplete,
 } from '@mui/material'
-import { useEffect, useState } from 'react'
 import EditIcon from '@mui/icons-material/Edit'
 import CloseIcon from '@mui/icons-material/Close'
-import { highlightText } from '@/src/helpers/highlightText'
+import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { Tag } from '@/src/types/tags/tag.type'
+import { useUpdateWord } from '@/src/hooks/useUpdateHook'
 import { getTags } from '@/src/services/tags/tag.service'
+import { highlightText } from '@/src/helpers/highlightText'
 import {
   addTagToWord,
   removeTagFromWord,
@@ -25,24 +25,25 @@ import {
 type WordCardProps = {
   id: string
   content: string
-  search: string
   tags: Tag[]
+  search?: string
 }
 
-export default function WordCard({ id, content, search, tags }: WordCardProps) {
+export default function WordCard({ id, content, tags, search }: WordCardProps) {
   const [editing, setEditing] = useState(false)
   const [editedContent, setEditedContent] = useState(content)
   const [selectedTags, setSelectedTags] = useState<Tag[]>(tags)
 
   const mutation = useUpdateWord()
 
+  // fetch all tags for selector
   const { data: allTags = [] } = useQuery<Tag[]>({
     queryKey: ['tags'],
     queryFn: () => getTags(),
     staleTime: 30_000,
   })
 
-  // 🔁 keep local state in sync after refetch
+  // sync when backend updates
   useEffect(() => {
     setEditedContent(content)
     setSelectedTags(tags)
@@ -53,7 +54,6 @@ export default function WordCard({ id, content, search, tags }: WordCardProps) {
       id,
       data: {
         content: editedContent,
-        tagIds: selectedTags.map((t) => t.id),
       },
     })
 
@@ -69,26 +69,19 @@ export default function WordCard({ id, content, search, tags }: WordCardProps) {
       (t) => !newTags.some((nt) => nt.id === t.id)
     )
 
-    // optimistic update
     setSelectedTags(newTags)
 
-    // add new tags
-    await Promise.all(added.map((tag) => addTagToWord(id, tag.id)))
-
-    // remove tags (if backend supports it)
-    await Promise.all(removed.map((tag) => removeTagFromWord(id, tag.id)))
-  }
-
-  const handleCancel = () => {
-    setEditedContent(content)
-    setEditing(false)
+    await Promise.all([
+      ...added.map((t) => addTagToWord(id, t.id)),
+      ...removed.map((t) => removeTagFromWord(id, t.id)),
+    ])
   }
 
   return (
     <Card sx={{ mb: 2 }}>
       <CardContent>
         {/* CONTENT */}
-        <Box display="flex" gap={1}>
+        <Box display="flex" alignItems="flex-start" gap={1}>
           {editing ? (
             <TextField
               fullWidth
@@ -107,15 +100,24 @@ export default function WordCard({ id, content, search, tags }: WordCardProps) {
           </IconButton>
         </Box>
 
-        {/* TAGS */}
-        {editing ? (
+        {/* TAGS (VIEW MODE) */}
+        {!editing && tags.length > 0 && (
+          <Box mt={1}>
+            <Typography variant="body2" color="text.secondary">
+              {tags.map((t) => t.name).join(', ')}
+            </Typography>
+          </Box>
+        )}
+
+        {/* TAGS (EDIT MODE) */}
+        {editing && (
           <Autocomplete
             multiple
             options={allTags}
             value={selectedTags}
             onChange={(_, newValue) => handleTagChange(newValue)}
             isOptionEqualToValue={(a, b) => a.id === b.id}
-            getOptionLabel={(o) => o.name}
+            getOptionLabel={(option) => option.name}
             renderTags={(value, getTagProps) =>
               value.map((option, index) => (
                 <Chip
@@ -128,12 +130,6 @@ export default function WordCard({ id, content, search, tags }: WordCardProps) {
             renderInput={(params) => <TextField {...params} label="Tags" />}
             sx={{ mt: 2 }}
           />
-        ) : (
-          tags.length > 0 && (
-            <Typography variant="body2" color="text.secondary" mt={1}>
-              {tags.map((t) => t.name).join(', ')}
-            </Typography>
-          )
         )}
 
         {/* ACTIONS */}

@@ -6,17 +6,11 @@ export function useUpdateWord() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({
-      id,
-      data,
-    }: {
-      id: string
-      data: { content: string; tagIds: string[] }
-    }) => updateWord(id, data),
+    mutationFn: ({ id, data }: { id: string; data: { content: string } }) =>
+      updateWord(id, data),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['words'] })
-      queryClient.invalidateQueries({ queryKey: ['tags'] })
     },
   })
 }

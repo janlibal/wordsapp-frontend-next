@@ -6,7 +6,11 @@ import { useUrlFilters } from '@/src/hooks/useFilters'
 import { Tag } from '@/src/types/tags/tag.type'
 import { getTags } from '@/src/services/tags/tag.service'
 
-export default function TagsSidebar() {
+type Props = {
+  onSelect?: () => void
+}
+
+export default function TagsSidebar({ onSelect }: Props) {
   const { tags: activeTags, toggleTag } = useUrlFilters()
 
   // 📦 fetch tags
@@ -42,7 +46,10 @@ export default function TagsSidebar() {
               clickable
               color={isActive ? 'primary' : 'default'}
               variant={isActive ? 'filled' : 'outlined'}
-              onClick={() => toggleTag(tag.id)}
+              onClick={() => {
+                toggleTag(tag.id)
+                onSelect?.()
+              }}
             />
           )
         })}

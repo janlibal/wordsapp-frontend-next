@@ -54,6 +54,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
 
   const { user, logout } = useAuth()
 
@@ -171,7 +172,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </ListItem>
       ))}
 
-      {user && <TagsSidebar />}
+      {user && <TagsSidebar onSelect={() => setMobileOpen(false)} />}
     </List>
   )
 
@@ -214,6 +215,35 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             />
           )}
 
+          {isMobile && mobileSearchOpen && (
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 56,
+                left: 0,
+                right: 0,
+                p: 1,
+                background: 'background.paper',
+                zIndex: 1200,
+              }}
+            >
+              <InputBase
+                autoFocus
+                fullWidth
+                value={value}
+                onChange={handleSearch}
+                onBlur={() => setMobileSearchOpen(false)}
+                placeholder="Search words..."
+                sx={{
+                  px: 2,
+                  py: 1,
+                  borderRadius: 1,
+                  backgroundColor: 'rgba(0,0,0,0.05)',
+                }}
+              />
+            </Box>
+          )}
+
           {/* RIGHT */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {user ? (
@@ -221,7 +251,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 {isMobile && (
                   <IconButton
                     color="inherit"
-                    onClick={() => router.push('/search')}
+                    onClick={() => setMobileSearchOpen(true)}
                   >
                     <SearchIcon />
                   </IconButton>

@@ -43,24 +43,42 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
     staleTime: 30_000,
   })
 
-  // sync when backend updates
-  useEffect(() => {
-    setEditedContent(content)
-    setSelectedTags(tags)
-  }, [content, tags])
-
   const handleSave = () => {
-    mutation.mutate({
-      id,
-      data: {
-        content: editedContent,
-      },
-    })
+  mutation.mutate({
+    id,
+    data: {
+      content: editedContent,
+    },
+  })
 
-    setEditing(false)
+  setEditing(false)
+}
+
+  // sync when backend updates
+useEffect(() => {
+  const sync = async () => {
+    const added = selectedTags.filter(
+      (t) => !tags.some((st) => st.id === t.id)
+    )
+
+    const removed = tags.filter(
+      (t) => !selectedTags.some((nt) => nt.id === t.id)
+    )
+
+    await Promise.all([
+      ...added.map((t) => addTagToWord(id, t.id)),
+      ...removed.map((t) => removeTagFromWord(id, t.id)),
+    ])
   }
 
-  const handleTagChange = async (newTags: Tag[]) => {
+  sync()
+}, [selectedTags])
+
+  const handleTagChange = (newTags: Tag[]) => {
+  setSelectedTags(newTags)
+}
+
+  const handleTagChange0 = async (newTags: Tag[]) => {
     const added = newTags.filter(
       (t) => !selectedTags.some((st) => st.id === t.id)
     )
@@ -112,14 +130,16 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
         {/* TAGS (EDIT MODE) */}
         {editing && (
           <Autocomplete
-            multiple
-            options={allTags}
-            value={selectedTags}
-            onChange={(_, newValue) => handleTagChange(newValue)}
-            isOptionEqualToValue={(a, b) => a.id === b.id}
-            getOptionLabel={(o) => o.name}
-            renderInput={(params) => <TextField {...params} label="Tags" />}
-          />
+  multiple
+  options={allTags}
+  value={selectedTags}
+  onChange={(_, newValue) => handleTagChange(newValue)}
+  isOptionEqualToValue={(a, b) => a.id === b.id}
+  getOptionLabel={(o) => o.name}
+  renderInput={(params) => (
+    <TextField {...params} label="Tags" />
+  )}
+/>
         )}
 
         {/* ACTIONS */}

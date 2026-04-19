@@ -69,12 +69,12 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
       (t) => !newTags.some((nt) => nt.id === t.id)
     )
 
+    // optimistic UI update (instant feel)
     setSelectedTags(newTags)
 
-    await Promise.all([
-      ...added.map((t) => addTagToWord(id, t.id)),
-      ...removed.map((t) => removeTagFromWord(id, t.id)),
-    ])
+    // fire-and-forget API calls
+    added.forEach((t) => addTagToWord(id, t.id))
+    removed.forEach((t) => removeTagFromWord(id, t.id))
   }
 
   return (
@@ -117,18 +117,8 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
             value={selectedTags}
             onChange={(_, newValue) => handleTagChange(newValue)}
             isOptionEqualToValue={(a, b) => a.id === b.id}
-            getOptionLabel={(option) => option.name}
-            renderTags={(value, getTagProps) =>
-              value.map((option, index) => (
-                <Chip
-                  label={option.name}
-                  {...getTagProps({ index })}
-                  key={option.id}
-                />
-              ))
-            }
+            getOptionLabel={(o) => o.name}
             renderInput={(params) => <TextField {...params} label="Tags" />}
-            sx={{ mt: 2 }}
           />
         )}
 

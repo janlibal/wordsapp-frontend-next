@@ -8,9 +8,11 @@ import {
   Button,
   Chip,
   Autocomplete,
+  Stack,
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
-import CloseIcon from '@mui/icons-material/Close'
+import DeleteIcon from '@mui/icons-material/Delete'
+import FavoriteIcon from '@mui/icons-material/Favorite'
 import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Tag } from '@/src/types/tags/tag.type'
@@ -33,52 +35,40 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
   const [editing, setEditing] = useState(false)
   const [editedContent, setEditedContent] = useState(content)
   const [selectedTags, setSelectedTags] = useState<Tag[]>(tags)
+  const [isSaving, setIsSaving] = useState(false)
+  const [hovered, setHovered] = useState(false)
 
   const mutation = useUpdateWord()
 
-  // fetch all tags for selector
   const { data: allTags = [] } = useQuery<Tag[]>({
     queryKey: ['tags'],
     queryFn: () => getTags(),
-    staleTime: 30_000,
   })
 
-  const handleSave = () => {
-  mutation.mutate({
-    id,
-    data: {
-      content: editedContent,
-    },
-  })
+  useEffect(() => {
+    setSelectedTags(tags)
+  }, [tags])
 
-  setEditing(false)
-}
+  // 💾 save with indicator
+  const handleSave = async () => {
+    setIsSaving(true)
 
-  // sync when backend updates
-useEffect(() => {
-  const sync = async () => {
-    const added = selectedTags.filter(
-      (t) => !tags.some((st) => st.id === t.id)
+    mutation.mutate(
+      {
+        id,
+        data: { content: editedContent },
+      },
+      {
+        onSettled: () => {
+          setIsSaving(false)
+          setEditing(false)
+        },
+      }
     )
-
-    const removed = tags.filter(
-      (t) => !selectedTags.some((nt) => nt.id === t.id)
-    )
-
-    await Promise.all([
-      ...added.map((t) => addTagToWord(id, t.id)),
-      ...removed.map((t) => removeTagFromWord(id, t.id)),
-    ])
   }
 
-  sync()
-}, [selectedTags])
-
-  const handleTagChange = (newTags: Tag[]) => {
-  setSelectedTags(newTags)
-}
-
-  const handleTagChange0 = async (newTags: Tag[]) => {
+  // 🏷 tag update
+  const handleTagChange = async (newTags: Tag[]) => {
     const added = newTags.filter(
       (t) => !selectedTags.some((st) => st.id === t.id)
     )
@@ -87,69 +77,119 @@ useEffect(() => {
       (t) => !newTags.some((nt) => nt.id === t.id)
     )
 
-    // optimistic UI update (instant feel)
     setSelectedTags(newTags)
 
-    // fire-and-forget API calls
-    added.forEach((t) => addTagToWord(id, t.id))
-    removed.forEach((t) => removeTagFromWord(id, t.id))
+    await Promise.all([
+      ...added.map((t) => addTagToWord(id, t.id)),
+      ...removed.map((t) => removeTagFromWord(id, t.id)),
+    ])
   }
 
+  // ✨ improved highlight (multi-word safe)
+
   return (
-    <Card sx={{ mb: 2 }}>
+    <Card
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      sx={{
+        borderRadius: 3,
+        mb: 2,
+        transition: '0.2s',
+        position: 'relative',
+        '&:hover': {
+          boxShadow: 4,
+        },
+      }}
+    >
       <CardContent>
-        {/* CONTENT */}
-        <Box display="flex" alignItems="flex-start" gap={1}>
-          {editing ? (
-            <TextField
-              fullWidth
-              multiline
-              value={editedContent}
-              onChange={(e) => setEditedContent(e.target.value)}
-            />
-          ) : (
-            <Typography sx={{ flex: 1 }}>
-              {highlightText(content, search)}
-            </Typography>
+        <Stack spacing={1.5}>
+          {/* TOP ROW */}
+          <Box display="flex" justifyContent="space-between">
+            {/* CONTENT */}
+            {editing ? (
+              <TextField
+                fullWidth
+                multiline
+                value={editedContent}
+                onChange={(e) => setEditedContent(e.target.value)}
+              />
+            ) : (
+              <Typography sx={{ flex: 1, lineHeight: 1.6 }}>
+                {highlightText(content, search)}
+              </Typography>
+            )}
+
+            {/* ACTIONS (hover only) */}
+            {hovered && !editing && (
+              <Stack direction="row" spacing={1}>
+                <IconButton size="small" onClick={() => setEditing(true)}>
+                  <EditIcon fontSize="small" />
+                </IconButton>
+
+                <IconButton size="small" color="error">
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+
+                <IconButton size="small">
+                  <FavoriteIcon fontSize="small" />
+                </IconButton>
+              </Stack>
+            )}
+          </Box>
+
+          {/* TAGS + COUNT BADGE */}
+          {!editing && (
+            <Box display="flex" alignItems="center" gap={1}>
+              <Stack direction="row" spacing={1} flexWrap="wrap">
+                {tags.map((t) => (
+                  <Chip
+                    key={t.id}
+                    label={t.name}
+                    size="small"
+                    sx={{ borderRadius: 1.5 }}
+                  />
+                ))}
+              </Stack>
+
+              <Chip
+                size="small"
+                label={tags.length}
+                sx={{
+                  ml: 'auto',
+                  fontSize: 11,
+                  height: 20,
+                }}
+              />
+            </Box>
           )}
 
-          <IconButton onClick={() => setEditing((v) => !v)}>
-            {editing ? <CloseIcon /> : <EditIcon />}
-          </IconButton>
-        </Box>
+          {/* EDIT MODE */}
+          {editing && (
+            <>
+              <Autocomplete
+                multiple
+                options={allTags}
+                value={selectedTags}
+                onChange={(_, v) => handleTagChange(v)}
+                isOptionEqualToValue={(a, b) => a.id === b.id}
+                getOptionLabel={(o) => o.name}
+                renderInput={(params) => <TextField {...params} label="Tags" />}
+              />
 
-        {/* TAGS (VIEW MODE) */}
-        {!editing && tags.length > 0 && (
-          <Box mt={1}>
-            <Typography variant="body2" color="text.secondary">
-              {tags.map((t) => t.name).join(', ')}
-            </Typography>
-          </Box>
-        )}
+              <Box display="flex" gap={1} alignItems="center">
+                <Button variant="contained" onClick={handleSave}>
+                  Save
+                </Button>
 
-        {/* TAGS (EDIT MODE) */}
-        {editing && (
-          <Autocomplete
-  multiple
-  options={allTags}
-  value={selectedTags}
-  onChange={(_, newValue) => handleTagChange(newValue)}
-  isOptionEqualToValue={(a, b) => a.id === b.id}
-  getOptionLabel={(o) => o.name}
-  renderInput={(params) => (
-    <TextField {...params} label="Tags" />
-  )}
-/>
-        )}
-
-        {/* ACTIONS */}
-        {editing && (
-          <Box mt={2} display="flex" gap={1}>
-            <Button variant="contained" onClick={handleSave}>
-              Save
-            </Button>
-          </Box>
-        )}
+                {isSaving && (
+                  <Typography variant="body2" color="text.secondary">
+                    Saving...
+                  </Typography>
+                )}
+              </Box>
+            </>
+          )}
+        </Stack>
       </CardContent>
     </Card>
   )

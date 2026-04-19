@@ -1,5 +1,7 @@
-import { Box, Typography } from '@mui/material'
+import { Box, Divider, Stack, Typography } from '@mui/material'
 import { SystemInfo } from '../../types/app/system.info.types'
+import { PageContainer } from '@/src/ui/pageContainer'
+import { AppCard } from '@/src/ui/appCard'
 
 type Props = {
   data: SystemInfo
@@ -7,28 +9,51 @@ type Props = {
 
 export default function SystemInfoPage({ data }: Props) {
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 2,
-      }}
-    >
-      <Typography variant="h4">System Info</Typography>
+    <PageContainer>
+      <AppCard>
+        <Stack spacing={3}>
+          {/* Title */}
+          <Typography variant="h5" fontWeight={600} textAlign="center">
+            System Info
+          </Typography>
 
-      <Typography>Name: {data.name}</Typography>
-      <Typography>Version: {data.version}</Typography>
-      <Typography>Description: {data.description}</Typography>
+          <Divider />
 
-      <Typography mt={2} variant="h6">
-        Environment
-      </Typography>
-      <Typography>Node: {data.env.nodeVersion}</Typography>
-      <Typography>Host: {data.env.hostName}</Typography>
-      <Typography>Platform: {data.env.platform}</Typography>
-    </Box>
+          {/* App info */}
+          <Stack spacing={1}>
+            <Typography variant="body1">
+              <strong>Name:</strong> {data.name}
+            </Typography>
+
+            <Typography variant="body1">
+              <strong>Version:</strong> {data.version}
+            </Typography>
+
+            <Typography variant="body2" color="text.secondary">
+              {data.description}
+            </Typography>
+          </Stack>
+
+          <Divider />
+
+          {/* Environment */}
+          <Stack spacing={1}>
+            <Typography variant="h6">Environment</Typography>
+
+            <Typography variant="body2">
+              <strong>Node:</strong> {data.env.nodeVersion}
+            </Typography>
+
+            <Typography variant="body2">
+              <strong>Host:</strong> {data.env.hostName}
+            </Typography>
+
+            <Typography variant="body2">
+              <strong>Platform:</strong> {data.env.platform}
+            </Typography>
+          </Stack>
+        </Stack>
+      </AppCard>
+    </PageContainer>
   )
 }

@@ -9,6 +9,18 @@ export function createWord(data: CreateWordDto): Promise<void> {
   })
 }
 
+export async function addTagToWord(wordId: string, tagId: string) {
+  return apiFetch(`/api/api/v1/words/${wordId}/tags/${tagId}`, {
+    method: 'POST',
+  })
+}
+
+export async function removeTagFromWord(wordId: string, tagId: string) {
+  return apiFetch(`/api/api/v1/words/${wordId}/tags/${tagId}`, {
+    method: 'DELETE',
+  })
+}
+
 /*export async function getWords(): Promise<Word[]> {
   const res = await apiFetch<{ result: Word[] }>('/api/api/v1/words', {
     method: 'GET',
@@ -64,6 +76,12 @@ export async function updateWord(
     tags?: string[]
   }
 ) {
+  console.log(
+    'passing data ',
+    id,
+    data.content,
+    data.tags?.map((f: any) => f.name)
+  )
   return apiFetch<Omit<Word, 'userId'>>(`/api/api/v1/words/${id}`, {
     method: 'PATCH',
     body: JSON.stringify(data),

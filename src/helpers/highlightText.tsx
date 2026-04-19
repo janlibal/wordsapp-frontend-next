@@ -1,28 +1,36 @@
-export function highlightText(content: string, search?: string) {
-  if (!search) return content
+import React from 'react'
 
-  const terms = search.toLowerCase().split(' ').filter(Boolean)
+export function highlightText(content: string, search?: string) {
+  if (!search?.trim()) return content
+
+  const terms = search.trim().toLowerCase().split(/\s+/).filter(Boolean)
 
   if (!terms.length) return content
 
-  const regex = new RegExp(`(${terms.join('|')})`, 'gi')
+  // escape regex special chars
+  const escapeRegExp = (str: string) =>
+    str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
-  return content.split(regex).map((part, i) => {
-    const match = terms.includes(part.toLowerCase())
+  const regex = new RegExp(`(${terms.map(escapeRegExp).join('|')})`, 'gi')
 
-    return match ? (
-      <span
+  const parts = content.split(regex)
+
+  return parts.map((part, i) => {
+    const isMatch = terms.includes(part.toLowerCase())
+
+    return isMatch ? (
+      <mark
         key={i}
         style={{
           backgroundColor: '#ffe58f',
           padding: '0 2px',
-          borderRadius: '2px',
+          borderRadius: '3px',
         }}
       >
         {part}
-      </span>
+      </mark>
     ) : (
-      part
+      <React.Fragment key={i}>{part}</React.Fragment>
     )
   })
 }

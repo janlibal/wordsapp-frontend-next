@@ -9,16 +9,17 @@ import {
   Chip,
   Autocomplete,
   Stack,
+  MenuItem,
+  Menu,
 } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
-import FavoriteIcon from '@mui/icons-material/Favorite'
 import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Tag } from '@/src/types/tags/tag.type'
 import { useUpdateWord } from '@/src/hooks/useUpdateHook'
 import { getTags } from '@/src/services/tags/tag.service'
-import { highlightText } from '@/src/helpers/highlightText'
+
+import MoreVertIcon from '@mui/icons-material/MoreVert'
+
 import {
   addTagToWord,
   removeTagFromWord,
@@ -38,6 +39,9 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
   const [isSaving, setIsSaving] = useState(false)
   const [hovered, setHovered] = useState(false)
 
+  const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
+  const openMenu = Boolean(menuAnchor)
+
   const mutation = useUpdateWord()
 
   const { data: allTags = [] } = useQuery<Tag[]>({
@@ -49,8 +53,8 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
     setSelectedTags(tags)
   }, [tags])
 
-  // 💾 save with indicator
-  const handleSave = async () => {
+  // 💾 save content
+  const handleSave = () => {
     setIsSaving(true)
 
     mutation.mutate(
@@ -85,7 +89,32 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
     ])
   }
 
-  // ✨ improved highlight (multi-word safe)
+  // 🧠 menu handlers
+  const handleMenuOpen = (e: React.MouseEvent<HTMLElement>) => {
+    setMenuAnchor(e.currentTarget)
+  }
+
+  const handleMenuClose = () => {
+    setMenuAnchor(null)
+  }
+
+  // ✨ highlight search
+  const highlightText = (text: string, query?: string) => {
+    if (!query) return text
+
+    const words = query.trim().split(/\s+/)
+    const regex = new RegExp(`(${words.join('|')})`, 'gi')
+
+    return text
+      .split(regex)
+      .map((part, i) =>
+        words.some((w) => w.toLowerCase() === part.toLowerCase()) ? (
+          <mark key={i}>{part}</mark>
+        ) : (
+          part
+        )
+      )
+  }
 
   return (
     <Card
@@ -104,7 +133,11 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
       <CardContent>
         <Stack spacing={1.5}>
           {/* TOP ROW */}
-          <Box display="flex" justifyContent="space-between">
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="flex-start"
+          >
             {/* CONTENT */}
             {editing ? (
               <TextField
@@ -119,25 +152,57 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
               </Typography>
             )}
 
-            {/* ACTIONS (hover only) */}
+            {/* MENU BUTTON (hover only) */}
             {hovered && !editing && (
-              <Stack direction="row" spacing={1}>
-                <IconButton size="small" onClick={() => setEditing(true)}>
-                  <EditIcon fontSize="small" />
-                </IconButton>
-
-                <IconButton size="small" color="error">
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-
-                <IconButton size="small">
-                  <FavoriteIcon fontSize="small" />
-                </IconButton>
-              </Stack>
+              <IconButton
+                size="small"
+                onClick={handleMenuOpen}
+                sx={{
+                  ml: 1,
+                  opacity: 0.7,
+                  '&:hover': { opacity: 1 },
+                }}
+              >
+                <MoreVertIcon fontSize="small" />
+              </IconButton>
             )}
+
+            {/* MENU (ALWAYS MOUNTED) */}
+            <Menu
+              anchorEl={menuAnchor}
+              open={openMenu}
+              onClose={handleMenuClose}
+            >
+              <MenuItem
+                onClick={() => {
+                  setEditing(true)
+                  handleMenuClose()
+                }}
+              >
+                Edit
+              </MenuItem>
+
+              <MenuItem
+                onClick={() => {
+                  alert('TODO delete')
+                  handleMenuClose()
+                }}
+              >
+                Delete
+              </MenuItem>
+
+              <MenuItem
+                onClick={() => {
+                  alert('TODO favorite')
+                  handleMenuClose()
+                }}
+              >
+                Favorite
+              </MenuItem>
+            </Menu>
           </Box>
 
-          {/* TAGS + COUNT BADGE */}
+          {/* TAGS + COUNT */}
           {!editing && (
             <Box display="flex" alignItems="center" gap={1}>
               <Stack direction="row" spacing={1} flexWrap="wrap">

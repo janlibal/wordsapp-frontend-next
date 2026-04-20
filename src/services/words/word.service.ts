@@ -21,6 +21,11 @@ export async function removeTagFromWord(wordId: string, tagId: string) {
   })
 }
 
+export function deleteWord(id: string) {
+  console.log('delete yet to be implemented')
+  return true
+}
+
 /*export async function getWords(): Promise<Word[]> {
   const res = await apiFetch<{ result: Word[] }>('/api/api/v1/words', {
     method: 'GET',

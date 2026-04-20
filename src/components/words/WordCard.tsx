@@ -11,9 +11,10 @@ import {
   Stack,
   MenuItem,
   Menu,
+  Snackbar,
 } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Tag } from '@/src/types/tags/tag.type'
 import { useUpdateWord } from '@/src/hooks/useUpdateHook'
 import { getTags } from '@/src/services/tags/tag.service'
@@ -22,9 +23,11 @@ import MoreVertIcon from '@mui/icons-material/MoreVert'
 
 import {
   addTagToWord,
+  deleteWord,
   removeTagFromWord,
 } from '@/src/services/words/word.service'
 import WordActionsMenu from './WordActionsMenu'
+import { Word } from '@/src/types/words/word.type'
 
 type WordCardProps = {
   id: string
@@ -40,13 +43,17 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
   const [isSaving, setIsSaving] = useState(false)
   const [hovered, setHovered] = useState(false)
 
-  const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
-  const openMenu = Boolean(menuAnchor)
+  const [deletedWord, setDeletedWord] = useState<Word | null>(null)
+  const [showUndo, setShowUndo] = useState(false)
 
-  const { handleOpen, Menu: ActionsMenu } = WordActionsMenu({
-    onEdit: () => setEditing(true),
-    onDelete: () => alert('TODO delete'),
-    onFavorite: () => alert('TODO favorite'),
+  const queryClient = useQueryClient()
+
+  // 🧠 MOCK delete (no backend yet)
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      console.log('delete (mock)', id)
+      return true
+    },
   })
 
   const mutation = useUpdateWord()
@@ -60,7 +67,7 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
     setSelectedTags(tags)
   }, [tags])
 
-  // 💾 save content
+  // 💾 save
   const handleSave = () => {
     setIsSaving(true)
 
@@ -96,13 +103,49 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
     ])
   }
 
-  // 🧠 menu handlers
+  // 🗑 DELETE (optimistic, safe)
+  const handleDelete = () => {
+    const currentWords = queryClient.getQueryData<Word[]>(['words']) || []
 
-  const handleMenuClose = () => {
-    setMenuAnchor(null)
+    const wordToDelete = currentWords.find((w) => w.id === id)
+    if (!wordToDelete) return
+
+    // remove instantly
+    queryClient.setQueryData(
+      ['words'],
+      currentWords.filter((w) => w.id !== id)
+    )
+
+    setDeletedWord(wordToDelete)
+    setShowUndo(true)
+
+    // delay actual delete
+    setTimeout(() => {
+      deleteMutation.mutate(id)
+    }, 3000)
   }
 
-  // ✨ highlight search
+  // ↩ undo
+  const handleUndo = () => {
+    if (!deletedWord) return
+
+    queryClient.setQueryData(['words'], (old: Word[] = []) => [
+      deletedWord,
+      ...old,
+    ])
+
+    setDeletedWord(null)
+    setShowUndo(false)
+  }
+
+  // 🎯 actions menu (clean)
+  const { handleOpen, Menu: ActionsMenu } = WordActionsMenu({
+    onEdit: () => setEditing(true),
+    onDelete: handleDelete,
+    onFavorite: () => alert('TODO favorite'),
+  })
+
+  // 🔍 highlight
   const highlightText = (text: string, query?: string) => {
     if (!query) return text
 
@@ -128,21 +171,13 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
         borderRadius: 3,
         mb: 2,
         transition: '0.2s',
-        position: 'relative',
-        '&:hover': {
-          boxShadow: 4,
-        },
+        '&:hover': { boxShadow: 4 },
       }}
     >
       <CardContent>
         <Stack spacing={1.5}>
-          {/* TOP ROW */}
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="flex-start"
-          >
-            {/* CONTENT */}
+          {/* TOP */}
+          <Box display="flex" justifyContent="space-between">
             {editing ? (
               <TextField
                 fullWidth
@@ -151,81 +186,35 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
                 onChange={(e) => setEditedContent(e.target.value)}
               />
             ) : (
-              <Typography sx={{ flex: 1, lineHeight: 1.6 }}>
+              <Typography sx={{ flex: 1 }}>
                 {highlightText(content, search)}
               </Typography>
             )}
 
-            {/* MENU BUTTON (hover only) */}
             {hovered && !editing && (
               <IconButton size="small" onClick={handleOpen}>
                 <MoreVertIcon fontSize="small" />
               </IconButton>
             )}
-
-            {/* MENU (ALWAYS MOUNTED) */}
-            {ActionsMenu}
-            <Menu
-              anchorEl={menuAnchor}
-              open={openMenu}
-              onClose={handleMenuClose}
-            >
-              <MenuItem
-                onClick={() => {
-                  setEditing(true)
-                  handleMenuClose()
-                }}
-              >
-                Edit
-              </MenuItem>
-
-              <MenuItem
-                onClick={() => {
-                  alert('TODO delete')
-                  handleMenuClose()
-                }}
-              >
-                Delete
-              </MenuItem>
-
-              <MenuItem
-                onClick={() => {
-                  alert('TODO favorite')
-                  handleMenuClose()
-                }}
-              >
-                Favorite
-              </MenuItem>
-            </Menu>
           </Box>
 
-          {/* TAGS + COUNT */}
+          {/* ✅ MENU (only ONE!) */}
+          {ActionsMenu}
+
+          {/* TAGS */}
           {!editing && (
             <Box display="flex" alignItems="center" gap={1}>
               <Stack direction="row" spacing={1} flexWrap="wrap">
                 {tags.map((t) => (
-                  <Chip
-                    key={t.id}
-                    label={t.name}
-                    size="small"
-                    sx={{ borderRadius: 1.5 }}
-                  />
+                  <Chip key={t.id} label={t.name} size="small" />
                 ))}
               </Stack>
 
-              <Chip
-                size="small"
-                label={tags.length}
-                sx={{
-                  ml: 'auto',
-                  fontSize: 11,
-                  height: 20,
-                }}
-              />
+              <Chip size="small" label={tags.length} />
             </Box>
           )}
 
-          {/* EDIT MODE */}
+          {/* EDIT */}
           {editing && (
             <>
               <Autocomplete
@@ -238,21 +227,30 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
                 renderInput={(params) => <TextField {...params} label="Tags" />}
               />
 
-              <Box display="flex" gap={1} alignItems="center">
-                <Button variant="contained" onClick={handleSave}>
+              <Box display="flex" gap={1}>
+                <Button onClick={handleSave} variant="contained">
                   Save
                 </Button>
 
-                {isSaving && (
-                  <Typography variant="body2" color="text.secondary">
-                    Saving...
-                  </Typography>
-                )}
+                {isSaving && <Typography variant="body2">Saving...</Typography>}
               </Box>
             </>
           )}
         </Stack>
       </CardContent>
+
+      {/* SNACKBAR */}
+      <Snackbar
+        open={showUndo}
+        autoHideDuration={3000}
+        onClose={() => setShowUndo(false)}
+        message="Word deleted"
+        action={
+          <Button onClick={handleUndo} size="small">
+            UNDO
+          </Button>
+        }
+      />
     </Card>
   )
 }

@@ -24,6 +24,7 @@ import {
   addTagToWord,
   removeTagFromWord,
 } from '@/src/services/words/word.service'
+import WordActionsMenu from './WordActionsMenu'
 
 type WordCardProps = {
   id: string
@@ -41,6 +42,12 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
 
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
   const openMenu = Boolean(menuAnchor)
+
+  const { handleOpen, Menu: ActionsMenu } = WordActionsMenu({
+    onEdit: () => setEditing(true),
+    onDelete: () => alert('TODO delete'),
+    onFavorite: () => alert('TODO favorite'),
+  })
 
   const mutation = useUpdateWord()
 
@@ -90,9 +97,6 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
   }
 
   // 🧠 menu handlers
-  const handleMenuOpen = (e: React.MouseEvent<HTMLElement>) => {
-    setMenuAnchor(e.currentTarget)
-  }
 
   const handleMenuClose = () => {
     setMenuAnchor(null)
@@ -154,20 +158,13 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
 
             {/* MENU BUTTON (hover only) */}
             {hovered && !editing && (
-              <IconButton
-                size="small"
-                onClick={handleMenuOpen}
-                sx={{
-                  ml: 1,
-                  opacity: 0.7,
-                  '&:hover': { opacity: 1 },
-                }}
-              >
+              <IconButton size="small" onClick={handleOpen}>
                 <MoreVertIcon fontSize="small" />
               </IconButton>
             )}
 
             {/* MENU (ALWAYS MOUNTED) */}
+            {ActionsMenu}
             <Menu
               anchorEl={menuAnchor}
               open={openMenu}

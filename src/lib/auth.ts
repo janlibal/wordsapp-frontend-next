@@ -1,8 +1,8 @@
-// lib/requireAuth.ts
+
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
-export async function requireAuth<T>(fetchUser: (token: string) => Promise<T>) {
+export async function removeThisRequireAuth<T>(fetchUser: (token: string) => Promise<T>) {
   const cookieStore = await cookies()
   const accessToken = cookieStore.get('access_token')?.value
   const refreshToken = cookieStore.get('refresh_token')?.value
@@ -16,10 +16,12 @@ export async function requireAuth<T>(fetchUser: (token: string) => Promise<T>) {
   } catch (err: any) {
     // if access token expired, try refresh
     if (refreshToken) {
-      const refreshRes = await fetch('http://api:5000/api/v1/auth/refresh', {
+      //const refreshRes = await fetch('http://api:5000/api/v1/auth/refresh', {
+      const refreshRes = await fetch('/api/api/v1/auth/refresh', {  
         method: 'POST',
         headers: { Cookie: `refresh_token=${refreshToken}` },
         cache: 'no-store',
+        credentials: 'include'
       })
       if (!refreshRes.ok) redirect('/login')
       const refreshData = await refreshRes.json()

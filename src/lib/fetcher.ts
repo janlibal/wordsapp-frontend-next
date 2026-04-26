@@ -1,8 +1,9 @@
+let refreshPromise: Promise<boolean> | null = null
+
 export async function apiFetch<T>(
   url: string,
   options: RequestInit & { _retry?: boolean } = {}
 ): Promise<T> {
-  // 🔧 strip _retry so fetch doesn't see it
   const { _retry, ...fetchOptions } = options
 
   const doFetch = () =>
@@ -15,93 +16,81 @@ export async function apiFetch<T>(
       credentials: 'include',
     })
 
+  console.log('[API] → Request:', url, {
+    method: fetchOptions.method,
+    retry: _retry || false,
+  })
+
   let res = await doFetch()
 
-  console.log('[API] Request:', url)
-  console.log('[API] Status:', res.status)
+  console.log('[API] ← Response:', url, res.status)
 
-  // 🔁 refresh logic
+  // 🔁 HANDLE 401 + REFRESH
   if (res.status === 401 && !_retry) {
-    console.log('[API] 401 → attempting refresh')
+    console.log('[API] ⚠️ 401 detected')
 
-    const refreshRes = await fetch('/api/api/v1/auth/refresh', {
-      method: 'POST',
-      credentials: 'include',
-    })
+    // 🔒 Start refresh if not already running
+    if (!refreshPromise) {
+      console.log('[API] 🔒 starting refresh')
 
-    console.log('[API] Refresh status:', refreshRes.status)
+      refreshPromise = (async () => {
+        try {
+          const refreshRes = await fetch('/api/api/v1/auth/refresh', {
+            method: 'POST',
+            credentials: 'include',
+          })
 
-    if (!refreshRes.ok) {
-      console.log('[API] Refresh failed → logout')
-      window.dispatchEvent(new Event('auth:logout'))
+          console.log('[API] 🔄 Refresh response:', refreshRes.status)
+
+          if (!refreshRes.ok) {
+            throw new Error('Refresh failed')
+          }
+
+          console.log('[API] ✅ Refresh success')
+          return true
+        } catch (err) {
+          console.log('[API] ❌ Refresh failed → logout')
+
+          window.dispatchEvent(new Event('auth:logout'))
+          return false
+        } finally {
+          refreshPromise = null // 🔑 release lock
+        }
+      })()
+    } else {
+      console.log('[API] ⏳ waiting for ongoing refresh')
+    }
+
+    const success = await refreshPromise
+
+    if (!success) {
       throw new Error('Unauthorized')
     }
 
-    // 🔁 retry original request (with _retry = true)
+    // 🔁 Retry original request ONCE
     return apiFetch<T>(url, {
       ...fetchOptions,
       _retry: true,
     })
   }
 
+  // ❌ Non-OK response (not 401 handled above)
   if (!res.ok) {
     let message = 'Request failed'
+
     try {
       const err = await res.json()
       message = err.message || message
     } catch {}
+
+    console.log('[API] ❌ Error:', message)
     throw new Error(message)
   }
 
+  // ✅ Success
   const text = await res.text()
-  return text ? JSON.parse(text) : (undefined as T)
-}
 
-export async function apiFetch1<T>(
-  url: string,
-  options: RequestInit = {}
-): Promise<T> {
-  let res = await fetch(url, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(options.headers || {}),
-    },
-    credentials: 'include',
-  })
+  console.log('[API] ✅ Success:', url)
 
-  if (res.status === 401) {
-    const refreshRes = await fetch('/api/api/v1/auth/refresh', {
-      method: 'POST',
-      credentials: 'include',
-    })
-
-    if (!refreshRes.ok) {
-      // 🔥 GLOBAL LOGOUT TRIGGER
-      window.dispatchEvent(new Event('auth:logout'))
-      throw new Error('Unauthorized')
-    }
-
-    // retry original request
-    res = await fetch(url, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(options.headers || {}),
-      },
-      credentials: 'include',
-    })
-  }
-
-  if (!res.ok) {
-    let message = 'Request failed'
-    try {
-      const err = await res.json()
-      message = err.message || message
-    } catch {}
-    throw new Error(message)
-  }
-
-  const text = await res.text()
   return text ? JSON.parse(text) : (undefined as T)
 }

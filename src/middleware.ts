@@ -1,7 +1,15 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export function middleware(req: NextRequest) {
+export function middleware() {
+  return NextResponse.next()
+}
+
+export const config = {
+  matcher: ['/system/:path*', '/me', '/login', '/register'],
+}
+
+export function middleware1(req: NextRequest) {
   const accessToken = req.cookies.get('access_token')?.value
 
   const isAuthPage =
@@ -24,6 +32,6 @@ export function middleware(req: NextRequest) {
   return NextResponse.next()
 }
 
-export const config = {
+export const config1 = {
   matcher: ['/system/:path*', '/me', '/login', '/register'],
 }

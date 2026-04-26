@@ -1,8 +1,5 @@
 import { useUrlFilters } from '@/src/hooks/useFilters'
-import { Tag } from '@/src/types/tags/tag.type'
 import { Box, Chip, Stack } from '@mui/material'
-import { useQuery } from '@tanstack/react-query'
-import { useMemo } from 'react'
 
 export default function WordFilterBar() {
   const { search, tags, setFilters } = useUrlFilters()

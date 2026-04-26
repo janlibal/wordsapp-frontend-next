@@ -22,7 +22,6 @@ export async function removeTagFromWord(wordId: string, tagId: string) {
 }
 
 export function deleteWord(id: string) {
-  console.log('delete yet to be implemented')
   return true
 }
 
@@ -81,12 +80,6 @@ export async function updateWord(
     tags?: string[]
   }
 ) {
-  console.log(
-    'passing data ',
-    id,
-    data.content,
-    data.tags?.map((f: any) => f.name)
-  )
   return apiFetch<Omit<Word, 'userId'>>(`/api/api/v1/words/${id}`, {
     method: 'PATCH',
     body: JSON.stringify(data),

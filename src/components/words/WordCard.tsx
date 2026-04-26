@@ -51,7 +51,6 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
   // 🧠 MOCK delete (no backend yet)
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      console.log('delete (mock)', id)
       return true
     },
   })
@@ -61,6 +60,8 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
   const { data: allTags = [] } = useQuery<Tag[]>({
     queryKey: ['tags'],
     queryFn: () => getTags(),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnWindowFocus: false,
   })
 
   useEffect(() => {

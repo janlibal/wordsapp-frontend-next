@@ -16,7 +16,9 @@ export default function WordsList() {
   const { data: words = [], isFetching } = useQuery({
     queryKey: ['words', search, tagIds],
     queryFn: () => getWords(search, tagIds),
-    staleTime: 30_000,
+    //staleTime: 30_000,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnWindowFocus: false,
   })
 
   return (

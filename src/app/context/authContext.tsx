@@ -52,12 +52,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ✅ Proper logout
   const logoutUser = async () => {
     try {
-      await logout() // 🔥 IMPORTANT: await this
+      await logout()
     } catch (err) {
       console.error('Logout failed', err)
     } finally {
-      setUser(null)
-      router.push('/login')
+      // 🔥 delegate everything to global handler
+      window.dispatchEvent(new Event('auth:logout'))
     }
   }
 

@@ -21,14 +21,6 @@ export default function AddWord() {
 
   const inputRef = useRef<HTMLInputElement | null>(null)
 
-  // ✅ fetch existing tags
-  const { data: allTags = [] } = useQuery<Tag[]>({
-    queryKey: ['tags'],
-    queryFn: () => getTags(),
-    staleTime: 1000 * 60 * 5,
-    refetchOnWindowFocus: false,
-  })
-
   // ✅ submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

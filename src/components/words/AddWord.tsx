@@ -1,32 +1,34 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Box, TextField, Button, Chip, Stack } from '@mui/material'
+import { Box, TextField, Button, Chip, Stack, Typography } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { createWord } from '@/src/services/words/word.service'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { Tag } from '@/src/types/tags/tag.type'
+import { getTags } from '@/src/services/tags/tag.service'
+import Autocomplete from '@mui/material/Autocomplete'
 
 export default function AddWord() {
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   const [content, setContent] = useState('')
-  const [tagInput, setTagInput] = useState('')
-  const [tags, setTags] = useState<string[]>([])
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const queryClient = useQueryClient()
+
   const inputRef = useRef<HTMLInputElement | null>(null)
 
-  const addTag = () => {
-    if (!tagInput.trim()) return
-    setTags((prev) => [...prev, tagInput.trim()])
-    setTagInput('')
-  }
+  // ✅ fetch existing tags
+  const { data: allTags = [] } = useQuery<Tag[]>({
+    queryKey: ['tags'],
+    queryFn: () => getTags(),
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+  })
 
-  const removeTag = (tag: string) => {
-    setTags((prev) => prev.filter((t) => t !== tag))
-  }
-
+  // ✅ submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -35,14 +37,14 @@ export default function AddWord() {
     try {
       await createWord({
         content,
-        tags,
+        tags: selectedTags.map((t) => t.name),
       })
 
       queryClient.invalidateQueries({ queryKey: ['words'] })
       queryClient.invalidateQueries({ queryKey: ['tags'] })
       queryClient.refetchQueries({ queryKey: ['tags'] })
 
-      router.push('/') // redirect after success
+      router.push('/')
     } catch (err: any) {
       setError(err.message || 'Failed to create word')
     } finally {
@@ -65,9 +67,9 @@ export default function AddWord() {
         gap: 2,
       }}
     >
-      <h2>Add new word / phrase</h2>
+      <Typography variant="h5">Add new word / phrase</Typography>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <Typography color="error">{error}</Typography>}
 
       <form onSubmit={handleSubmit}>
         <TextField
@@ -79,31 +81,73 @@ export default function AddWord() {
           inputRef={inputRef}
         />
 
-        {/* TAG INPUT */}
-        <Box mt={2}>
-          <TextField
-            label="Add tag"
-            fullWidth
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault()
-                addTag()
+        {/* ✅ TAG SELECTOR */}
+        <Autocomplete
+          multiple
+          freeSolo
+          options={allTags}
+          value={selectedTags}
+          onChange={(_, newValue) => {
+            const mapped = newValue.map((item) => {
+              if (typeof item === 'string') {
+                return { id: item, name: item, count: 0 }
               }
-            }}
-          />
-          <Button onClick={addTag} sx={{ mt: 1 }}>
-            Add tag
-          </Button>
-        </Box>
 
-        {/* TAG LIST */}
-        <Stack direction="row" spacing={1} mt={2} flexWrap="wrap">
-          {tags.map((tag) => (
-            <Chip key={tag} label={tag} onDelete={() => removeTag(tag)} />
-          ))}
-        </Stack>
+              if ((item as any).inputValue) {
+                return {
+                  id: (item as any).inputValue,
+                  name: (item as any).inputValue,
+                  count: 0,
+                }
+              }
+
+              return item
+            })
+
+            // ✅ prevent duplicates
+            const unique = Array.from(
+              new Map(mapped.map((t) => [t.name.toLowerCase(), t])).values()
+            )
+
+            setSelectedTags(unique)
+          }}
+          isOptionEqualToValue={(a, b) => a.id === b.id}
+          getOptionLabel={(option) => {
+            if (typeof option === 'string') return option
+            return option.name
+          }}
+          filterOptions={(options, params) => {
+            const filtered = options.filter((o) =>
+              o.name.toLowerCase().includes(params.inputValue.toLowerCase())
+            )
+
+            if (params.inputValue !== '') {
+              filtered.push({
+                id: params.inputValue,
+                name: `Add "${params.inputValue}"`,
+                count: 0,
+                inputValue: params.inputValue,
+              } as any)
+            }
+
+            return filtered
+          }}
+          renderTags={(value, getTagProps) =>
+            value.map((option, index) => {
+              const { key, ...tagProps } = getTagProps({ index })
+
+              return <Chip key={key} label={option.name} {...tagProps} />
+            })
+          }
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Tags"
+              placeholder="Type or select tags"
+              sx={{ mt: 2 }}
+            />
+          )}
+        />
 
         <Button
           type="submit"

@@ -28,6 +28,7 @@ import {
 } from '@/src/services/words/word.service'
 import WordActionsMenu from './WordActionsMenu'
 import { Word } from '@/src/types/words/word.type'
+import TagSelector from '../tags/TagSelector'
 
 type WordCardProps = {
   id: string
@@ -172,25 +173,32 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
         borderRadius: 3,
         mb: 2,
         transition: '0.2s',
-        '&:hover': { boxShadow: 4 },
+        border: '1px solid',
+        borderColor: 'divider',
+        '&:hover': {
+          boxShadow: 3,
+          borderColor: 'primary.light',
+        },
       }}
     >
-      <CardContent>
-        <Stack spacing={1.5}>
+      <CardContent sx={{ p: 2.5 }}>
+        <Stack spacing={2}>
           {/* TOP */}
-          <Box display="flex" justifyContent="space-between">
-            {editing ? (
-              <TextField
-                fullWidth
-                multiline
-                value={editedContent}
-                onChange={(e) => setEditedContent(e.target.value)}
-              />
-            ) : (
-              <Typography sx={{ flex: 1 }}>
-                {highlightText(content, search)}
-              </Typography>
-            )}
+          <Box display="flex" alignItems="flex-start" gap={1}>
+            <Box flex={1}>
+              {editing ? (
+                <TextField
+                  fullWidth
+                  multiline
+                  value={editedContent}
+                  onChange={(e) => setEditedContent(e.target.value)}
+                />
+              ) : (
+                <Typography sx={{ lineHeight: 1.6 }}>
+                  {highlightText(content, search)}
+                </Typography>
+              )}
+            </Box>
 
             {hovered && !editing && (
               <IconButton size="small" onClick={handleOpen}>
@@ -199,43 +207,51 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
             )}
           </Box>
 
-          {/* ✅ MENU (only ONE!) */}
           {ActionsMenu}
 
           {/* TAGS */}
           {!editing && (
-            <Box display="flex" alignItems="center" gap={1}>
-              <Stack direction="row" spacing={1} flexWrap="wrap">
-                {tags.map((t) => (
-                  <Chip key={t.id} label={t.name} size="small" />
-                ))}
-              </Stack>
+            <Stack direction="row" spacing={1} flexWrap="wrap">
+              {tags.map((t) => (
+                <Chip
+                  key={t.id}
+                  label={t.name}
+                  size="small"
+                  variant="outlined"
+                />
+              ))}
 
-              <Chip size="small" label={tags.length} />
-            </Box>
+              {tags.length > 0 && <Chip size="small" label={tags.length} />}
+            </Stack>
           )}
 
-          {/* EDIT */}
+          {/* EDIT MODE */}
           {editing && (
-            <>
-              <Autocomplete
-                multiple
-                options={allTags}
-                value={selectedTags}
-                onChange={(_, v) => handleTagChange(v)}
-                isOptionEqualToValue={(a, b) => a.id === b.id}
-                getOptionLabel={(o) => o.name}
-                renderInput={(params) => <TextField {...params} label="Tags" />}
-              />
+            <Stack spacing={2}>
+              <TagSelector value={selectedTags} onChange={handleTagChange} />
 
-              <Box display="flex" gap={1}>
-                <Button onClick={handleSave} variant="contained">
-                  Save
+              <Box display="flex" gap={1} justifyContent="flex-end">
+                <Button
+                  size="small"
+                  onClick={() => {
+                    setEditing(false)
+                    setEditedContent(content)
+                    setSelectedTags(tags)
+                  }}
+                >
+                  Cancel
                 </Button>
 
-                {isSaving && <Typography variant="body2">Saving...</Typography>}
+                <Button
+                  size="small"
+                  variant="contained"
+                  onClick={handleSave}
+                  disabled={isSaving}
+                >
+                  {isSaving ? 'Saving...' : 'Save'}
+                </Button>
               </Box>
-            </>
+            </Stack>
           )}
         </Stack>
       </CardContent>

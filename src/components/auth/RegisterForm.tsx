@@ -1,25 +1,55 @@
 'use client'
 
-import { useAuth } from '@/src/app/context/authContext'
-import { register } from '@/src/services/auth/auth.service'
-import { Alert, Box, Button, Paper, TextField, Typography } from '@mui/material'
+import {
+  Alert,
+  Box,
+  Button,
+  IconButton,
+  InputAdornment,
+  Paper,
+  TextField,
+  Typography,
+  Fade,
+} from '@mui/material'
+import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { register } from '@/src/services/auth/auth.service'
 
 export default function RegisterForm() {
   const router = useRouter()
-  const { refetchUser } = useAuth()
 
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
+  const firstNameRef = useRef<HTMLInputElement | null>(null)
+
+  useEffect(() => {
+    firstNameRef.current?.focus()
+  }, [])
+
+  const validate = () => {
+    if (!email.includes('@')) return 'Invalid email'
+    if (password.length < 6) return 'Password must be at least 6 characters'
+    if (!firstName.trim()) return 'First name is required'
+    return null
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    const validationError = validate()
+    if (validationError) {
+      setError(validationError)
+      return
+    }
+
     setError(null)
     setLoading(true)
 
@@ -40,37 +70,20 @@ export default function RegisterForm() {
   }
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        px: 2,
-      }}
-    >
-      <Paper
-        sx={{
-          p: 4,
-          width: '100%',
-          maxWidth: 400,
-        }}
-      >
+    <Fade in timeout={400}>
+      <Paper sx={{ p: 4, width: '100%', maxWidth: 400 }}>
         <Typography variant="h5" mb={2} textAlign="center">
           Create Account
         </Typography>
 
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
+        {error && <Alert severity="error">{error}</Alert>}
 
         <form onSubmit={handleSubmit}>
           <TextField
             label="First Name"
             fullWidth
             margin="normal"
+            inputRef={firstNameRef}
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
           />
@@ -93,24 +106,42 @@ export default function RegisterForm() {
 
           <TextField
             label="Password"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             fullWidth
             margin="normal"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            helperText="At least 6 characters"
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setShowPassword((s) => !s)}>
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
 
           <Button
             type="submit"
-            variant="contained"
             fullWidth
+            variant="contained"
             sx={{ mt: 2 }}
             disabled={loading}
           >
             {loading ? 'Creating account...' : 'Register'}
           </Button>
         </form>
+
+        {/* 🔁 SWITCH */}
+        <Typography variant="body2" textAlign="center" sx={{ mt: 2 }}>
+          Already have an account?{' '}
+          <Button size="small" onClick={() => router.push('/login')}>
+            Login
+          </Button>
+        </Typography>
       </Paper>
-    </Box>
+    </Fade>
   )
 }

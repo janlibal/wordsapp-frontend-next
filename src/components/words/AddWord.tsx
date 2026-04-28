@@ -1,7 +1,16 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Box, TextField, Button, Chip, Stack, Typography } from '@mui/material'
+import {
+  Box,
+  TextField,
+  Button,
+  Chip,
+  Stack,
+  Typography,
+  Paper,
+  Alert,
+} from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { createWord } from '@/src/services/words/word.service'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -21,7 +30,10 @@ export default function AddWord() {
 
   const inputRef = useRef<HTMLInputElement | null>(null)
 
-  // ✅ submit
+  useEffect(() => {
+    inputRef.current?.focus()
+  }, [])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -35,7 +47,6 @@ export default function AddWord() {
 
       queryClient.invalidateQueries({ queryKey: ['words'] })
       queryClient.invalidateQueries({ queryKey: ['tags'] })
-      queryClient.refetchQueries({ queryKey: ['tags'] })
 
       router.push('/')
     } catch (err: any) {
@@ -45,48 +56,56 @@ export default function AddWord() {
     }
   }
 
-  useEffect(() => {
-    inputRef.current?.focus()
-  }, [])
-
   return (
     <Box
       sx={{
-        maxWidth: 500,
+        maxWidth: 520,
         mx: 'auto',
-        mt: 10,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 2,
+        mt: { xs: 6, md: 10 },
+        px: 2,
       }}
     >
-      <Typography variant="h5">Add new word / phrase</Typography>
+      <Paper sx={{ p: 4 }}>
+        <Typography variant="h5" mb={1}>
+          Add new word
+        </Typography>
 
-      {error && <Typography color="error">{error}</Typography>}
+        <Typography variant="body2" color="text.secondary" mb={2}>
+          Save words, phrases, or anything worth remembering.
+        </Typography>
 
-      <form onSubmit={handleSubmit}>
-        <TextField
-          label="Word / Phrase"
-          fullWidth
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          required
-          inputRef={inputRef}
-        />
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
 
-        {/* ✅ TAG SELECTOR */}
-        <TagSelector value={selectedTags} onChange={setSelectedTags} />
+        <form onSubmit={handleSubmit}>
+          <Stack spacing={2}>
+            <TextField
+              label="Word / Phrase"
+              fullWidth
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              required
+              inputRef={inputRef}
+            />
 
-        <Button
-          type="submit"
-          variant="contained"
-          fullWidth
-          sx={{ mt: 3 }}
-          disabled={loading}
-        >
-          {loading ? 'Saving...' : 'Save'}
-        </Button>
-      </form>
+            <TagSelector value={selectedTags} onChange={setSelectedTags} />
+
+            {/* ACTIONS */}
+            <Box display="flex" justifyContent="flex-end" gap={1} mt={1}>
+              <Button onClick={() => router.back()} color="inherit">
+                Cancel
+              </Button>
+
+              <Button type="submit" variant="contained" disabled={loading}>
+                {loading ? 'Saving...' : 'Save'}
+              </Button>
+            </Box>
+          </Stack>
+        </form>
+      </Paper>
     </Box>
   )
 }

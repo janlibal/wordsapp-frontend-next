@@ -54,16 +54,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
 
   const { user, logout } = useAuth()
 
   const [value, setValue] = useState(searchParams.get('search') || '')
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   const debounced = useDebouncedValue(value, 400)
 
+  // 🔍 sync search with URL
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString())
 
@@ -72,11 +73,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
     router.replace(`/?${params.toString()}`)
   }, [debounced])
-
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) =>
-    setAnchorEl(event.currentTarget)
-
-  const handleMenuClose = () => setAnchorEl(null)
 
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen)
 
@@ -92,10 +88,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     router.replace(params.toString() ? `/?${params}` : '/')
   }
 
-  // 🔥 SINGLE SOURCE OF TRUTH
-  const navItems: NavItem[] = useMemo(() => {
-    if (!user) return []
+  const handleMenuOpen = (e: React.MouseEvent<HTMLElement>) =>
+    setAnchorEl(e.currentTarget)
 
+  const handleMenuClose = () => setAnchorEl(null)
+
+  // 🔥 NAV CONFIG
+  const navItems: NavItem[] = useMemo(() => {
     return [
       {
         label: 'All Words',
@@ -115,7 +114,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         href: '/system',
         showInDrawer: true,
         showInMenu: true,
-        mobileMenu: false,
       },
       {
         label: 'Tags',
@@ -141,48 +139,67 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         mobileMenu: true,
       },
     ]
-  }, [user, logout, router])
+  }, [logout, router])
 
-  // 🎯 FILTERED VIEWS
   const drawerItems = navItems.filter((i) => i.showInDrawer)
-
   const menuItems = navItems.filter(
     (i) => i.showInMenu && (!isMobile || i.mobileMenu)
   )
 
-  const regularMenuItems = menuItems.filter((i) => i.label !== 'Logout')
-  const logoutItem = menuItems.find((i) => i.label === 'Logout')
-
-  // 📂 DRAWER
+  // 📂 DRAWER CONTENT
   const drawerContent = (
-    <List>
-      {drawerItems.map((item) => (
-        <ListItem key={item.label} disablePadding>
-          <ListItemButton
-            component={item.href ? Link : 'button'}
-            href={item.href}
-            onClick={() => {
-              setMobileOpen(false)
-              if (item.action) item.action()
-            }}
-          >
-            <Box sx={{ mr: 2 }}>{item.icon}</Box>
-            <ListItemText primary={item.label} />
-          </ListItemButton>
-        </ListItem>
-      ))}
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <List>
+        {drawerItems.map((item) => (
+          <ListItem key={item.label} disablePadding>
+            <ListItemButton
+              component={item.href ? Link : 'button'}
+              href={item.href}
+              onClick={() => {
+                setMobileOpen(false)
+                if (item.action) item.action()
+              }}
+            >
+              <Box sx={{ mr: 2 }}>{item.icon}</Box>
+              <ListItemText primary={item.label} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
 
-      {user && <TagsSidebar onSelect={() => setMobileOpen(false)} />}
-    </List>
+      <Divider sx={{ my: 1 }} />
+
+      <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
+        <TagsSidebar onSelect={() => setMobileOpen(false)} />
+      </Box>
+    </Box>
   )
+
+  // 🔒 AUTH GUARD — minimal layout when logged out
+  if (!user) {
+    return (
+      <Box
+        sx={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          px: 2,
+          background: 'linear-gradient(135deg, #f5f7fa 0%, #e4ecf7 100%)',
+        }}
+      >
+        {children}
+      </Box>
+    )
+  }
 
   return (
     <Box sx={{ display: 'flex' }}>
       {/* 🔝 APP BAR */}
-      <AppBar position="fixed">
-        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+      <AppBar position="fixed" elevation={1}>
+        <Toolbar sx={{ justifyContent: 'space-between' }}>
           {/* LEFT */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {isMobile && (
               <IconButton color="inherit" onClick={handleDrawerToggle}>
                 <MenuIcon />
@@ -191,15 +208,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
             <Typography
               variant="h6"
-              sx={{ cursor: 'pointer' }}
+              sx={{ cursor: 'pointer', fontWeight: 600 }}
               onClick={() => router.push('/')}
             >
               WordsApp
             </Typography>
           </Box>
 
-          {/* CENTER */}
-          {!isMobile && user && (
+          {/* CENTER (desktop search) */}
+          {!isMobile && (
             <InputBase
               value={value}
               onChange={handleSearch}
@@ -208,170 +225,111 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 background: 'rgba(255,255,255,0.15)',
                 px: 2,
                 py: 0.5,
-                borderRadius: 1,
-                width: 300,
+                borderRadius: 2,
+                width: 320,
                 color: 'white',
               }}
             />
           )}
 
-          {isMobile && mobileSearchOpen && (
-            <Box
-              sx={{
-                position: 'absolute',
-                top: 56,
-                left: 0,
-                right: 0,
-                p: 1,
-                background: 'background.paper',
-                zIndex: 1200,
-              }}
-            >
-              <InputBase
-                autoFocus
-                fullWidth
-                value={value}
-                onChange={handleSearch}
-                onBlur={() => setMobileSearchOpen(false)}
-                placeholder="Search words..."
-                sx={{
-                  px: 2,
-                  py: 1,
-                  borderRadius: 1,
-                  backgroundColor: 'rgba(0,0,0,0.05)',
-                }}
-              />
-            </Box>
-          )}
-
           {/* RIGHT */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {user ? (
-              <>
-                {isMobile && (
-                  <IconButton
-                    color="inherit"
-                    onClick={() => setMobileSearchOpen(true)}
-                  >
-                    <SearchIcon />
-                  </IconButton>
-                )}
-
-                {isMobile ? (
-                  <IconButton
-                    color="inherit"
-                    onClick={() => router.push('/words/new')}
-                  >
-                    <AddIcon />
-                  </IconButton>
-                ) : (
-                  <Button
-                    color="inherit"
-                    startIcon={<AddIcon />}
-                    onClick={() => router.push('/words/new')}
-                  >
-                    Add
-                  </Button>
-                )}
-
-                <IconButton color="inherit" onClick={handleMenuOpen}>
-                  <Person />
-                </IconButton>
-
-                {/* 🔽 DROPDOWN */}
-                <Menu
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleMenuClose}
-                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                  transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                  PaperProps={{ sx: { minWidth: 180, mt: 1 } }}
-                >
-                  {/* Regular items */}
-                  {regularMenuItems.map((item) => (
-                    <MenuItem
-                      key={item.label}
-                      sx={{ py: 1.5 }}
-                      onClick={async () => {
-                        handleMenuClose()
-                        if (item.href) router.push(item.href)
-                        if (item.action) await item.action()
-                      }}
-                    >
-                      <Box sx={{ mr: 1 }}>{item.icon}</Box>
-                      {item.label}
-                    </MenuItem>
-                  ))}
-
-                  {/* Logout separated */}
-                  {logoutItem && [
-                    <Divider key="divider" />,
-                    <MenuItem
-                      key="logout"
-                      sx={{ py: 1.5, color: 'error.main' }}
-                      onClick={async () => {
-                        handleMenuClose()
-                        if (logoutItem.action) await logoutItem.action()
-                      }}
-                    >
-                      <Box sx={{ mr: 1 }}>{logoutItem.icon}</Box>
-                      {logoutItem.label}
-                    </MenuItem>,
-                  ]}
-                </Menu>
-              </>
-            ) : (
-              <>
-                <Button color="inherit" onClick={() => router.push('/login')}>
-                  {isMobile ? '' : 'Login'}
-                </Button>
-
-                <Button
-                  color="inherit"
-                  onClick={() => router.push('/register')}
-                >
-                  {isMobile ? '' : 'Sign Up'}
-                </Button>
-              </>
+            {isMobile && (
+              <IconButton
+                color="inherit"
+                onClick={() => setMobileSearchOpen(true)}
+              >
+                <SearchIcon />
+              </IconButton>
             )}
+
+            <IconButton
+              color="inherit"
+              onClick={() => router.push('/words/new')}
+            >
+              <AddIcon />
+            </IconButton>
+
+            <IconButton color="inherit" onClick={handleMenuOpen}>
+              <Person />
+            </IconButton>
           </Box>
         </Toolbar>
       </AppBar>
 
-      {/* 📂 SIDEBAR */}
-      {isMobile ? (
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{ keepMounted: true }}
-          PaperProps={{ sx: { width: drawerWidth } }}
-        >
-          {drawerContent}
-        </Drawer>
-      ) : (
-        <Drawer
-          variant="permanent"
+      {/* 🔍 MOBILE SEARCH */}
+      {isMobile && mobileSearchOpen && (
+        <Box
           sx={{
-            width: drawerWidth,
-            flexShrink: 0,
-            [`& .MuiDrawer-paper`]: {
-              width: drawerWidth,
-              boxSizing: 'border-box',
-              mt: 8,
-            },
+            position: 'fixed',
+            top: 64,
+            left: 0,
+            right: 0,
+            p: 1,
+            background: 'background.paper',
+            zIndex: 1200,
           }}
         >
-          {drawerContent}
-        </Drawer>
+          <InputBase
+            autoFocus
+            fullWidth
+            value={value}
+            onChange={handleSearch}
+            onBlur={() => setMobileSearchOpen(false)}
+            placeholder="Search words..."
+            sx={{
+              px: 2,
+              py: 1,
+              borderRadius: 1,
+              backgroundColor: 'rgba(0,0,0,0.05)',
+            }}
+          />
+        </Box>
       )}
+
+      {/* 📂 DRAWER */}
+      <Drawer
+        variant={isMobile ? 'temporary' : 'permanent'}
+        open={isMobile ? mobileOpen : true}
+        onClose={handleDrawerToggle}
+        ModalProps={{ keepMounted: true }}
+        PaperProps={{
+          sx: {
+            width: drawerWidth,
+            mt: isMobile ? 0 : 8,
+          },
+        }}
+      >
+        {drawerContent}
+      </Drawer>
+
+      {/* 🔽 USER MENU */}
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+      >
+        {menuItems.map((item) => (
+          <MenuItem
+            key={item.label}
+            onClick={async () => {
+              handleMenuClose()
+              if (item.href) router.push(item.href)
+              if (item.action) await item.action()
+            }}
+          >
+            <Box sx={{ mr: 1 }}>{item.icon}</Box>
+            {item.label}
+          </MenuItem>
+        ))}
+      </Menu>
 
       {/* MAIN */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          p: 2,
+          p: { xs: 2, md: 3 },
           mt: 8,
           ml: isMobile ? 0 : `${drawerWidth}px`,
         }}

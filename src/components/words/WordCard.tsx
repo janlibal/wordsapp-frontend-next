@@ -7,23 +7,21 @@ import {
   IconButton,
   Button,
   Chip,
-  Autocomplete,
   Stack,
-  MenuItem,
-  Menu,
   Snackbar,
+  Fade,
+  Collapse,
 } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Tag } from '@/src/types/tags/tag.type'
 import { useUpdateWord } from '@/src/hooks/useUpdateHook'
 import { getTags } from '@/src/services/tags/tag.service'
-
+import { motion } from 'framer-motion'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 
 import {
   addTagToWord,
-  deleteWord,
   removeTagFromWord,
 } from '@/src/services/words/word.service'
 import WordActionsMenu from './WordActionsMenu'
@@ -201,58 +199,67 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
             </Box>
 
             {hovered && !editing && (
-              <IconButton size="small" onClick={handleOpen}>
-                <MoreVertIcon fontSize="small" />
-              </IconButton>
+              <Fade in={!editing}>
+                <IconButton size="small" onClick={handleOpen}>
+                  <MoreVertIcon fontSize="small" />
+                </IconButton>
+              </Fade>
             )}
           </Box>
 
           {ActionsMenu}
 
           {/* TAGS */}
-          {!editing && (
-            <Stack direction="row" spacing={1} flexWrap="wrap">
-              {tags.map((t) => (
-                <Chip
-                  key={t.id}
-                  label={t.name}
-                  size="small"
-                  variant="outlined"
-                />
-              ))}
+          <Collapse in={!editing}>
+            <Fade in={!editing}>
+              <Stack direction="row" spacing={1} flexWrap="wrap">
+                {tags.map((t) => (
+                  <motion.div
+                    key={t.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                  >
+                    <Chip label={t.name} size="small" variant="outlined" />
+                  </motion.div>
+                ))}
 
-              {tags.length > 0 && <Chip size="small" label={tags.length} />}
-            </Stack>
-          )}
+                {tags.length > 0 && <Chip size="small" label={tags.length} />}
+              </Stack>
+            </Fade>
+          </Collapse>
 
           {/* EDIT MODE */}
-          {editing && (
-            <Stack spacing={2}>
-              <TagSelector value={selectedTags} onChange={handleTagChange} />
+          <Collapse in={editing}>
+            <Fade in={editing}>
+              <Stack spacing={2} sx={{ mt: 1 }}>
+                <TagSelector value={selectedTags} onChange={handleTagChange} />
 
-              <Box display="flex" gap={1} justifyContent="flex-end">
-                <Button
-                  size="small"
-                  onClick={() => {
-                    setEditing(false)
-                    setEditedContent(content)
-                    setSelectedTags(tags)
-                  }}
-                >
-                  Cancel
-                </Button>
+                <Box display="flex" gap={1} justifyContent="flex-end">
+                  <Button
+                    size="small"
+                    onClick={() => {
+                      setEditing(false)
+                      setEditedContent(content)
+                      setSelectedTags(tags)
+                    }}
+                  >
+                    Cancel
+                  </Button>
 
-                <Button
-                  size="small"
-                  variant="contained"
-                  onClick={handleSave}
-                  disabled={isSaving}
-                >
-                  {isSaving ? 'Saving...' : 'Save'}
-                </Button>
-              </Box>
-            </Stack>
-          )}
+                  <Button
+                    size="small"
+                    variant="contained"
+                    onClick={handleSave}
+                    disabled={isSaving}
+                  >
+                    {isSaving ? 'Saving...' : 'Save'}
+                  </Button>
+                </Box>
+              </Stack>
+            </Fade>
+          </Collapse>
         </Stack>
       </CardContent>
 

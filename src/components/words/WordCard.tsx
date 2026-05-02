@@ -27,6 +27,7 @@ import {
 import WordActionsMenu from './WordActionsMenu'
 import { Word } from '@/src/types/words/word.type'
 import TagSelector from '../tags/TagSelector'
+import { highlightText } from '@/src/helpers/highlightText'
 
 type WordCardProps = {
   id: string
@@ -144,24 +145,6 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
     onDelete: handleDelete,
     onFavorite: () => alert('TODO favorite'),
   })
-
-  // 🔍 highlight
-  const highlightText = (text: string, query?: string) => {
-    if (!query) return text
-
-    const words = query.trim().split(/\s+/)
-    const regex = new RegExp(`(${words.join('|')})`, 'gi')
-
-    return text
-      .split(regex)
-      .map((part, i) =>
-        words.some((w) => w.toLowerCase() === part.toLowerCase()) ? (
-          <mark key={i}>{part}</mark>
-        ) : (
-          part
-        )
-      )
-  }
 
   return (
     <Card

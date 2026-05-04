@@ -31,7 +31,7 @@ export default function WordsList() {
         )}
 
         {words.map((word) => (
-          <WordCard key={word.id} {...word} />
+          <WordCard key={word.id} {...word} search={search} />
         ))}
       </Stack>
     </PageContainer>

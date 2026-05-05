@@ -12,48 +12,47 @@ import {
   Alert,
 } from '@mui/material'
 import { useRouter } from 'next/navigation'
-import { createWord } from '@/src/services/words/word.service'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Tag } from '@/src/types/tags/tag.type'
 import { getTags } from '@/src/services/tags/tag.service'
 import Autocomplete from '@mui/material/Autocomplete'
 import TagSelector from '../tags/TagSelector'
+import useCreateWord from '@/src/hooks/useCreateHook'
 
 export default function AddWord() {
   const router = useRouter()
-  const queryClient = useQueryClient()
 
   const [content, setContent] = useState('')
   const [selectedTags, setSelectedTags] = useState<Tag[]>([])
-  const [loading, setLoading] = useState(false)
+
   const [error, setError] = useState<string | null>(null)
 
   const inputRef = useRef<HTMLInputElement | null>(null)
+
+  const createMutation = useCreateWord()
+  const isLoading = createMutation.isPending
 
   useEffect(() => {
     inputRef.current?.focus()
   }, [])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
-    setLoading(true)
 
-    try {
-      await createWord({
+    createMutation.mutate(
+      {
         content,
         tags: selectedTags.map((t) => t.name),
-      })
-
-      queryClient.invalidateQueries({ queryKey: ['words'] })
-      queryClient.invalidateQueries({ queryKey: ['tags'] })
-
-      router.push('/')
-    } catch (err: any) {
-      setError(err.message || 'Failed to create word')
-    } finally {
-      setLoading(false)
-    }
+      },
+      {
+        onSuccess: () => {
+          router.push('/')
+        },
+        onError: (err: any) => {
+          setError(err.message || 'Failed to create word')
+        },
+      }
+    )
   }
 
   return (
@@ -99,8 +98,8 @@ export default function AddWord() {
                 Cancel
               </Button>
 
-              <Button type="submit" variant="contained" disabled={loading}>
-                {loading ? 'Saving...' : 'Save'}
+              <Button type="submit" variant="contained" disabled={isLoading}>
+                {isLoading ? 'Saving...' : 'Save'}
               </Button>
             </Box>
           </Stack>

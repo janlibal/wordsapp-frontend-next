@@ -12,7 +12,7 @@ import {
   Fade,
   Collapse,
 } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Tag } from '@/src/types/tags/tag.type'
 import { useUpdateWord } from '@/src/hooks/useUpdateHook'
@@ -27,6 +27,8 @@ import {
 import WordActionsMenu from './WordActionsMenu'
 import { Word } from '@/src/types/words/word.type'
 import TagSelector from '../tags/TagSelector'
+import { useDeleteWord } from '@/src/hooks/useDeleteHook'
+import { highlightText } from '@/src/helpers/highlightText'
 
 type WordCardProps = {
   id: string
@@ -42,36 +44,32 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
   const [isSaving, setIsSaving] = useState(false)
   const [hovered, setHovered] = useState(false)
 
-  const [deletedWord, setDeletedWord] = useState<Word | null>(null)
-  const [showUndo, setShowUndo] = useState(false)
-
   const queryClient = useQueryClient()
 
-  // 🧠 MOCK delete (no backend yet)
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      return true
-    },
-  })
+  const updateMutation = useUpdateWord()
+  const deleteMutation = useDeleteWord()
 
-  const mutation = useUpdateWord()
-
-  const { data: allTags = [] } = useQuery<Tag[]>({
+  /*const { data: allTags = [] } = useQuery<Tag[]>({
     queryKey: ['tags'],
     queryFn: () => getTags(),
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: false,
-  })
+  })*/
 
   useEffect(() => {
     setSelectedTags(tags)
   }, [tags])
 
+  const handleDelete = () => {
+    if (deleteMutation.isPending) return
+    deleteMutation.mutate(id)
+  }
+
   // 💾 save
   const handleSave = () => {
     setIsSaving(true)
 
-    mutation.mutate(
+    updateMutation.mutate(
       {
         id,
         data: { content: editedContent },
@@ -103,65 +101,12 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
     ])
   }
 
-  // 🗑 DELETE (optimistic, safe)
-  const handleDelete = () => {
-    const currentWords = queryClient.getQueryData<Word[]>(['words']) || []
-
-    const wordToDelete = currentWords.find((w) => w.id === id)
-    if (!wordToDelete) return
-
-    // remove instantly
-    queryClient.setQueryData(
-      ['words'],
-      currentWords.filter((w) => w.id !== id)
-    )
-
-    setDeletedWord(wordToDelete)
-    setShowUndo(true)
-
-    // delay actual delete
-    setTimeout(() => {
-      deleteMutation.mutate(id)
-    }, 3000)
-  }
-
-  // ↩ undo
-  const handleUndo = () => {
-    if (!deletedWord) return
-
-    queryClient.setQueryData(['words'], (old: Word[] = []) => [
-      deletedWord,
-      ...old,
-    ])
-
-    setDeletedWord(null)
-    setShowUndo(false)
-  }
-
   // 🎯 actions menu (clean)
   const { handleOpen, Menu: ActionsMenu } = WordActionsMenu({
     onEdit: () => setEditing(true),
     onDelete: handleDelete,
     onFavorite: () => alert('TODO favorite'),
   })
-
-  // 🔍 highlight
-  const highlightText = (text: string, query?: string) => {
-    if (!query) return text
-
-    const words = query.trim().split(/\s+/)
-    const regex = new RegExp(`(${words.join('|')})`, 'gi')
-
-    return text
-      .split(regex)
-      .map((part, i) =>
-        words.some((w) => w.toLowerCase() === part.toLowerCase()) ? (
-          <mark key={i}>{part}</mark>
-        ) : (
-          part
-        )
-      )
-  }
 
   return (
     <Card
@@ -264,17 +209,6 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
       </CardContent>
 
       {/* SNACKBAR */}
-      <Snackbar
-        open={showUndo}
-        autoHideDuration={3000}
-        onClose={() => setShowUndo(false)}
-        message="Word deleted"
-        action={
-          <Button onClick={handleUndo} size="small">
-            UNDO
-          </Button>
-        }
-      />
     </Card>
   )
 }

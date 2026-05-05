@@ -22,7 +22,9 @@ export async function removeTagFromWord(wordId: string, tagId: string) {
 }
 
 export function deleteWord(id: string) {
-  return true
+  return apiFetch(`/api/api/v1/words/${id}`, {
+    method: 'DELETE',
+  })
 }
 
 /*export async function getWords(): Promise<Word[]> {

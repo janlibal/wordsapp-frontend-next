@@ -29,6 +29,7 @@ import { Word } from '@/src/types/words/word.type'
 import TagSelector from '../tags/TagSelector'
 import { useDeleteWord } from '@/src/hooks/useDeleteHook'
 import { highlightText } from '@/src/helpers/highlightText'
+import { useSnackbar } from '@/src/hooks/SnacbarProvider'
 
 type WordCardProps = {
   id: string
@@ -41,13 +42,13 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
   const [editing, setEditing] = useState(false)
   const [editedContent, setEditedContent] = useState(content)
   const [selectedTags, setSelectedTags] = useState<Tag[]>(tags)
-  const [isSaving, setIsSaving] = useState(false)
   const [hovered, setHovered] = useState(false)
-
-  const queryClient = useQueryClient()
+  const [snackbar, setSnackbar] = useState<string | null>(null)
 
   const updateMutation = useUpdateWord()
+  updateMutation.isPending
   const deleteMutation = useDeleteWord()
+  const showSnackbar = useSnackbar()
 
   /*const { data: allTags = [] } = useQuery<Tag[]>({
     queryKey: ['tags'],
@@ -61,24 +62,22 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
   }, [tags])
 
   const handleDelete = () => {
-    if (deleteMutation.isPending) return
-    deleteMutation.mutate(id)
+    deleteMutation.mutate(id, {
+      onSuccess: () => showSnackbar('Word deleted'),
+      onError: () => showSnackbar('Delete failed'),
+    })
   }
 
   // 💾 save
   const handleSave = () => {
-    setIsSaving(true)
-
     updateMutation.mutate(
+      { id, data: { content: editedContent } },
       {
-        id,
-        data: { content: editedContent },
-      },
-      {
-        onSettled: () => {
-          setIsSaving(false)
+        onSuccess: () => {
+          showSnackbar('Word updated')
           setEditing(false)
         },
+        onError: () => showSnackbar('Update failed'),
       }
     )
   }
@@ -197,9 +196,9 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
                     size="small"
                     variant="contained"
                     onClick={handleSave}
-                    disabled={isSaving}
+                    disabled={updateMutation.isPending}
                   >
-                    {isSaving ? 'Saving...' : 'Save'}
+                    {updateMutation.isPending ? 'Saving...' : 'Save'}
                   </Button>
                 </Box>
               </Stack>
@@ -207,8 +206,13 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
           </Collapse>
         </Stack>
       </CardContent>
-
       {/* SNACKBAR */}
+      <Snackbar
+        open={!!snackbar}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar(null)}
+        message={snackbar}
+      />
     </Card>
   )
 }

@@ -6,6 +6,7 @@ import AppLayout from './components/AppLayout'
 import theme from './theme'
 import { AuthProvider } from './context/authContext'
 import Providers from './providers'
+import { SnackbarProvider } from '../hooks/SnacbarProvider'
 
 export default function RootLayout({
   children,
@@ -19,7 +20,9 @@ export default function RootLayout({
           <ThemeProvider theme={theme}>
             <CssBaseline />
             <Providers>
-              <AppLayout>{children}</AppLayout>
+              <AppLayout>
+                <SnackbarProvider>{children}</SnackbarProvider>
+              </AppLayout>
             </Providers>
           </ThemeProvider>
         </AuthProvider>

@@ -17,6 +17,7 @@ import { getTags } from '@/src/services/tags/tag.service'
 import Autocomplete from '@mui/material/Autocomplete'
 import TagSelector from '../tags/TagSelector'
 import useCreateWord from '@/src/hooks/useCreateHook'
+import { useSnackbar } from '@/src/hooks/SnacbarProvider'
 
 export default function AddWord() {
   const router = useRouter()
@@ -27,9 +28,11 @@ export default function AddWord() {
   const [error, setError] = useState<string | null>(null)
 
   const inputRef = useRef<HTMLInputElement | null>(null)
+  const [snackbar, setSnackbar] = useState<string | null>(null)
 
   const createMutation = useCreateWord()
   const isLoading = createMutation.isPending
+  const showSnackbar = useSnackbar()
 
   useEffect(() => {
     inputRef.current?.focus()
@@ -46,10 +49,12 @@ export default function AddWord() {
       },
       {
         onSuccess: () => {
+          showSnackbar('Content created')
           router.push('/')
         },
         onError: (err: any) => {
-          setError(err.message || 'Failed to create word')
+          ;(showSnackbar('Creating failed'),
+            setError(err.message || 'Failed to create word'))
         },
       }
     )

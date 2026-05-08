@@ -69,37 +69,35 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
       tags,
     }
 
-    deleteMutation.mutate(id, {
-      onSuccess: () => {
-        showSnackbar({
-          message: 'Word deleted',
+    showSnackbar({
+      message: 'Word deleted',
 
-          action: (
-            <Button
-              color="secondary"
-              size="small"
-              onClick={() => {
-                restoreMutation.mutate(deletedWord, {
-                  onSuccess: () => {
-                    showSnackbar({
-                      message: 'Word restored',
-                    })
-                  },
-
-                  onError: () => {
-                    showSnackbar({
-                      message: 'Restore failed',
-                    })
-                  },
+      action: (
+        <Button
+          color="secondary"
+          size="small"
+          onClick={() => {
+            restoreMutation.mutate(deletedWord, {
+              onSuccess: () => {
+                showSnackbar({
+                  message: 'Word restored',
                 })
-              }}
-            >
-              UNDO
-            </Button>
-          ),
-        })
-      },
+              },
 
+              onError: () => {
+                showSnackbar({
+                  message: 'Restore failed',
+                })
+              },
+            })
+          }}
+        >
+          UNDO
+        </Button>
+      ),
+    })
+
+    deleteMutation.mutate(id, {
       onError: () => {
         showSnackbar({
           message: 'Delete failed',

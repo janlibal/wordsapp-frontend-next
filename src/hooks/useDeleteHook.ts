@@ -10,28 +10,36 @@ export function useDeleteWord() {
     mutationFn: (id: string) => deleteWord(id),
 
     onMutate: async (id) => {
-      await queryClient.cancelQueries({ queryKey: queryKeys.words })
+      await queryClient.cancelQueries({
+        queryKey: queryKeys.words,
+      })
 
-      const previous = queryClient.getQueryData<Word[]>(queryKeys.words)
+      // get ALL word queries
+      const previousQueries = queryClient.getQueriesData<Word[]>({
+        queryKey: queryKeys.words,
+      })
 
-      queryClient.setQueryData<Word[]>(queryKeys.words, (old = []) =>
-        old.filter((w) => w.id !== id)
-      )
+      // update ALL caches
+      previousQueries.forEach(([queryKey]) => {
+        queryClient.setQueryData<Word[]>(queryKey, (old = []) =>
+          old.filter((w) => w.id !== id)
+        )
+      })
 
-      return { previous }
+      return { previousQueries }
     },
 
-    onSuccess: () => {
-      // nothing — UI already correct
-    },
     onError: (_err, _id, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(queryKeys.words, context.previous)
-      }
+      // rollback ALL caches
+      context?.previousQueries.forEach(([queryKey, data]) => {
+        queryClient.setQueryData(queryKey, data)
+      })
     },
 
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.words })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.words,
+      })
     },
   })
 }

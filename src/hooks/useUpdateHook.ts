@@ -7,29 +7,60 @@ export function useUpdateWord() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: { content: string } }) =>
-      updateWord(id, data),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string
+      data: { content: string }
+    }) => updateWord(id, data),
 
     onMutate: async ({ id, data }) => {
-      await queryClient.cancelQueries({ queryKey: queryKeys.words })
+      await queryClient.cancelQueries({
+        queryKey: queryKeys.words,
+      })
 
-      const previous = queryClient.getQueryData<Word[]>(queryKeys.words)
+      // snapshot ALL matching queries
+      const previousQueries =
+        queryClient.getQueriesData<Word[]>({
+          queryKey: queryKeys.words,
+        })
 
-      queryClient.setQueryData<Word[]>(queryKeys.words, (old = []) =>
-        old.map((w) => (w.id === id ? { ...w, content: data.content } : w))
-      )
+      // update ALL caches
+      previousQueries.forEach(([queryKey]) => {
+        queryClient.setQueryData<Word[]>(
+          queryKey,
+          (old = []) =>
+            old.map((w) =>
+              w.id === id
+                ? {
+                    ...w,
+                    content: data.content,
+                  }
+                : w
+            )
+        )
+      })
 
-      return { previous }
+      return { previousQueries }
     },
 
     onError: (_err, _vars, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(queryKeys.words, context.previous)
-      }
+      // rollback ALL caches
+      context?.previousQueries.forEach(
+        ([queryKey, data]) => {
+          queryClient.setQueryData(
+            queryKey,
+            data
+          )
+        }
+      )
     },
 
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.words })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.words,
+      })
     },
   })
 }

@@ -8,10 +8,7 @@ export default function useCreateWord() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: {
-      content: string
-      tags: string[]
-    }) => createWord(data),
+    mutationFn: (data: { content: string; tags: string[] }) => createWord(data),
 
     onMutate: async (newWord) => {
       await queryClient.cancelQueries({
@@ -19,90 +16,53 @@ export default function useCreateWord() {
       })
 
       // snapshot ALL caches
-      const previousQueries =
-        queryClient.getQueriesData<Word[]>({
-          queryKey: queryKeys.words,
-        })
+      const previousQueries = queryClient.getQueriesData<Word[]>({
+        queryKey: queryKeys.words,
+      })
 
-      const allTags =
-        queryClient.getQueryData<Tag[]>(
-          queryKeys.tags
-        ) || []
+      const allTags = queryClient.getQueryData<Tag[]>(queryKeys.tags) || []
 
-      const resolvedTags = allTags.filter((t) =>
-        newWord.tags.includes(t.name)
-      )
+      const resolvedTags = allTags.filter((t) => newWord.tags.includes(t.name))
 
       const optimisticWord: Word = {
-        id:
-          'temp-' +
-          Math.random()
-            .toString(36)
-            .slice(2),
+        id: 'temp-' + Math.random().toString(36).slice(2),
 
         content: newWord.content,
         tags: resolvedTags,
       }
 
       // update ALL matching caches carefully
-      previousQueries.forEach(
-        ([queryKey]) => {
-          const [
-            _,
-            search,
-            tagIds,
-          ] = queryKey as [
-            string,
-            string,
-            string[]
-          ]
+      previousQueries.forEach(([queryKey]) => {
+        const [_, search, tagIds] = queryKey as [string, string, string[]]
 
-          // search filtering
-          const matchesSearch =
-            !search ||
-            optimisticWord.content
-              .toLowerCase()
-              .includes(
-                search.toLowerCase()
-              )
+        // search filtering
+        const matchesSearch =
+          !search ||
+          optimisticWord.content.toLowerCase().includes(search.toLowerCase())
 
-          // tag filtering
-          const matchesTags =
-            !tagIds?.length ||
-            optimisticWord.tags.some((t) =>
-              tagIds.includes(t.id)
-            )
+        // tag filtering
+        const matchesTags =
+          !tagIds?.length ||
+          optimisticWord.tags.some((t) => tagIds.includes(t.id))
 
-          // skip unrelated caches
-          if (
-            !matchesSearch ||
-            !matchesTags
-          ) {
-            return
-          }
-
-          queryClient.setQueryData<Word[]>(
-            queryKey,
-            (old = []) => [
-              optimisticWord,
-              ...old,
-            ]
-          )
+        // skip unrelated caches
+        if (!matchesSearch || !matchesTags) {
+          return
         }
-      )
+
+        queryClient.setQueryData<Word[]>(queryKey, (old = []) => [
+          optimisticWord,
+          ...old,
+        ])
+      })
 
       return { previousQueries }
     },
 
     onError: (_err, _vars, context) => {
-      context?.previousQueries.forEach(
-        ([queryKey, data]) => {
-          queryClient.setQueryData(
-            queryKey,
-            data
-          )
-        }
-      )
+      context?.previousQueries.forEach(([queryKey, data]) => {
+        queryClient.setQueryData(queryKey, data)
+      })
     },
 
     onSettled: () => {

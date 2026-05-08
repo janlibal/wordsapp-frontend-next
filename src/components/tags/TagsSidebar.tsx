@@ -5,6 +5,7 @@ import { Box, Chip } from '@mui/material'
 import { useUrlFilters } from '@/src/hooks/useFilters'
 import { Tag } from '@/src/types/tags/tag.type'
 import { getTags } from '@/src/services/tags/tag.service'
+import { queryKeys } from '@/src/hooks/types/queryKeys'
 
 type Props = {
   onSelect?: () => void
@@ -14,9 +15,8 @@ export default function TagsSidebar({ onSelect }: Props) {
   const { tags: activeTags, toggleTag } = useUrlFilters()
 
   // 📦 fetch tags
-
   const { data: tags = [], isLoading } = useQuery<Tag[]>({
-    queryKey: ['tags'],
+    queryKey: queryKeys.tags,
     queryFn: () => getTags(),
     //staleTime: 30_000,
     staleTime: 1000 * 60 * 5, // 5 minutes

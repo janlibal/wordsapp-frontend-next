@@ -7,13 +7,8 @@ export function useUpdateWord() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({
-      id,
-      data,
-    }: {
-      id: string
-      data: { content: string }
-    }) => updateWord(id, data),
+    mutationFn: ({ id, data }: { id: string; data: { content: string } }) =>
+      updateWord(id, data),
 
     onMutate: async ({ id, data }) => {
       await queryClient.cancelQueries({
@@ -21,24 +16,21 @@ export function useUpdateWord() {
       })
 
       // snapshot ALL matching queries
-      const previousQueries =
-        queryClient.getQueriesData<Word[]>({
-          queryKey: queryKeys.words,
-        })
+      const previousQueries = queryClient.getQueriesData<Word[]>({
+        queryKey: queryKeys.words,
+      })
 
       // update ALL caches
       previousQueries.forEach(([queryKey]) => {
-        queryClient.setQueryData<Word[]>(
-          queryKey,
-          (old = []) =>
-            old.map((w) =>
-              w.id === id
-                ? {
-                    ...w,
-                    content: data.content,
-                  }
-                : w
-            )
+        queryClient.setQueryData<Word[]>(queryKey, (old = []) =>
+          old.map((w) =>
+            w.id === id
+              ? {
+                  ...w,
+                  content: data.content,
+                }
+              : w
+          )
         )
       })
 
@@ -47,14 +39,9 @@ export function useUpdateWord() {
 
     onError: (_err, _vars, context) => {
       // rollback ALL caches
-      context?.previousQueries.forEach(
-        ([queryKey, data]) => {
-          queryClient.setQueryData(
-            queryKey,
-            data
-          )
-        }
-      )
+      context?.previousQueries.forEach(([queryKey, data]) => {
+        queryClient.setQueryData(queryKey, data)
+      })
     },
 
     onSettled: () => {

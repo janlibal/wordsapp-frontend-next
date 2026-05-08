@@ -1,13 +1,22 @@
-import { createContext, useContext, useState } from 'react'
-import { Snackbar } from '@mui/material'
+'use client'
 
-const SnackbarContext = createContext<(msg: string) => void>(() => {})
+import { Snackbar, Button } from '@mui/material'
+import { createContext, useContext, useState } from 'react'
+
+type SnackbarOptions = {
+  message: string
+  action?: React.ReactNode
+}
+
+type SnackbarContextType = (options: SnackbarOptions) => void
+
+const SnackbarContext = createContext<SnackbarContextType>(() => {})
 
 export function SnackbarProvider({ children }: { children: React.ReactNode }) {
-  const [message, setMessage] = useState<string | null>(null)
+  const [snackbar, setSnackbar] = useState<SnackbarOptions | null>(null)
 
-  const showSnackbar = (msg: string) => {
-    setMessage(msg)
+  const showSnackbar = (options: SnackbarOptions) => {
+    setSnackbar(options)
   }
 
   return (
@@ -15,10 +24,11 @@ export function SnackbarProvider({ children }: { children: React.ReactNode }) {
       {children}
 
       <Snackbar
-        open={!!message}
-        autoHideDuration={3000}
-        onClose={() => setMessage(null)}
-        message={message}
+        open={!!snackbar}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar(null)}
+        message={snackbar?.message}
+        action={snackbar?.action}
       />
     </SnackbarContext.Provider>
   )

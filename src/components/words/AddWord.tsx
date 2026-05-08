@@ -49,11 +49,11 @@ export default function AddWord() {
       },
       {
         onSuccess: () => {
-          showSnackbar('Content created')
+          showSnackbar({ message: 'Content created' })
           router.push('/')
         },
         onError: (err: any) => {
-          ;(showSnackbar('Creating failed'),
+          ;(showSnackbar({ message: 'Failed to create word' }),
             setError(err.message || 'Failed to create word'))
         },
       }

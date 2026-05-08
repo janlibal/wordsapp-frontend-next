@@ -30,6 +30,7 @@ import TagSelector from '../tags/TagSelector'
 import { useDeleteWord } from '@/src/hooks/useDeleteHook'
 import { highlightText } from '@/src/helpers/highlightText'
 import { useSnackbar } from '@/src/hooks/SnacbarProvider'
+import { useRestoreWord } from '@/src/hooks/useRestoreHook'
 
 type WordCardProps = {
   id: string
@@ -43,11 +44,11 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
   const [editedContent, setEditedContent] = useState(content)
   const [selectedTags, setSelectedTags] = useState<Tag[]>(tags)
   const [hovered, setHovered] = useState(false)
-  const [snackbar, setSnackbar] = useState<string | null>(null)
 
   const updateMutation = useUpdateWord()
   updateMutation.isPending
   const deleteMutation = useDeleteWord()
+  const restoreMutation = useRestoreWord()
   const showSnackbar = useSnackbar()
 
   /*const { data: allTags = [] } = useQuery<Tag[]>({
@@ -63,8 +64,17 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
 
   const handleDelete = () => {
     deleteMutation.mutate(id, {
-      onSuccess: () => showSnackbar('Word deleted'),
-      onError: () => showSnackbar('Delete failed'),
+      onSuccess: () => {
+        showSnackbar({
+          message: 'Word deleted',
+        })
+      },
+
+      onError: () => {
+        showSnackbar({
+          message: 'Delete failed',
+        })
+      },
     })
   }
 
@@ -74,10 +84,10 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
       { id, data: { content: editedContent } },
       {
         onSuccess: () => {
-          showSnackbar('Word updated')
+          showSnackbar({ message: 'Word updated' })
           setEditing(false)
         },
-        onError: () => showSnackbar('Update failed'),
+        onError: () => showSnackbar({ message: 'Update failed' }),
       }
     )
   }
@@ -207,12 +217,6 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
         </Stack>
       </CardContent>
       {/* SNACKBAR */}
-      <Snackbar
-        open={!!snackbar}
-        autoHideDuration={3000}
-        onClose={() => setSnackbar(null)}
-        message={snackbar}
-      />
     </Card>
   )
 }

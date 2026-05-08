@@ -1,4 +1,8 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  InfiniteData,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query'
 import { createWord } from '../services/words/word.service'
 import { Word } from '../types/words/word.type'
 import { Tag } from '../types/tags/tag.type'
@@ -15,8 +19,7 @@ export default function useCreateWord() {
         queryKey: queryKeys.words,
       })
 
-      // snapshot ALL caches
-      const previousQueries = queryClient.getQueriesData<Word[]>({
+      const previousQueries = queryClient.getQueriesData<InfiniteData<Word[]>>({
         queryKey: queryKeys.words,
       })
 
@@ -26,34 +29,35 @@ export default function useCreateWord() {
 
       const optimisticWord: Word = {
         id: 'temp-' + Math.random().toString(36).slice(2),
-
         content: newWord.content,
         tags: resolvedTags,
       }
 
-      // update ALL matching caches carefully
-      previousQueries.forEach(([queryKey]) => {
+      // apply update per cache entry (NO inner setQueriesData)
+      previousQueries.forEach(([queryKey, oldData]) => {
+        if (!oldData) return
+
         const [_, search, tagIds] = queryKey as [string, string, string[]]
 
-        // search filtering
         const matchesSearch =
           !search ||
           optimisticWord.content.toLowerCase().includes(search.toLowerCase())
 
-        // tag filtering
         const matchesTags =
           !tagIds?.length ||
           optimisticWord.tags.some((t) => tagIds.includes(t.id))
 
-        // skip unrelated caches
-        if (!matchesSearch || !matchesTags) {
-          return
+        if (!matchesSearch || !matchesTags) return
+
+        const updated: InfiniteData<Word[]> = {
+          ...oldData,
+          pages: [
+            [optimisticWord, ...(oldData.pages[0] ?? [])],
+            ...oldData.pages.slice(1),
+          ],
         }
 
-        queryClient.setQueryData<Word[]>(queryKey, (old = []) => [
-          optimisticWord,
-          ...old,
-        ])
+        queryClient.setQueryData(queryKey, updated)
       })
 
       return { previousQueries }

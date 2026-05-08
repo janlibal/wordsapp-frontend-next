@@ -1,7 +1,12 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  InfiniteData,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query'
 import { deleteWord } from '../services/words/word.service'
 import { Word } from '../types/words/word.type'
 import { queryKeys } from './types/queryKeys'
+import { mapInfiniteWords } from '../helpers/mapInfiniteWords'
 
 export function useDeleteWord() {
   const queryClient = useQueryClient()
@@ -9,7 +14,23 @@ export function useDeleteWord() {
   return useMutation({
     mutationFn: (id: string) => deleteWord(id),
 
-    onMutate: async (id) => {
+    onMutate: async (id: string) => {
+      await queryClient.cancelQueries({
+        queryKey: queryKeys.words,
+      })
+
+      const previous = queryClient.getQueriesData<InfiniteData<Word[]>>({
+        queryKey: queryKeys.words,
+      })
+
+      queryClient.setQueriesData<InfiniteData<Word[]>>(
+        { queryKey: queryKeys.words },
+        (old) => mapInfiniteWords(old, (word) => (word.id === id ? null : word))
+      )
+
+      return { previous }
+
+      /*onMutate: async (id) => {
       await queryClient.cancelQueries({
         queryKey: queryKeys.words,
       })
@@ -26,12 +47,11 @@ export function useDeleteWord() {
         )
       })
 
-      return { previousQueries }
+      return { previousQueries }*/
     },
 
     onError: (_err, _id, context) => {
-      // rollback ALL caches
-      context?.previousQueries.forEach(([queryKey, data]) => {
+      context?.previous.forEach(([queryKey, data]) => {
         queryClient.setQueryData(queryKey, data)
       })
     },

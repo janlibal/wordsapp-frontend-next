@@ -61,6 +61,26 @@ export async function getWords1(
 
 export async function getWords(
   search?: string,
+  tagIds: string[] = [],
+  page = 1,
+  limit = 20
+): Promise<Word[]> {
+  const params = new URLSearchParams()
+
+  params.set('page', String(page))
+  params.set('limit', String(limit))
+  if (search) params.set('search', search)
+  if (tagIds.length) params.set('tags', tagIds.join(','))
+
+  const res = await apiFetch<{ result: Word[] }>(
+    `/api/api/v1/words?${params.toString()}`
+  )
+
+  return res.result
+}
+
+export async function getWords100(
+  search?: string,
   tagIds: string[] = []
 ): Promise<Word[]> {
   const params = new URLSearchParams()

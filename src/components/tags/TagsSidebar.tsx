@@ -6,13 +6,14 @@ import { useUrlFilters } from '@/src/hooks/useFilters'
 import { Tag } from '@/src/types/tags/tag.type'
 import { getTags } from '@/src/services/tags/tag.service'
 import { queryKeys } from '@/src/hooks/types/queryKeys'
+import ClearIcon from '@mui/icons-material/Clear'
 
 type Props = {
   onSelect?: () => void
 }
 
 export default function TagsSidebar({ onSelect }: Props) {
-  const { tags: activeTags, toggleTag } = useUrlFilters()
+  const { tags: activeTags, toggleTag, setFilters } = useUrlFilters()
 
   // 📦 fetch tags
   const { data: tags = [], isLoading } = useQuery<Tag[]>({
@@ -36,6 +37,20 @@ export default function TagsSidebar({ onSelect }: Props) {
         gap: 1,
       }}
     >
+      {activeTags.length > 0 && (
+        <Chip
+          icon={<ClearIcon />}
+          label={`Clear (${activeTags.length})`}
+          clickable
+          color="secondary"
+          variant="filled"
+          onClick={() => {
+            setFilters({ tags: [] })
+            onSelect?.()
+          }}
+        />
+      )}
+
       {tags
         .filter((tag) => tag.count > 0)
         .map((tag) => {

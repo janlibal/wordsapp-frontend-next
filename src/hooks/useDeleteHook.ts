@@ -29,25 +29,6 @@ export function useDeleteWord() {
       )
 
       return { previous }
-
-      /*onMutate: async (id) => {
-      await queryClient.cancelQueries({
-        queryKey: queryKeys.words,
-      })
-
-      // get ALL word queries
-      const previousQueries = queryClient.getQueriesData<Word[]>({
-        queryKey: queryKeys.words,
-      })
-
-      // update ALL caches
-      previousQueries.forEach(([queryKey]) => {
-        queryClient.setQueryData<Word[]>(queryKey, (old = []) =>
-          old.filter((w) => w.id !== id)
-        )
-      })
-
-      return { previousQueries }*/
     },
 
     onError: (_err, _id, context) => {

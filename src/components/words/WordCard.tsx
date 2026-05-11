@@ -19,6 +19,7 @@ import { useUpdateWord } from '@/src/hooks/useUpdateHook'
 import { getTags } from '@/src/services/tags/tag.service'
 import { motion } from 'framer-motion'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
+import { useTheme, useMediaQuery } from '@mui/material'
 
 import {
   addTagToWord,
@@ -44,6 +45,8 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
   const [editedContent, setEditedContent] = useState(content)
   const [selectedTags, setSelectedTags] = useState<Tag[]>(tags)
   const [hovered, setHovered] = useState(false)
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   const updateMutation = useUpdateWord()
   updateMutation.isPending
@@ -180,12 +183,13 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
               )}
             </Box>
 
-            {hovered && !editing && (
-              <Fade in={!editing}>
-                <IconButton size="small" onClick={handleOpen}>
-                  <MoreVertIcon fontSize="small" />
-                </IconButton>
-              </Fade>
+            {!editing && (
+              <IconButton
+                size={isMobile ? 'medium' : 'small'}
+                onClick={handleOpen}
+              >
+                <MoreVertIcon fontSize="small" />
+              </IconButton>
             )}
           </Box>
 

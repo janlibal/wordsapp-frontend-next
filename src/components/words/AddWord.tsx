@@ -63,18 +63,29 @@ export default function AddWord() {
   return (
     <Box
       sx={{
-        maxWidth: 520,
-        mx: 'auto',
-        mt: { xs: 6, md: 10 },
+        minHeight: { md: '80vh' },
+        display: 'flex',
+        alignItems: { md: 'center' },
+        justifyContent: 'center',
         px: 2,
       }}
     >
-      <Paper sx={{ p: 4 }}>
+      <Paper
+        elevation={0}
+        sx={{
+          width: '100%',
+          maxWidth: 520,
+          p: { xs: 2.5, sm: 4 },
+          borderRadius: 3,
+          border: '1px solid',
+          borderColor: 'divider',
+        }}
+      >
         <Typography variant="h5" mb={1}>
           Add new word
         </Typography>
 
-        <Typography variant="body2" color="text.secondary" mb={2}>
+        <Typography variant="body2" color="text.secondary" mb={3}>
           Save words, phrases, or anything worth remembering.
         </Typography>
 
@@ -85,7 +96,7 @@ export default function AddWord() {
         )}
 
         <form onSubmit={handleSubmit}>
-          <Stack spacing={2}>
+          <Stack spacing={2.5}>
             <TextField
               label="Word / Phrase"
               fullWidth
@@ -93,17 +104,35 @@ export default function AddWord() {
               onChange={(e) => setContent(e.target.value)}
               required
               inputRef={inputRef}
+              autoComplete="off"
             />
 
             <TagSelector value={selectedTags} onChange={setSelectedTags} />
 
-            {/* ACTIONS */}
-            <Box display="flex" justifyContent="flex-end" gap={1} mt={1}>
-              <Button onClick={() => router.back()} color="inherit">
+            <Box
+              display="flex"
+              gap={1}
+              justifyContent="flex-end"
+              flexDirection={{ xs: 'column-reverse', sm: 'row' }}
+            >
+              <Button
+                onClick={() => router.back()}
+                color="inherit"
+                sx={{
+                  width: { xs: '100%', sm: 'auto' },
+                }}
+              >
                 Cancel
               </Button>
 
-              <Button type="submit" variant="contained" disabled={isLoading}>
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={isLoading}
+                sx={{
+                  width: { xs: '100%', sm: 'auto' },
+                }}
+              >
                 {isLoading ? 'Saving...' : 'Save'}
               </Button>
             </Box>

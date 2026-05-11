@@ -25,13 +25,11 @@ export default function AddWord() {
   const [content, setContent] = useState('')
   const [selectedTags, setSelectedTags] = useState<Tag[]>([])
 
-  const [error, setError] = useState<string | null>(null)
-
   const inputRef = useRef<HTMLInputElement | null>(null)
-  const [snackbar, setSnackbar] = useState<string | null>(null)
 
   const createMutation = useCreateWord()
   const isLoading = createMutation.isPending
+
   const showSnackbar = useSnackbar()
 
   useEffect(() => {
@@ -40,7 +38,6 @@ export default function AddWord() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setError(null)
 
     createMutation.mutate(
       {
@@ -49,12 +46,20 @@ export default function AddWord() {
       },
       {
         onSuccess: () => {
-          showSnackbar({ message: 'Content created' })
-          router.push('/')
+          showSnackbar({
+            message: 'Content created',
+          })
+
+          // allow snackbar to render before navigation
+          setTimeout(() => {
+            router.push('/')
+          }, 150)
         },
+
         onError: (err: any) => {
-          ;(showSnackbar({ message: 'Failed to create word' }),
-            setError(err.message || 'Failed to create word'))
+          showSnackbar({
+            message: err.message || 'Failed to create word',
+          })
         },
       }
     )
@@ -89,22 +94,16 @@ export default function AddWord() {
           Save words, phrases, or anything worth remembering.
         </Typography>
 
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-
         <form onSubmit={handleSubmit}>
           <Stack spacing={2.5}>
             <TextField
               label="Word / Phrase"
               fullWidth
+              required
+              autoComplete="off"
+              inputRef={inputRef}
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              required
-              inputRef={inputRef}
-              autoComplete="off"
             />
 
             <TagSelector value={selectedTags} onChange={setSelectedTags} />

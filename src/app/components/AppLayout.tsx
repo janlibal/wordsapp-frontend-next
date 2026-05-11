@@ -112,8 +112,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         label: 'System',
         icon: <ComputerIcon />,
         href: '/system',
-        showInDrawer: true,
+        showInDrawer: false,
         showInMenu: true,
+        mobileMenu: true,
       },
       {
         label: 'Tags',

@@ -7,6 +7,7 @@ import { Tag } from '@/src/types/tags/tag.type'
 import { getTags } from '@/src/services/tags/tag.service'
 import { queryKeys } from '@/src/hooks/types/queryKeys'
 import ClearIcon from '@mui/icons-material/Clear'
+import useTags from '@/src/hooks/queries/useTags'
 
 type Props = {
   onSelect?: () => void
@@ -16,13 +17,15 @@ export default function TagsSidebar({ onSelect }: Props) {
   const { tags: activeTags, toggleTag, setFilters } = useUrlFilters()
 
   // 📦 fetch tags
-  const { data: tags = [], isLoading } = useQuery<Tag[]>({
+  /*const { data: tags = [], isLoading } = useQuery<Tag[]>({
     queryKey: queryKeys.tags,
     queryFn: () => getTags(),
     //staleTime: 30_000,
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: false,
-  })
+  })*/
+
+  const { data: tags = [], isLoading } = useTags()
 
   if (isLoading) return <p>Loading tags...</p>
   if (!tags.length) return null

@@ -3,10 +3,10 @@ import {
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query'
-import { deleteWord } from '../services/words/word.service'
-import { Word } from '../types/words/word.type'
-import { queryKeys } from './types/queryKeys'
-import { mapInfiniteWords } from '../helpers/mapInfiniteWords'
+import { deleteWord } from '../../services/words/word.service'
+import { Word } from '../../types/words/word.type'
+import { queryKeys } from '../types/queryKeys'
+import { mapInfiniteWords } from '../../helpers/mapInfiniteWords'
 
 export function useDeleteWord() {
   const queryClient = useQueryClient()

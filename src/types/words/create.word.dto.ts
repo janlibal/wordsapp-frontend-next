@@ -1,4 +1,4 @@
 export type CreateWordDto = {
   content: string
-  tags?: string[]
+  tags: string[]
 }

@@ -49,11 +49,12 @@ export default function AddWord() {
           showSnackbar({
             message: 'Content created',
           })
+          router.push('/')
 
           // allow snackbar to render before navigation
-          setTimeout(() => {
+          /*setTimeout(() => {
             router.push('/')
-          }, 150)
+          }, 150)*/
         },
 
         onError: (err: any) => {

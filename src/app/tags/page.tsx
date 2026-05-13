@@ -1,5 +1,5 @@
-import TagsPage from '@/src/components/tags/TagsPage'
+import TagsList from '@/src/components/tags/TagsList'
 
 export default async function Page() {
-  return <TagsPage />
+  return <TagsList />
 }

@@ -13,14 +13,35 @@ import {
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import { useState } from 'react'
+import { useUpdateTag } from '@/src/hooks/mutations/tags/useUpdateTagHook'
+import { useSnackbar } from '@/src/hooks/SnacbarProvider'
 
 type Props = {
   tag: Tag
 }
 
 export default function TagCard({ tag }: Props) {
-  const [editing, setEditing] = useState(false)
+  //const [editing, setEditing] = useState(false)
   const [name, setName] = useState(tag.name)
+  const [editing, setEditing] = useState(false)
+  const [editedName, setEditedName] = useState(name)
+  const showSnackbar = useSnackbar()
+
+  const updateMutation = useUpdateTag()
+  updateMutation.isPending
+
+  const handleSave = () => {
+    updateMutation.mutate(
+      { id: tag.id, data: { name: editedName } },
+      {
+        onSuccess: () => {
+          showSnackbar({ message: 'Tag updated' })
+          setEditing(false)
+        },
+        onError: () => showSnackbar({ message: 'Tag failed' }),
+      }
+    )
+  }
 
   return (
     <Card
@@ -37,8 +58,8 @@ export default function TagCard({ tag }: Props) {
               <TextField
                 fullWidth
                 size="small"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={editedName}
+                onChange={(e) => setEditedName(e.target.value)}
               />
             ) : (
               <Typography variant="body1">#{tag.name}</Typography>
@@ -55,14 +76,19 @@ export default function TagCard({ tag }: Props) {
                 size="small"
                 onClick={() => {
                   setEditing(false)
-                  setName(tag.name)
+                  setEditedName(tag.name)
                 }}
               >
                 Cancel
               </Button>
 
-              <Button size="small" variant="contained">
-                Save
+              <Button
+                size="small"
+                variant="contained"
+                onClick={handleSave}
+                disabled={updateMutation.isPending}
+              >
+                {updateMutation.isPending ? 'Saving...' : 'Update'}
               </Button>
             </Stack>
           ) : (

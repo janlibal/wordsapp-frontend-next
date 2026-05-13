@@ -13,3 +13,15 @@ export async function getTags(
   const res = await apiFetch<{ result: Tag[] }>(`/api/api/v1/tags`)
   return res.result
 }
+
+export async function updateTag(
+  id: string,
+  data: {
+    name?: string
+  }
+) {
+  return apiFetch<Omit<Tag, 'userId'>>(`/api/api/v1/tags/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  })
+}

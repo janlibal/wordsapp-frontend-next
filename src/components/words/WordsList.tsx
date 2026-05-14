@@ -7,6 +7,8 @@ import { useUrlFilters } from '@/src/hooks/useFilters'
 import { PageContainer } from '@/src/ui/pageContainer'
 import { useEffect, useRef } from 'react'
 import WordCard from './WordCard'
+import { queryKeys } from '@/src/hooks/types/queryKeys'
+import useWords from '@/src/hooks/queries/useWords'
 
 export default function WordsList() {
   const searchParams = useSearchParams()
@@ -16,23 +18,11 @@ export default function WordsList() {
 
   const LIMIT = 20
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching } =
-    useInfiniteQuery({
-      queryKey: ['words', search, tagIds],
-
-      queryFn: ({ pageParam }) => getWords(search, tagIds, pageParam, LIMIT),
-
-      initialPageParam: 1,
-
-      getNextPageParam: (lastPage, pages) => {
-        return lastPage?.length === LIMIT ? (pages?.length ?? 0) + 1 : undefined
-      },
-
-      staleTime: 1000 * 60 * 5,
-      refetchOnWindowFocus: false,
+  const { words, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching } =
+    useWords({
+      search,
+      tagIds,
     })
-
-  const words = data?.pages.flat() ?? []
 
   // infinite scroll trigger
   const loadMoreRef = useRef<HTMLDivElement | null>(null)

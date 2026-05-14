@@ -1,6 +1,6 @@
 'use client'
 
-import useTags from '@/src/hooks/queries/useTags'
+import useTags from '@/src/hooks/queries/tags/useTags'
 import { PageContainer } from '@/src/ui/pageContainer'
 import { Box, Stack, Typography } from '@mui/material'
 import TagCard from './TagCard'

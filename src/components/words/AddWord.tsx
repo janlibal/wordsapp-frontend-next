@@ -16,7 +16,7 @@ import { Tag } from '@/src/types/tags/tag.type'
 import { getTags } from '@/src/services/tags/tag.service'
 import Autocomplete from '@mui/material/Autocomplete'
 import TagSelector from '../tags/TagSelector'
-import useCreateWord from '@/src/hooks/mutations/useCreateHook'
+import useCreateWord from '@/src/hooks/mutations/words/useCreateHook'
 import { useSnackbar } from '@/src/hooks/SnacbarProvider'
 
 export default function AddWord() {

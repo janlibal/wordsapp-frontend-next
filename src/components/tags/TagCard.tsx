@@ -12,7 +12,7 @@ import {
   Typography,
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useUpdateTag } from '@/src/hooks/mutations/tags/useUpdateTagHook'
 import { useSnackbar } from '@/src/hooks/SnacbarProvider'
 
@@ -21,14 +21,16 @@ type Props = {
 }
 
 export default function TagCard({ tag }: Props) {
-  //const [editing, setEditing] = useState(false)
-  const [name, setName] = useState(tag.name)
+  const [editedName, setEditedName] = useState(tag.name)
   const [editing, setEditing] = useState(false)
-  const [editedName, setEditedName] = useState(name)
   const showSnackbar = useSnackbar()
 
+  useEffect(() => {
+    setEditedName(tag.name)
+  }, [tag.name])
+
   const updateMutation = useUpdateTag()
-  updateMutation.isPending
+  const isSaving = updateMutation.isPending
 
   const handleSave = () => {
     updateMutation.mutate(
@@ -86,9 +88,9 @@ export default function TagCard({ tag }: Props) {
                 size="small"
                 variant="contained"
                 onClick={handleSave}
-                disabled={updateMutation.isPending}
+                disabled={isSaving}
               >
-                {updateMutation.isPending ? 'Saving...' : 'Update'}
+                {isSaving ? 'Saving...' : 'Update'}
               </Button>
             </Stack>
           ) : (

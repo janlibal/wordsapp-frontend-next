@@ -7,7 +7,7 @@ import { Tag } from '@/src/types/tags/tag.type'
 import { getTags } from '@/src/services/tags/tag.service'
 import { queryKeys } from '@/src/hooks/types/queryKeys'
 import ClearIcon from '@mui/icons-material/Clear'
-import useTags from '@/src/hooks/queries/useTags'
+import useTags from '@/src/hooks/queries/tags/useTags'
 
 type Props = {
   onSelect?: () => void

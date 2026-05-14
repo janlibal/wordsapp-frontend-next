@@ -3,10 +3,10 @@ import {
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query'
-import { createWord } from '../../services/words/word.service'
-import { Word } from '../../types/words/word.type'
-import { Tag } from '../../types/tags/tag.type'
-import { queryKeys } from '../types/queryKeys'
+import { createWord } from '../../../services/words/word.service'
+import { Word } from '../../../types/words/word.type'
+import { Tag } from '../../../types/tags/tag.type'
+import { queryKeys } from '../../types/queryKeys'
 
 export default function useCreateWord() {
   const queryClient = useQueryClient()

@@ -13,7 +13,7 @@ import {
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import { useEffect, useState } from 'react'
-import { useUpdateTag } from '@/src/hooks/mutations/tags/useUpdateTagHook'
+import { useUpdateTag } from '@/src/hooks/mutations/useUpdateTagHook'
 import { useSnackbar } from '@/src/hooks/SnacbarProvider'
 
 type Props = {

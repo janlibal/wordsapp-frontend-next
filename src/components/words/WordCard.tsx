@@ -15,7 +15,7 @@ import {
 import { useEffect, useRef, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Tag } from '@/src/types/tags/tag.type'
-import { useUpdateWord } from '@/src/hooks/mutations/words/useUpdateHook'
+import { useUpdateWord } from '@/src/hooks/mutations/useUpdateWordHook'
 import { getTags } from '@/src/services/tags/tag.service'
 import { motion } from 'framer-motion'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
@@ -28,10 +28,10 @@ import {
 import WordActionsMenu from './WordActionsMenu'
 import { Word } from '@/src/types/words/word.type'
 import TagSelector from '../tags/TagSelector'
-import { useDeleteWord } from '@/src/hooks/mutations/words/useDeleteHook'
+import { useDeleteWord } from '@/src/hooks/mutations/useDeleteWordHook'
 import { highlightText } from '@/src/helpers/highlightText'
 import { useSnackbar } from '@/src/hooks/SnacbarProvider'
-import { useRestoreWord } from '@/src/hooks/mutations/words/useRestoreHook'
+import { useRestoreWord } from '@/src/hooks/mutations/useRestoreWordHook'
 
 type WordCardProps = {
   id: string

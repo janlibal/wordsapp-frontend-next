@@ -4,7 +4,7 @@ import {
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query'
-import { queryKeys } from '../../types/queryKeys'
+import { queryKeys } from '../types/queryKeys'
 import { mapInfiniteWords } from '@/src/helpers/mapInfiniteWords'
 import { Word } from '@/src/types/words/word.type'
 import { Tag } from '@/src/types/tags/tag.type'

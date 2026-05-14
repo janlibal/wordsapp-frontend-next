@@ -9,6 +9,7 @@ import { useEffect, useRef } from 'react'
 import WordCard from './WordCard'
 import { queryKeys } from '@/src/hooks/types/queryKeys'
 import useWords from '@/src/hooks/queries/useWords'
+import useInfiniteScroll from '@/src/hooks/useInfiniteScroll'
 
 export default function WordsList() {
   const searchParams = useSearchParams()
@@ -25,21 +26,11 @@ export default function WordsList() {
     })
 
   // infinite scroll trigger
-  const loadMoreRef = useRef<HTMLDivElement | null>(null)
-
-  useEffect(() => {
-    const el = loadMoreRef.current
-    if (!el) return
-
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-        fetchNextPage()
-      }
-    })
-
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+  const loadMoreRef = useInfiniteScroll({
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  })
 
   return (
     <PageContainer>

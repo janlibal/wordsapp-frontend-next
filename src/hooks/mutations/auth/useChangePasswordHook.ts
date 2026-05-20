@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { ChangePasswordDto } from './change-password.dto'
+import { ChangePasswordDto } from '@/src/types/auth/auth.types'
 
 export function useChangePassword() {
   return useMutation({

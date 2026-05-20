@@ -25,3 +25,8 @@ export type User = {
   email: string
   password: string
 }
+
+export type ChangePasswordDto = {
+  currentPassword: string
+  newPassword: string
+}

@@ -19,6 +19,7 @@ import {
 } from '@mui/material'
 
 import { Visibility, VisibilityOff } from '@mui/icons-material'
+import { useSnackbar } from '@/src/hooks/SnacbarProvider'
 
 type Props = {
   open: boolean
@@ -29,6 +30,8 @@ const MIN_PASSWORD_LENGTH = 8
 
 export default function ChangePasswordDialog({ open, onClose }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null)
+  const changeMutation = useCreateWord()
+  const showSnackbar = useSnackbar()
 
   const theme = useTheme()
 
@@ -79,7 +82,33 @@ export default function ChangePasswordDialog({ open, onClose }: Props) {
     onClose()
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
+    if (!isFormValid) return
+
+    changeMutation.mutate(
+      {
+        currentPassword,
+        newPassword,
+      },
+      {
+        onSuccess: () => {
+          showSnackbar({
+            message: 'Password changed successfully',
+          })
+
+          handleClose()
+        },
+
+        onError: (err: any) => {
+          showSnackbar({
+            message: err.message || 'Failed to change password',
+          })
+        },
+      }
+    )
+  }
+
+  const handleSubmit2 = async () => {
     if (!isFormValid) return
 
     try {

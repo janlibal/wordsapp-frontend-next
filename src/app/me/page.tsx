@@ -1,6 +1,6 @@
 'use client'
 
-import MeInfo from '@/src/components/auth/MeInfo'
+import MeInfo from '@/src/components/auth/me/MeInfo'
 import { Typography } from '@mui/material'
 import { useAuth } from '../context/authContext'
 

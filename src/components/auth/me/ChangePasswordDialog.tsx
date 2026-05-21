@@ -20,6 +20,7 @@ import {
 
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { useSnackbar } from '@/src/hooks/SnacbarProvider'
+import { useChangePassword } from '@/src/hooks/mutations/auth/useChangePasswordHook'
 
 type Props = {
   open: boolean
@@ -30,7 +31,7 @@ const MIN_PASSWORD_LENGTH = 8
 
 export default function ChangePasswordDialog({ open, onClose }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null)
-  const changeMutation = useCreateWord()
+  const changeMutation = useChangePassword()
   const showSnackbar = useSnackbar()
 
   const theme = useTheme()

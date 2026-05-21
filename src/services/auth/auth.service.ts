@@ -1,10 +1,21 @@
 import { apiFetch } from '../../lib/fetcher'
 import {
+  ChangePasswordDto,
   LoginDto,
   LoginResponse,
   RegisterDto,
   User,
 } from '../../types/auth/auth.types'
+
+export async function changePassword(data: ChangePasswordDto): Promise<void> {
+  return await apiFetch<void>('/api/api/v1/auth/me', {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  })
+}
 
 export async function getCurrentUser(): Promise<User> {
   const res = await apiFetch<{ result: User }>('/api/api/v1/auth/me', {

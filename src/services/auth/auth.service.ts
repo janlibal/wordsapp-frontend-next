@@ -8,11 +8,8 @@ import {
 } from '../../types/auth/auth.types'
 
 export async function changePassword(data: ChangePasswordDto): Promise<void> {
-  return await apiFetch<void>('/api/api/v1/auth/me', {
+  await apiFetch('/api/api/v1/auth/change-password', {
     method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     body: JSON.stringify(data),
   })
 }

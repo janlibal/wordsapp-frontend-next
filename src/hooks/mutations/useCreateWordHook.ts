@@ -15,6 +15,140 @@ export default function useCreateWord() {
     mutationFn: createWord,
 
     onMutate: async (newWord) => {
+      // cancel ongoing requests
+      await queryClient.cancelQueries({
+        queryKey: queryKeys.words,
+      })
+
+      await queryClient.cancelQueries({
+        queryKey: queryKeys.tags,
+      })
+
+      // snapshot previous caches
+      const previousQueries = queryClient.getQueriesData<InfiniteData<Word[]>>({
+        queryKey: queryKeys.words,
+      })
+
+      const previousTags = queryClient.getQueryData<Tag[]>(queryKeys.tags) || []
+
+      // all existing tags
+      const allTags = queryClient.getQueryData<Tag[]>(queryKeys.tags) || []
+
+      // resolve optimistic tags
+      const resolvedTags = newWord.tags.map((name) => {
+        const existing = allTags.find((t) => t.name === name)
+
+        return (
+          existing ?? {
+            id: name,
+            name,
+            count: 0,
+          }
+        )
+      })
+
+      // optimistic word
+      const optimisticWord: Word = {
+        id: 'temp-' + Math.random().toString(36).slice(2),
+        content: newWord.content,
+        tags: resolvedTags,
+      }
+
+      // optimistic tag count updates
+      queryClient.setQueryData<Tag[]>(queryKeys.tags, (old = []) =>
+        old.map((tag) =>
+          newWord.tags.includes(tag.name)
+            ? {
+                ...tag,
+                count: tag.count + 1,
+              }
+            : tag
+        )
+      )
+
+      // optimistic word insertion
+      previousQueries.forEach(([queryKey, oldData]) => {
+        if (!oldData) return
+
+        // validate query key structure
+        if (
+          !Array.isArray(queryKey) ||
+          queryKey.length < 2 ||
+          typeof queryKey[1] !== 'object'
+        ) {
+          return
+        }
+
+        const filters = queryKey[1] as {
+          search?: string
+          tagIds?: string[]
+        }
+
+        const search = filters.search ?? ''
+        const tagIds = filters.tagIds ?? []
+
+        const matchesSearch =
+          !search ||
+          optimisticWord.content.toLowerCase().includes(search.toLowerCase())
+
+        const matchesTags =
+          !tagIds.length ||
+          optimisticWord.tags.some((t) => tagIds.includes(t.id))
+
+        // skip nonmatching filtered queries
+        if (!matchesSearch || !matchesTags) {
+          return
+        }
+
+        const updated: InfiniteData<Word[]> = {
+          ...oldData,
+
+          pages: [
+            [optimisticWord, ...(oldData.pages[0] ?? [])],
+            ...oldData.pages.slice(1),
+          ],
+        }
+
+        queryClient.setQueryData(queryKey, updated)
+      })
+
+      return {
+        previousQueries,
+        previousTags,
+      }
+    },
+
+    onError: (_err, _vars, context) => {
+      // rollback words
+      context?.previousQueries.forEach(([queryKey, data]) => {
+        queryClient.setQueryData(queryKey, data)
+      })
+
+      // rollback tags
+      if (context?.previousTags) {
+        queryClient.setQueryData(queryKeys.tags, context.previousTags)
+      }
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.words,
+      })
+
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.tags,
+      })
+    },
+  })
+}
+
+export function useCreateWord44() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: createWord,
+
+    onMutate: async (newWord) => {
       // cancel outgoing fetches
       await queryClient.cancelQueries({
         queryKey: queryKeys.words,
@@ -59,14 +193,26 @@ export default function useCreateWord() {
       previousQueries.forEach(([queryKey, oldData]) => {
         if (!oldData) return
 
-        const [_, search, tagIds] = queryKey as [string, string, string[]]
+        //const [_, search, tagIds] = queryKey as [string, string, string[]]
+        const [, filters] = queryKey as [
+          string,
+          {
+            search?: string
+            tagIds?: string[]
+          },
+        ]
 
+        const search = filters?.search ?? ''
+        const tagIds = filters?.tagIds ?? []
+
+        //const matchesSearch = !search || optimisticWord.content.toLowerCase().includes(search.toLowerCase())
         const matchesSearch =
           !search ||
           optimisticWord.content.toLowerCase().includes(search.toLowerCase())
 
+        //const matchesTags = !tagIds?.length || optimisticWord.tags.some((t) => tagIds.includes(t.id))
         const matchesTags =
-          !tagIds?.length ||
+          !tagIds.length ||
           optimisticWord.tags.some((t) => tagIds.includes(t.id))
 
         if (!matchesSearch || !matchesTags) return
@@ -141,7 +287,24 @@ export function useCreateWord333() {
       previousQueries.forEach(([queryKey, oldData]) => {
         if (!oldData) return
 
-        const [_, search, tagIds] = queryKey as [string, string, string[]]
+        // skip malformed keys
+        if (
+          !Array.isArray(queryKey) ||
+          queryKey.length < 2 ||
+          typeof queryKey[1] !== 'object'
+        ) {
+          return
+        }
+
+        const filters = queryKey[1] as {
+          search?: string
+          tagIds?: string[]
+        }
+
+        const search = filters.search ?? ''
+        const tagIds = filters.tagIds ?? []
+
+        // const [_, search, tagIds] = queryKey as [string, string, string[]]
 
         const matchesSearch =
           !search ||

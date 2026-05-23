@@ -68,15 +68,31 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString())
 
+    if (debounced) {
+      params.set('search', debounced)
+    } else {
+      params.delete('search')
+    }
+
+    router.replace(params.toString() ? `/?${params.toString()}` : '/')
+  }, [debounced])
+
+  /*useEffect1(() => {
+    const params = new URLSearchParams(searchParams.toString())
+
     if (debounced) params.set('search', debounced)
     else params.delete('search')
 
     router.replace(`/?${params.toString()}`)
-  }, [debounced])
+  }, [debounced])*/
 
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen)
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value)
+  }
+
+  const handleSearch1 = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value
     setValue(val)
 
@@ -246,7 +262,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
             <IconButton
               color="inherit"
-              onClick={() => router.push('/words/new')}
+              onClick={() => {
+                const params = searchParams.toString()
+
+                router.push(params ? `/words/new?${params}` : '/words/new')
+              }}
             >
               <AddIcon />
             </IconButton>

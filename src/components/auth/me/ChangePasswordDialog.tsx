@@ -50,8 +50,6 @@ export default function ChangePasswordDialog({ open, onClose }: Props) {
 
   const [showConfirm, setShowConfirm] = useState(false)
 
-  const [loading, setLoading] = useState(false)
-
   // VALIDATION
 
   const passwordTooShort =
@@ -107,21 +105,6 @@ export default function ChangePasswordDialog({ open, onClose }: Props) {
         },
       }
     )
-  }
-
-  const handleSubmit2 = async () => {
-    if (!isFormValid) return
-
-    try {
-      setLoading(true)
-
-      // TODO:
-      // await changePassword(...)
-
-      handleClose()
-    } finally {
-      setLoading(false)
-    }
   }
 
   return (
@@ -236,16 +219,16 @@ export default function ChangePasswordDialog({ open, onClose }: Props) {
           pb: 3,
         }}
       >
-        <Button onClick={handleClose} disabled={loading}>
+        <Button onClick={handleClose} disabled={changeMutation.isPending}>
           Cancel
         </Button>
 
         <Button
           variant="contained"
           onClick={handleSubmit}
-          disabled={!isFormValid || loading}
+          disabled={changeMutation.isPending}
         >
-          {loading ? 'Saving...' : 'Save Password'}
+          {changeMutation.isPending ? 'Saving...' : 'Save Password'}
         </Button>
       </DialogActions>
     </Dialog>

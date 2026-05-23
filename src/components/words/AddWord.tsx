@@ -11,7 +11,7 @@ import {
   Paper,
   Alert,
 } from '@mui/material'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Tag } from '@/src/types/tags/tag.type'
 import { getTags } from '@/src/services/tags/tag.service'
 import Autocomplete from '@mui/material/Autocomplete'
@@ -21,7 +21,7 @@ import { useSnackbar } from '@/src/hooks/SnacbarProvider'
 
 export default function AddWord() {
   const router = useRouter()
-
+  const searchParams = useSearchParams()
   const [content, setContent] = useState('')
   const [selectedTags, setSelectedTags] = useState<Tag[]>([])
 
@@ -49,8 +49,10 @@ export default function AddWord() {
           showSnackbar({
             message: 'Content created',
           })
-          router.push('/')
+          //router.push('/')
+          const params = searchParams.toString()
 
+          router.push(params ? `/?${params}` : '/')
           // allow snackbar to render before navigation
           /*setTimeout(() => {
             router.push('/')

@@ -11,6 +11,34 @@ type Params = {
 const LIMIT = 20
 
 export default function useWords({ search, tagIds }: Params) {
+  const query = useInfiniteQuery({
+    queryKey: [
+      ...queryKeys.words,
+      {
+        search,
+        tagIds: [...tagIds].sort(),
+      },
+    ],
+
+    queryFn: ({ pageParam }) => getWords(search, tagIds, pageParam, LIMIT),
+
+    initialPageParam: 1,
+
+    getNextPageParam: (lastPage, pages) => {
+      return lastPage.length === LIMIT ? pages.length + 1 : undefined
+    },
+
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+  })
+
+  return {
+    ...query,
+    words: query.data?.pages.flat() ?? [],
+  }
+}
+
+export function useWords1({ search, tagIds }: Params) {
   const query = useInfiniteQuery<
     Word[],
     Error,

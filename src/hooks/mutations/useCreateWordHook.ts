@@ -35,16 +35,20 @@ export default function useCreateWord() {
       const allTags = queryClient.getQueryData<Tag[]>(queryKeys.tags) || []
 
       // resolve optimistic tags
+      //const resolvedTags = newWord.tags.map((name) => allTags.find((t) => t.name === name)).filter(Boolean) as Tag[]
+
       const resolvedTags = newWord.tags.map((name) => {
         const existing = allTags.find((t) => t.name === name)
 
-        return (
-          existing ?? {
-            id: name,
+        if (!existing) {
+          return {
+            id: name, // temporary but consistent
             name,
             count: 0,
           }
-        )
+        }
+
+        return existing
       })
 
       // optimistic word
@@ -90,6 +94,9 @@ export default function useCreateWord() {
         const matchesSearch =
           !search ||
           optimisticWord.content.toLowerCase().includes(search.toLowerCase())
+
+        //const matchesTags = !tagIds.length || optimisticWord.tags.some((t) => tagIds.includes(t.id))
+        //const tagIds = filters?.tagIds ?? []
 
         const matchesTags =
           !tagIds.length ||

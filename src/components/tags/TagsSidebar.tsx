@@ -1,19 +1,142 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { Box, Chip } from '@mui/material'
+import {
+  Box,
+  Chip,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
+  Typography,
+} from '@mui/material'
 import { useUrlFilters } from '@/src/hooks/useFilters'
 import { Tag } from '@/src/types/tags/tag.type'
 import { getTags } from '@/src/services/tags/tag.service'
 import { queryKeys } from '@/src/hooks/types/queryKeys'
 import ClearIcon from '@mui/icons-material/Clear'
 import useTags from '@/src/hooks/queries/useTags'
+import { useMemo, useState } from 'react'
 
 type Props = {
   onSelect?: () => void
 }
 
+type SortOption = 'alphabetical' | 'count'
+
 export default function TagsSidebar({ onSelect }: Props) {
+  const { tags: activeTags, toggleTag, setFilters } = useUrlFilters()
+
+  const { data: tags = [], isLoading } = useTags()
+
+  const [sortBy, setSortBy] = useState<SortOption>('count')
+
+  const sortedTags = useMemo(() => {
+    return [...tags]
+      .filter((tag) => tag.count > 0)
+      .sort((a, b) => {
+        if (sortBy === 'alphabetical') {
+          return a.name.localeCompare(b.name)
+        }
+
+        // highest count first
+        return b.count - a.count
+      })
+  }, [tags, sortBy])
+
+  if (isLoading) return <p>Loading tags...</p>
+  if (!tags.length) return null
+
+  return (
+    <Box
+      sx={{
+        px: 2,
+        py: 2,
+      }}
+    >
+      {/* Header / Controls */}
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={1.5}
+        alignItems={{ xs: 'stretch', sm: 'center' }}
+        justifyContent="space-between"
+        sx={{ mb: 2 }}
+      >
+        <Typography variant="subtitle2">Tags</Typography>
+
+        <FormControl
+          size="small"
+          sx={{
+            minWidth: { xs: '100%', sm: 180 },
+          }}
+        >
+          <InputLabel>Sort by</InputLabel>
+
+          <Select
+            value={sortBy}
+            label="Sort by"
+            onChange={(e) => setSortBy(e.target.value as SortOption)}
+          >
+            <MenuItem value="count">Words count</MenuItem>
+
+            <MenuItem value="alphabetical">Alphabetical</MenuItem>
+          </Select>
+        </FormControl>
+      </Stack>
+
+      {/* Tags */}
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 1,
+        }}
+      >
+        {activeTags.length > 0 && (
+          <Chip
+            icon={<ClearIcon />}
+            label={`Clear (${activeTags.length})`}
+            clickable
+            color="secondary"
+            variant="filled"
+            onClick={() => {
+              setFilters({ tags: [] })
+              onSelect?.()
+            }}
+          />
+        )}
+
+        {sortedTags.map((tag) => {
+          const isActive = activeTags.includes(tag.id)
+
+          return (
+            <Chip
+              key={tag.id}
+              label={`#${tag.name} (${tag.count})`}
+              clickable
+              color={isActive ? 'primary' : 'default'}
+              variant={isActive ? 'filled' : 'outlined'}
+              onClick={() => {
+                toggleTag(tag.id)
+                onSelect?.()
+              }}
+              sx={{
+                maxWidth: '100%',
+                '& .MuiChip-label': {
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                },
+              }}
+            />
+          )
+        })}
+      </Box>
+    </Box>
+  )
+}
+
+export function TagsSidebar1({ onSelect }: Props) {
   const { tags: activeTags, toggleTag, setFilters } = useUrlFilters()
 
   // 📦 fetch tags

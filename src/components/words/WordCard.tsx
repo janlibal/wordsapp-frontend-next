@@ -19,6 +19,8 @@ import { useUpdateWord } from '@/src/hooks/mutations/useUpdateWordHook'
 import { getTags } from '@/src/services/tags/tag.service'
 import { motion } from 'framer-motion'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
+import StarIcon from '@mui/icons-material/Star'
+import StarBorderIcon from '@mui/icons-material/StarBorder'
 import { useTheme, useMediaQuery } from '@mui/material'
 
 import {
@@ -37,10 +39,17 @@ type WordCardProps = {
   id: string
   content: string
   tags: Tag[]
+  favorite: boolean
   search?: string
 }
 
-export default function WordCard({ id, content, tags, search }: WordCardProps) {
+export default function WordCard({
+  id,
+  content,
+  tags,
+  search,
+  favorite,
+}: WordCardProps) {
   const [editing, setEditing] = useState(false)
   const [editedContent, setEditedContent] = useState(content)
   const [selectedTags, setSelectedTags] = useState<Tag[]>(tags)
@@ -69,6 +78,7 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
     const deletedWord: Word = {
       id,
       content,
+      favorite,
       tags,
     }
 
@@ -157,10 +167,11 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
         mb: 2,
         transition: '0.2s',
         border: '1px solid',
-        borderColor: 'divider',
+        borderColor: favorite ? 'warning.main' : 'divider',
+
         '&:hover': {
           boxShadow: 3,
-          borderColor: 'primary.light',
+          borderColor: favorite ? 'warning.dark' : 'primary.light',
         },
       }}
     >
@@ -184,12 +195,21 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
             </Box>
 
             {!editing && (
-              <IconButton
-                size={isMobile ? 'medium' : 'small'}
-                onClick={handleOpen}
-              >
-                <MoreVertIcon fontSize="small" />
-              </IconButton>
+              <Stack direction="row" spacing={0.5} alignItems="center">
+                {favorite && (
+                  <StarIcon
+                    color="warning"
+                    fontSize={isMobile ? 'medium' : 'small'}
+                  />
+                )}
+
+                <IconButton
+                  size={isMobile ? 'medium' : 'small'}
+                  onClick={handleOpen}
+                >
+                  <MoreVertIcon fontSize="small" />
+                </IconButton>
+              </Stack>
             )}
           </Box>
 
@@ -248,7 +268,6 @@ export default function WordCard({ id, content, tags, search }: WordCardProps) {
           </Collapse>
         </Stack>
       </CardContent>
-      {/* SNACKBAR */}
     </Card>
   )
 }

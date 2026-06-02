@@ -168,11 +168,9 @@ export default function WordCard({
         transition: '0.2s',
         border: '1px solid',
         borderColor: favorite ? 'warning.main' : 'divider',
-
-        '&:hover': {
-          boxShadow: 3,
-          borderColor: favorite ? 'warning.dark' : 'primary.light',
-        },
+        backgroundColor: favorite
+          ? 'rgba(255, 193, 7, 0.04)'
+          : 'background.paper',
       }}
     >
       <CardContent sx={{ p: 2.5 }}>
@@ -196,12 +194,27 @@ export default function WordCard({
 
             {!editing && (
               <Stack direction="row" spacing={0.5} alignItems="center">
-                {favorite && (
-                  <StarIcon
-                    color="warning"
-                    fontSize={isMobile ? 'medium' : 'small'}
-                  />
-                )}
+                <IconButton
+                  size={isMobile ? 'medium' : 'small'}
+                  aria-label={
+                    favorite ? 'Remove from favorites' : 'Add to favorites'
+                  }
+                  onClick={() => {
+                    // TODO: handleFavorite()
+                  }}
+                >
+                  {favorite ? (
+                    <StarIcon
+                      color="warning"
+                      fontSize={isMobile ? 'medium' : 'small'}
+                    />
+                  ) : (
+                    <StarBorderIcon
+                      color="warning"
+                      fontSize={isMobile ? 'medium' : 'small'}
+                    />
+                  )}
+                </IconButton>
 
                 <IconButton
                   size={isMobile ? 'medium' : 'small'}

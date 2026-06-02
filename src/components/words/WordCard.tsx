@@ -74,6 +74,31 @@ export default function WordCard({
     setSelectedTags(tags)
   }, [tags])
 
+  const handleToggleFavorite = () => {
+    updateMutation.mutate(
+      {
+        id,
+        data: {
+          favorite: !favorite,
+        },
+      },
+      {
+        onSuccess: () => {
+          showSnackbar({
+            message: !favorite
+              ? 'Added to favorites'
+              : 'Removed from favorites',
+          })
+        },
+        onError: () => {
+          showSnackbar({
+            message: 'Favorite update failed',
+          })
+        },
+      }
+    )
+  }
+
   const handleDelete = () => {
     const deletedWord: Word = {
       id,
@@ -155,7 +180,6 @@ export default function WordCard({
   const { handleOpen, Menu: ActionsMenu } = WordActionsMenu({
     onEdit: () => setEditing(true),
     onDelete: handleDelete,
-    onFavorite: () => alert('TODO favorite'),
   })
 
   return (
@@ -199,9 +223,7 @@ export default function WordCard({
                   aria-label={
                     favorite ? 'Remove from favorites' : 'Add to favorites'
                   }
-                  onClick={() => {
-                    // TODO: handleFavorite()
-                  }}
+                  onClick={handleToggleFavorite}
                 >
                   {favorite ? (
                     <StarIcon

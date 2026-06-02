@@ -12,8 +12,13 @@ export function useUpdateWord() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: { content: string } }) =>
-      updateWord(id, data),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string
+      data: Partial<Pick<Word, 'content' | 'favorite'>>
+    }) => updateWord(id, data),
 
     onMutate: async ({ id, data }) => {
       await queryClient.cancelQueries({

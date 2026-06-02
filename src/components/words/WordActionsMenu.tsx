@@ -4,14 +4,9 @@ import { useState } from 'react'
 type Props = {
   onEdit: () => void
   onDelete: () => void
-  onFavorite: () => void
 }
 
-export default function WordActionsMenu({
-  onEdit,
-  onDelete,
-  onFavorite,
-}: Props) {
+export default function WordActionsMenu({ onEdit, onDelete }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   const open = Boolean(anchorEl)
@@ -51,7 +46,6 @@ export default function WordActionsMenu({
 
         <MenuItem
           onClick={() => {
-            onFavorite()
             handleClose()
           }}
         >

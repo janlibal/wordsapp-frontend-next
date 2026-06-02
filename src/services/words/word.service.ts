@@ -99,6 +99,7 @@ export async function updateWord(
   id: string,
   data: {
     content?: string
+    favorite?: boolean
     tags?: string[]
   }
 ) {

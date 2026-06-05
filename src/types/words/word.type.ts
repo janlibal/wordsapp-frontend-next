@@ -4,5 +4,7 @@ export type Word = {
   id: string
   content: string
   favorite: boolean
+  createdAt: string
+  updatedAt: string
   tags: Tag[]
 }

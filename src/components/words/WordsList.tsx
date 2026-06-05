@@ -5,11 +5,12 @@ import { useSearchParams } from 'next/navigation'
 import { Word } from '@/src/types/words/word.type'
 import { useUrlFilters } from '@/src/hooks/useFilters'
 import { PageContainer } from '@/src/ui/pageContainer'
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import WordCard from './WordCard'
 import { queryKeys } from '@/src/hooks/types/queryKeys'
 import useWords from '@/src/hooks/queries/useWords'
 import useInfiniteScroll from '@/src/hooks/useInfiniteScroll'
+import WordSortSelector from './WordSortSelector'
 
 export default function WordsList() {
   const searchParams = useSearchParams()
@@ -17,13 +18,44 @@ export default function WordsList() {
   const search = searchParams.get('search') || ''
   const tagIds = searchParams.get('tags')?.split(',').filter(Boolean) ?? []
 
-  const LIMIT = 20
+  const sort = searchParams.get('sort') ?? 'updated'
 
   const { words, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching } =
     useWords({
       search,
       tagIds,
     })
+
+  const sortedWords = useMemo(() => {
+    const result = [...words]
+
+    switch (sort) {
+      case 'favorites':
+        return result.sort((a, b) => {
+          if (a.favorite === b.favorite) return 0
+          return a.favorite ? -1 : 1
+        })
+
+      case 'oldest':
+        return result.sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        )
+
+      case 'updated':
+      default:
+        return result.sort(
+          (a, b) =>
+            new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        )
+
+      case 'newest':
+        return result.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )
+    }
+  }, [words, sort])
 
   // infinite scroll trigger
   const loadMoreRef = useInfiniteScroll({
@@ -41,7 +73,9 @@ export default function WordsList() {
           <Typography color="text.secondary">No words found</Typography>
         )}
 
-        {words.map((word) => (
+        <WordSortSelector />
+
+        {sortedWords.map((word) => (
           <WordCard key={word.id} {...word} search={search} />
         ))}
 

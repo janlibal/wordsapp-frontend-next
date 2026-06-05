@@ -41,6 +41,8 @@ type WordCardProps = {
   tags: Tag[]
   favorite: boolean
   search?: string
+  createdAt: string
+  updatedAt: string
 }
 
 export default function WordCard({
@@ -49,6 +51,8 @@ export default function WordCard({
   tags,
   search,
   favorite,
+  createdAt,
+  updatedAt,
 }: WordCardProps) {
   const [editing, setEditing] = useState(false)
   const [editedContent, setEditedContent] = useState(content)
@@ -105,6 +109,8 @@ export default function WordCard({
       content,
       favorite,
       tags,
+      updatedAt,
+      createdAt,
     }
 
     showSnackbar({

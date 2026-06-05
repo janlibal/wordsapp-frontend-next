@@ -122,7 +122,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         label: 'Favorites',
         icon: <FavoriteIcon />,
         href: '/favorites',
-        showInDrawer: true,
+        hidden: true,
+        //showInDrawer: true,
       },
       {
         label: 'System',

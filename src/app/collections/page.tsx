@@ -1,8 +1,8 @@
-import FavoritesPage from '@/src/components/favorites/Favorites'
+import CollectionsPage from '@/src/components/collections/Collections'
 
 export default async function Page() {
   // optionally pass user to component
-  return <FavoritesPage />
+  return <CollectionsPage />
 }
 
 /*//'use client'

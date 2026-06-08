@@ -24,7 +24,7 @@ import MenuIcon from '@mui/icons-material/Menu'
 import AddIcon from '@mui/icons-material/Add'
 import LogoutIcon from '@mui/icons-material/Logout'
 import Person from '@mui/icons-material/Person'
-import FavoriteIcon from '@mui/icons-material/Favorite'
+import CollectionsIcon from '@mui/icons-material/Collections'
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote'
 import ComputerIcon from '@mui/icons-material/Computer'
 import LocalOfferIcon from '@mui/icons-material/LocalOffer'
@@ -119,11 +119,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         showInDrawer: true,
       },
       {
-        label: 'Favorites',
-        icon: <FavoriteIcon />,
-        href: '/favorites',
-        hidden: true,
-        //showInDrawer: true,
+        label: 'Collections',
+        icon: <CollectionsIcon />,
+        href: '/collections',
+        //hidden: true,
+        showInDrawer: true,
       },
       {
         label: 'System',

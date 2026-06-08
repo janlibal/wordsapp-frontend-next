@@ -2,7 +2,7 @@
 import { User } from '@/src/types/auth/auth.types'
 import { Box } from '@mui/material'
 
-export default function FavoritesPage() {
+export default function CollectionsPage() {
   return (
     <Box
       sx={{
@@ -15,7 +15,7 @@ export default function FavoritesPage() {
         gap: 2,
       }}
     >
-      <h1>Favorites</h1>
+      <h1>Collections</h1>
     </Box>
   )
 }

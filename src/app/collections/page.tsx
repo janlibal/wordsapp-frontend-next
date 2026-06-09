@@ -1,8 +1,8 @@
-import CollectionsPage from '@/src/components/collections/Collections'
+import CollectionsList from '@/src/components/collections/CollectionsList'
 
 export default async function Page() {
   // optionally pass user to component
-  return <CollectionsPage />
+  return <CollectionsList />
 }
 
 /*//'use client'

@@ -113,6 +113,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const navItems: NavItem[] = useMemo(() => {
     return [
       {
+        label: 'New collection',
+        icon: false,
+        href: '/collections/new',
+        showInDrawer: true,
+      },
+      {
         label: 'All Words',
         icon: <FormatQuoteIcon />,
         href: '/',

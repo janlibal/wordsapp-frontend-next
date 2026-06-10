@@ -19,7 +19,7 @@ export function useCreateCollection() {
 
       const optimisticCollection: Collection = {
         id: `temp-${Date.now()}`,
-        name: newCollection.name,
+        name: newCollection.name.trim(),
         count: 0,
       }
 

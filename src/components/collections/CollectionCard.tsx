@@ -28,6 +28,7 @@ export default function CollectionCard({ collection }: Props) {
   const { handleOpen, Menu: ActionsMenu } = CollectionActionsMenu({
     onEdit: () => alert('TODO edit'),
     onDelete: () => alert('TODO delete'),
+    onView: () => alert('TODO view'),
   })
 
   return (

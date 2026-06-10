@@ -4,9 +4,14 @@ import { useState } from 'react'
 type Props = {
   onEdit: () => void
   onDelete: () => void
+  onView: () => void
 }
 
-export default function CollectionActionsMenu({ onEdit, onDelete }: Props) {
+export default function CollectionActionsMenu({
+  onEdit,
+  onDelete,
+  onView,
+}: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   const open = Boolean(anchorEl)
@@ -28,6 +33,7 @@ export default function CollectionActionsMenu({ onEdit, onDelete }: Props) {
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         <MenuItem
           onClick={() => {
+            onView()
             handleClose()
           }}
         >
@@ -40,7 +46,7 @@ export default function CollectionActionsMenu({ onEdit, onDelete }: Props) {
             handleClose()
           }}
         >
-          Rename
+          Edit
         </MenuItem>
 
         <MenuItem

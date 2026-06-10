@@ -6,6 +6,7 @@ import {
   Button,
   Card,
   CardContent,
+  Chip,
   IconButton,
   Stack,
   TextField,
@@ -36,6 +37,7 @@ export default function CollectionCard({ collection }: Props) {
         <Stack direction="row" alignItems="center" spacing={2}>
           <Box flex={1}>
             <Typography variant="body1">{collection.name}</Typography>
+            <Chip size="small" label={`${collection.count} words`} />
           </Box>
         </Stack>
       </CardContent>

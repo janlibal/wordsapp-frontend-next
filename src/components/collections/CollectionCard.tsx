@@ -1,11 +1,15 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Box,
+  Button,
   Card,
   CardContent,
   Chip,
+  Collapse,
+  Fade,
   IconButton,
   Stack,
+  TextField,
   Typography,
   useMediaQuery,
 } from '@mui/material'
@@ -14,6 +18,9 @@ import FolderIcon from '@mui/icons-material/Folder'
 import { useTheme } from '@mui/material/styles'
 import { Collection } from '@/src/types/collections/collections.type'
 import CollectionActionsMenu from './CollectionActionsMenu'
+import { useSnackbar } from '@/src/hooks/SnacbarProvider'
+import { useUpdateCollection } from '@/src/hooks/mutations/useUpdateCollectionHook'
+import { useDeleteCollection } from '@/src/hooks/mutations/useDeleteCollectionHook'
 
 type Props = {
   collection: Collection
@@ -21,13 +28,44 @@ type Props = {
 
 export default function CollectionCard({ collection }: Props) {
   const [hovered, setHovered] = useState(false)
+  const [editing, setEditing] = useState(false)
+  const [editedCollection, setEditedCollection] = useState(collection.name)
+  const showSnackbar = useSnackbar()
+
+  const updateMutation = useUpdateCollection()
+  updateMutation.isPending
+  const deleteMutation = useDeleteCollection()
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
+  const handleSave = () => {
+    updateMutation.mutate(
+      { id: collection.id, data: { name: editedCollection } },
+      {
+        onSuccess: () => {
+          showSnackbar({ message: 'Collection updated' })
+          setEditing(false)
+        },
+        onError: () => showSnackbar({ message: 'Update failed' }),
+      }
+    )
+  }
+
+  const handleDelete = () => {
+    deleteMutation.mutate(collection.id, {
+      onError: () => {
+        showSnackbar({
+          message: 'Delete failed',
+        })
+      },
+    })
+  }
+
   const { handleOpen, Menu: ActionsMenu } = CollectionActionsMenu({
-    onEdit: () => alert('TODO edit'),
-    onDelete: () => alert('TODO delete'),
+    onEdit: () => setEditing(true),
+    onDelete: handleDelete,
+    deleteDisabled: (collection.count ?? 0) > 0,
     onView: () => alert('TODO view'),
   })
 
@@ -52,33 +90,85 @@ export default function CollectionCard({ collection }: Props) {
           {/* TOP */}
           <Box display="flex" alignItems="flex-start" gap={1}>
             <Box flex={1}>
-              <Stack direction="row" spacing={1} alignItems="center" mb={1}>
+              <Stack direction="row" spacing={1} alignItems="center">
                 <FolderIcon
                   color="primary"
                   fontSize={isMobile ? 'medium' : 'small'}
                 />
 
-                <Typography variant="body1" fontWeight={500}>
-                  {collection.name}
-                </Typography>
+                {editing ? (
+                  <TextField
+                    fullWidth
+                    size="small"
+                    value={editedCollection}
+                    onChange={(e) => setEditedCollection(e.target.value)}
+                  />
+                ) : (
+                  <Typography
+                    variant="body1"
+                    fontWeight={500}
+                    sx={{ lineHeight: 1.6 }}
+                  >
+                    {collection.name}
+                  </Typography>
+                )}
               </Stack>
 
-              <Chip
-                size="small"
-                variant="outlined"
-                label={`${collection.count ?? 0} words`}
-              />
+              {!editing && (
+                <Box mt={1}>
+                  <Chip
+                    size="small"
+                    variant="outlined"
+                    label={`${collection.count ?? 0} words`}
+                  />
+                </Box>
+              )}
             </Box>
 
-            <IconButton
-              size={isMobile ? 'medium' : 'small'}
-              onClick={handleOpen}
-            >
-              <MoreVertIcon fontSize="small" />
-            </IconButton>
+            {!editing && (
+              <IconButton
+                size={isMobile ? 'medium' : 'small'}
+                onClick={handleOpen}
+              >
+                <MoreVertIcon fontSize="small" />
+              </IconButton>
+            )}
           </Box>
 
           {ActionsMenu}
+
+          {/* EDIT MODE */}
+          <Collapse in={editing}>
+            <Fade in={editing}>
+              <Stack spacing={2}>
+                <Box
+                  display="flex"
+                  gap={1}
+                  justifyContent="flex-end"
+                  flexDirection={{ xs: 'column-reverse', sm: 'row' }}
+                >
+                  <Button
+                    size="small"
+                    onClick={() => {
+                      setEditing(false)
+                      setEditedCollection(collection.name)
+                    }}
+                  >
+                    Cancel
+                  </Button>
+
+                  <Button
+                    size="small"
+                    variant="contained"
+                    onClick={handleSave}
+                    disabled={updateMutation.isPending}
+                  >
+                    {updateMutation.isPending ? 'Saving...' : 'Save'}
+                  </Button>
+                </Box>
+              </Stack>
+            </Fade>
+          </Collapse>
         </Stack>
       </CardContent>
     </Card>

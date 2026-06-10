@@ -1,16 +1,25 @@
-import { Menu, MenuItem } from '@mui/material'
+import {
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Tooltip,
+} from '@mui/material'
+import DeleteIcon from '@mui/icons-material/Delete'
 import { useState } from 'react'
 
 type Props = {
   onEdit: () => void
   onDelete: () => void
   onView: () => void
+  deleteDisabled: boolean
 }
 
 export default function CollectionActionsMenu({
   onEdit,
   onDelete,
   onView,
+  deleteDisabled,
 }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
@@ -49,14 +58,27 @@ export default function CollectionActionsMenu({
           Edit
         </MenuItem>
 
-        <MenuItem
-          onClick={() => {
-            onDelete()
-            handleClose()
-          }}
+        <Tooltip
+          title={
+            deleteDisabled ? 'Remove all words from this collection first' : ''
+          }
         >
-          Delete
-        </MenuItem>
+          <span>
+            <MenuItem
+              disabled={deleteDisabled}
+              onClick={() => {
+                onDelete()
+                handleClose()
+              }}
+            >
+              <ListItemIcon>
+                <DeleteIcon fontSize="small" />
+              </ListItemIcon>
+
+              <ListItemText primary="Delete" />
+            </MenuItem>
+          </span>
+        </Tooltip>
       </Menu>
     ),
   }

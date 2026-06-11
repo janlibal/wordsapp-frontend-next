@@ -20,6 +20,7 @@ import { getTags } from '@/src/services/tags/tag.service'
 import { motion } from 'framer-motion'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import StarIcon from '@mui/icons-material/Star'
+import FolderIcon from '@mui/icons-material/Folder'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import { useTheme, useMediaQuery } from '@mui/material'
 
@@ -43,6 +44,11 @@ type WordCardProps = {
   search?: string
   createdAt: string
   updatedAt: string
+  collectionId?: string
+  collection?: {
+    id: string
+    name: string
+  }
 }
 
 export default function WordCard({
@@ -51,6 +57,7 @@ export default function WordCard({
   tags,
   search,
   favorite,
+  collection,
   createdAt,
   updatedAt,
 }: WordCardProps) {
@@ -216,9 +223,24 @@ export default function WordCard({
                   onChange={(e) => setEditedContent(e.target.value)}
                 />
               ) : (
-                <Typography sx={{ lineHeight: 1.6 }}>
-                  {highlightText(content, search)}
-                </Typography>
+                <>
+                  <Typography sx={{ lineHeight: 1.6 }}>
+                    {highlightText(content, search)}
+                  </Typography>
+
+                  {collection && (
+                    <Chip
+                      icon={<FolderIcon />}
+                      label={collection.name}
+                      size="small"
+                      variant="outlined"
+                      sx={{
+                        mt: 1,
+                        maxWidth: 'fit-content',
+                      }}
+                    />
+                  )}
+                </>
               )}
             </Box>
 

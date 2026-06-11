@@ -28,15 +28,13 @@ export function useDeleteCollectionWithOptimisticUpdate() {
         queryKey: queryKeys.collections,
       })
 
-      const previousCollections =
-        queryClient.getQueryData<Collection[]>(
-          queryKeys.collections
-        )
+      const previousCollections = queryClient.getQueryData<Collection[]>(
+        queryKeys.collections
+      )
 
       queryClient.setQueryData<Collection[]>(
         queryKeys.collections,
-        (old = []) =>
-          old.filter((collection) => collection.id !== id)
+        (old = []) => old.filter((collection) => collection.id !== id)
       )
 
       return {

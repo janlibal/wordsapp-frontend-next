@@ -10,6 +10,10 @@ import {
   Typography,
   Paper,
   Alert,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Tag } from '@/src/types/tags/tag.type'
@@ -18,14 +22,18 @@ import Autocomplete from '@mui/material/Autocomplete'
 import TagSelector from '../tags/TagSelector'
 import useCreateWord from '@/src/hooks/mutations/useCreateWordHook'
 import { useSnackbar } from '@/src/hooks/SnacbarProvider'
+import useCollections from '@/src/hooks/queries/useCollections'
 
 export default function AddWord() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [content, setContent] = useState('')
   const [selectedTags, setSelectedTags] = useState<Tag[]>([])
+  const [selectedCollectionId, setSelectedCollectionId] = useState<string>('')
 
   const inputRef = useRef<HTMLInputElement | null>(null)
+
+  const { data: collections = [] } = useCollections()
 
   const createMutation = useCreateWord()
   const isLoading = createMutation.isPending
@@ -43,6 +51,7 @@ export default function AddWord() {
       {
         content,
         tags: selectedTags.map((t) => t.name),
+        collectionId: selectedCollectionId || undefined,
       },
       {
         onSuccess: () => {
@@ -110,6 +119,24 @@ export default function AddWord() {
             />
 
             <TagSelector value={selectedTags} onChange={setSelectedTags} />
+
+            <FormControl fullWidth>
+              <InputLabel>Collection</InputLabel>
+
+              <Select
+                value={selectedCollectionId}
+                label="Collection"
+                onChange={(e) => setSelectedCollectionId(e.target.value)}
+              >
+                <MenuItem value="">None</MenuItem>
+
+                {collections.map((collection) => (
+                  <MenuItem key={collection.id} value={collection.id}>
+                    {collection.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
             <Box
               display="flex"

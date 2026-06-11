@@ -1,3 +1,4 @@
+import { CollectionSummary } from '../collections/collection.sumary.type'
 import { Tag } from '../tags/tag.type'
 
 export type Word = {
@@ -6,5 +7,7 @@ export type Word = {
   favorite: boolean
   createdAt: string
   updatedAt: string
+  collectionId?: string
+  collection?: CollectionSummary
   tags: Tag[]
 }

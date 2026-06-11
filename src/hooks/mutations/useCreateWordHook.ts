@@ -56,6 +56,10 @@ export default function useCreateWord() {
         id: 'temp-' + Math.random().toString(36).slice(2),
         content: newWord.content,
         tags: resolvedTags,
+        favorite: false,
+        collectionId: newWord.collectionId,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       }
 
       // optimistic tag count updates
@@ -149,7 +153,7 @@ export default function useCreateWord() {
   })
 }
 
-export function useCreateWord44() {
+/*export function useCreateWord44() {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -263,9 +267,9 @@ export function useCreateWord44() {
       })
     },
   })
-}
+}*/
 
-export function useCreateWord333() {
+/*export function useCreateWord333() {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -366,4 +370,4 @@ export function useCreateWord1() {
       queryClient.invalidateQueries({ queryKey: ['tags'] })
     },
   })
-}
+}*/

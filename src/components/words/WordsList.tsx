@@ -17,6 +17,7 @@ export default function WordsList() {
 
   const search = searchParams.get('search') || ''
   const tagIds = searchParams.get('tags')?.split(',').filter(Boolean) ?? []
+  const collectionId = searchParams.get('collectionId') ?? undefined
 
   const sort = searchParams.get('sort') ?? 'updated'
 
@@ -24,6 +25,7 @@ export default function WordsList() {
     useWords({
       search,
       tagIds,
+      collectionId,
     })
 
   const sortedWords = useMemo(() => {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   Box,
   Button,
@@ -21,12 +21,14 @@ import CollectionActionsMenu from './CollectionActionsMenu'
 import { useSnackbar } from '@/src/hooks/SnacbarProvider'
 import { useUpdateCollection } from '@/src/hooks/mutations/useUpdateCollectionHook'
 import { useDeleteCollection } from '@/src/hooks/mutations/useDeleteCollectionHook'
+import { useRouter } from 'next/navigation'
 
 type Props = {
   collection: Collection
 }
 
 export default function CollectionCard({ collection }: Props) {
+  const router = useRouter()
   const [hovered, setHovered] = useState(false)
   const [editing, setEditing] = useState(false)
   const [editedCollection, setEditedCollection] = useState(collection.name)
@@ -62,11 +64,15 @@ export default function CollectionCard({ collection }: Props) {
     })
   }
 
+  const handleView = useCallback(() => {
+    router.push(`/?collectionId=${collection.id}`)
+  }, [router, collection.id])
+
   const { handleOpen, Menu: ActionsMenu } = CollectionActionsMenu({
     onEdit: () => setEditing(true),
     onDelete: handleDelete,
     deleteDisabled: (collection.count ?? 0) > 0,
-    onView: () => alert('TODO view'),
+    onView: () => handleView,
   })
 
   return (

@@ -62,6 +62,7 @@ export async function getWords1(
 export async function getWords(
   search?: string,
   tagIds: string[] = [],
+  collectionId?: string | undefined,
   page = 1,
   limit = 20
 ): Promise<Word[]> {
@@ -71,6 +72,7 @@ export async function getWords(
   params.set('limit', String(limit))
   if (search) params.set('search', search)
   if (tagIds.length) params.set('tags', tagIds.join(','))
+  if (collectionId) params.set('collectionId', collectionId)
 
   const res = await apiFetch<{ result: Word[] }>(
     `/api/api/v1/words?${params.toString()}`

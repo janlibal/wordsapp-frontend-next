@@ -11,6 +11,10 @@ import {
   Snackbar,
   Fade,
   Collapse,
+  InputLabel,
+  FormControl,
+  Select,
+  MenuItem,
 } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -35,6 +39,7 @@ import { useDeleteWord } from '@/src/hooks/mutations/useDeleteWordHook'
 import { highlightText } from '@/src/helpers/highlightText'
 import { useSnackbar } from '@/src/hooks/SnacbarProvider'
 import { useRestoreWord } from '@/src/hooks/mutations/useRestoreWordHook'
+import useCollections from '@/src/hooks/queries/useCollections'
 
 type WordCardProps = {
   id: string
@@ -58,6 +63,7 @@ export default function WordCard({
   search,
   favorite,
   collection,
+  collectionId,
   createdAt,
   updatedAt,
 }: WordCardProps) {
@@ -65,8 +71,14 @@ export default function WordCard({
   const [editedContent, setEditedContent] = useState(content)
   const [selectedTags, setSelectedTags] = useState<Tag[]>(tags)
   const [hovered, setHovered] = useState(false)
+  //const [selectedCollectionId, setSelectedCollectionId] = useState(collectionId ?? '')
+  const [selectedCollectionId, setSelectedCollectionId] = useState<
+    string | null
+  >(collection?.id ?? null)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+
+  const { data: collections = [] } = useCollections()
 
   const updateMutation = useUpdateWord()
   updateMutation.isPending
@@ -82,8 +94,12 @@ export default function WordCard({
   })*/
 
   useEffect(() => {
-    setSelectedTags(tags)
-  }, [tags])
+    ;(setSelectedTags(tags), setSelectedCollectionId(collectionId ?? ''))
+  }, [tags, collectionId])
+
+  const handleCollectionChange = (value: string) => {
+    setSelectedCollectionId(value)
+  }
 
   const handleToggleFavorite = () => {
     updateMutation.mutate(
@@ -160,7 +176,13 @@ export default function WordCard({
   // 💾 save
   const handleSave = () => {
     updateMutation.mutate(
-      { id, data: { content: editedContent } },
+      {
+        id,
+        data: {
+          content: editedContent,
+          collectionId: selectedCollectionId || undefined,
+        },
+      },
       {
         onSuccess: () => {
           showSnackbar({ message: 'Word updated' })
@@ -190,8 +212,17 @@ export default function WordCard({
   }
 
   // 🎯 actions menu (clean)
-  const { handleOpen, Menu: ActionsMenu } = WordActionsMenu({
+  /*const { handleOpen, Menu: ActionsMenu } = WordActionsMenu({
     onEdit: () => setEditing(true),
+    onDelete: handleDelete,
+  })*/
+  const { handleOpen, Menu: ActionsMenu } = WordActionsMenu({
+    onEdit: () => {
+      setEditedContent(content)
+      setSelectedTags(tags)
+      setSelectedCollectionId(collection?.id ?? null)
+      setEditing(true)
+    },
     onDelete: handleDelete,
   })
 
@@ -236,7 +267,7 @@ export default function WordCard({
                       variant="outlined"
                       sx={{
                         mt: 1,
-                        maxWidth: 'fit-content',
+                        width: 'fit-content',
                       }}
                     />
                   )}
@@ -304,6 +335,25 @@ export default function WordCard({
             <Fade in={editing}>
               <Stack spacing={2} sx={{ mt: 1 }}>
                 <TagSelector value={selectedTags} onChange={handleTagChange} />
+                <FormControl fullWidth size="small">
+                  <InputLabel>Collection</InputLabel>
+
+                  <Select
+                    value={selectedCollectionId}
+                    label="Collection"
+                    onChange={(e) =>
+                      setSelectedCollectionId(e.target.value || null)
+                    }
+                  >
+                    <MenuItem value="">No collection</MenuItem>
+
+                    {collections.map((collection) => (
+                      <MenuItem key={collection.id} value={collection.id}>
+                        {collection.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
 
                 <Box display="flex" gap={1} justifyContent="flex-end">
                   <Button
@@ -312,6 +362,7 @@ export default function WordCard({
                       setEditing(false)
                       setEditedContent(content)
                       setSelectedTags(tags)
+                      setSelectedCollectionId(collection?.id ?? null)
                     }}
                   >
                     Cancel

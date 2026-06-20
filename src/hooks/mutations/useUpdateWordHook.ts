@@ -17,7 +17,7 @@ export function useUpdateWord() {
       data,
     }: {
       id: string
-      data: Partial<Pick<Word, 'content' | 'favorite'>>
+      data: Partial<Pick<Word, 'content' | 'favorite' | 'collectionId'>>
     }) => updateWord(id, data),
 
     onMutate: async ({ id, data }) => {

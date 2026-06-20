@@ -75,7 +75,8 @@ export async function getWords(
   if (collectionId) params.set('collectionId', collectionId)
 
   const res = await apiFetch<{ result: Word[] }>(
-    `/api/api/v1/words?${params.toString()}`, {
+    `/api/api/v1/words?${params.toString()}`,
+    {
       method: 'GET',
     }
   )

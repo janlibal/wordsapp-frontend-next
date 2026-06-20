@@ -72,7 +72,7 @@ export default function CollectionCard({ collection }: Props) {
     onEdit: () => setEditing(true),
     onDelete: handleDelete,
     deleteDisabled: (collection.count ?? 0) > 0,
-    onView: () => handleView,
+    onView: () => handleView(),
   })
 
   return (

@@ -3,10 +3,11 @@ import {
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query'
-import { updateWord } from '../../services/words/word.service'
-import { Word } from '../../types/words/word.type'
+import { Collection } from '@/src/types/collections/collections.type'
+import { Word } from '@/src/types/words/word.type'
+import { updateWord } from '@/src/services/words/word.service'
 import { queryKeys } from '../types/queryKeys'
-import { mapInfiniteWords } from '../../helpers/mapInfiniteWords'
+import { mapInfiniteWords } from '@/src/helpers/mapInfiniteWords'
 
 export function useUpdateWord() {
   const queryClient = useQueryClient()
@@ -25,63 +26,119 @@ export function useUpdateWord() {
         queryKey: queryKeys.words,
       })
 
-      const previous = queryClient.getQueriesData<InfiniteData<Word[]>>({
+      await queryClient.cancelQueries({
+        queryKey: queryKeys.collections,
+      })
+
+      const previousWords = queryClient.getQueriesData<InfiniteData<Word[]>>({
         queryKey: queryKeys.words,
       })
 
+      const previousCollections = queryClient.getQueryData<Collection[]>(
+        queryKeys.collections
+      )
+
+      const collections = previousCollections ?? []
+
+      // 👇 capture the current word BEFORE optimistic changes
+      const previousWord = queryClient
+        .getQueryData<InfiniteData<Word[]>>(queryKeys.words)
+        ?.pages.flat()
+        .find((w) => w.id === id)
+
+      const oldCollectionId = previousWord?.collectionId
+
+      // 👇 optimistic word update
       queryClient.setQueriesData<InfiniteData<Word[]>>(
         { queryKey: queryKeys.words },
         (old) =>
-          mapInfiniteWords(old, (word) =>
-            word.id === id ? { ...word, ...data } : word
-          )
+          mapInfiniteWords(old, (word) => {
+            if (word.id !== id) {
+              return word
+            }
+
+            const updatedCollection =
+              data.collectionId !== undefined
+                ? collections.find((c) => c.id === data.collectionId)
+                : word.collection
+
+            return {
+              ...word,
+              ...data,
+
+              collectionId:
+                data.collectionId !== undefined
+                  ? data.collectionId
+                  : word.collectionId,
+
+              collection: updatedCollection
+                ? {
+                    id: updatedCollection.id,
+                    name: updatedCollection.name,
+                  }
+                : undefined,
+            }
+          })
       )
 
-      return { previous }
+      // 👇 optimistic collection counts
+      queryClient.setQueryData<Collection[]>(
+        queryKeys.collections,
+        (old = []) =>
+          old.map((collection) => {
+            let count = collection.count
 
-      /*onMutate: async ({ id, data }) => {
-      await queryClient.cancelQueries({
-        queryKey: queryKeys.words,
-      })
+            // leaving old collection
+            if (
+              oldCollectionId &&
+              collection.id === oldCollectionId &&
+              oldCollectionId !== data.collectionId
+            ) {
+              count = Math.max(0, count - 1)
+            }
 
-      // snapshot ALL matching queries
-      const previousQueries = queryClient.getQueriesData<Word[]>({
-        queryKey: queryKeys.words,
-      })
+            // entering new collection
+            if (
+              data.collectionId &&
+              collection.id === data.collectionId &&
+              oldCollectionId !== data.collectionId
+            ) {
+              count = count + 1
+            }
 
-      // update ALL caches
-      previousQueries.forEach(([queryKey]) => {
-        queryClient.setQueryData<Word[]>(queryKey, (old = []) =>
-          old.map((w) =>
-            w.id === id
-              ? {
-                  ...w,
-                  content: data.content,
-                }
-              : w
-          )
-        )
-      })
+            return {
+              ...collection,
+              count,
+            }
+          })
+      )
 
-      return { previousQueries }*/
+      return {
+        previousWords,
+        previousCollections,
+      }
     },
 
-    /*onError: (_err, _vars, context) => {
-      // rollback ALL caches
-      context?.previousQueries.forEach(([queryKey, data]) => {
+    onError: (_err, _vars, context) => {
+      context?.previousWords.forEach(([queryKey, data]) => {
         queryClient.setQueryData(queryKey, data)
       })
-    },*/
 
-    onError: (_err, _id, context) => {
-      context?.previous.forEach(([queryKey, data]) => {
-        queryClient.setQueryData(queryKey, data)
-      })
+      if (context?.previousCollections) {
+        queryClient.setQueryData(
+          queryKeys.collections,
+          context.previousCollections
+        )
+      }
     },
 
     onSettled: () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.words,
+      })
+
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.collections,
       })
     },
   })

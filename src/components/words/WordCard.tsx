@@ -339,13 +339,10 @@ export default function WordCard({
                   <InputLabel>Collection</InputLabel>
 
                   <Select
-                    value={selectedCollectionId}
-                    label="Collection"
-                    onChange={(e) =>
-                      setSelectedCollectionId(e.target.value || null)
-                    }
+                    value={selectedCollectionId ?? ''}
+                    onChange={(e) => setSelectedCollectionId(e.target.value)}
                   >
-                    <MenuItem value="">No collection</MenuItem>
+                    <MenuItem value="">None</MenuItem>
 
                     {collections.map((collection) => (
                       <MenuItem key={collection.id} value={collection.id}>

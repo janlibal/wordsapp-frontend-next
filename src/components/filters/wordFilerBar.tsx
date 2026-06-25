@@ -1,10 +1,11 @@
 import { useUrlFilters } from '@/src/hooks/useFilters'
+import { Tag } from '@/src/types/tags/tag.type'
 import { Box, Chip, Stack } from '@mui/material'
 
 export default function WordFilterBar() {
   const { search, tags, setFilters } = useUrlFilters()
 
-  const removeTag = (tagId: string) => {
+  const removeTag = (tagId: Tag['id']) => {
     setFilters({
       tags: tags.filter((t) => t !== tagId),
     })

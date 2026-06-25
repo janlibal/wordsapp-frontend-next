@@ -30,9 +30,9 @@ export function createCollection(
 }
 
 export async function updateCollection(
-  id: string,
+  id: Collection['id'], //string,
   data: {
-    name?: string
+    name?: Collection['name'] //string
   }
 ) {
   return apiFetch<Omit<Collection, 'userId'>>(`/api/api/v1/collections/${id}`, {
@@ -41,7 +41,7 @@ export async function updateCollection(
   })
 }
 
-export function deleteCollection(id: string) {
+export function deleteCollection(id: Collection['id']) {
   return apiFetch(`/api/api/v1/collections/${id}`, {
     method: 'DELETE',
   })

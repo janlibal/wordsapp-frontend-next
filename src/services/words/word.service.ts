@@ -1,4 +1,5 @@
 import { apiFetch } from '@/src/lib/fetcher'
+import { Tag } from '@/src/types/tags/tag.type'
 import { CreateWordDto } from '@/src/types/words/create.word.dto'
 import { Word } from '@/src/types/words/word.type'
 
@@ -9,19 +10,19 @@ export function createWord(data: CreateWordDto): Promise<void> {
   })
 }
 
-export async function addTagToWord(wordId: string, tagId: string) {
+export async function addTagToWord(wordId: Word['id'], tagId: Tag['id']) {
   return apiFetch(`/api/api/v1/words/${wordId}/tags/${tagId}`, {
     method: 'POST',
   })
 }
 
-export async function removeTagFromWord(wordId: string, tagId: string) {
+export async function removeTagFromWord(wordId: Word['id'], tagId: Tag['id']) {
   return apiFetch(`/api/api/v1/words/${wordId}/tags/${tagId}`, {
     method: 'DELETE',
   })
 }
 
-export function deleteWord(id: string) {
+export function deleteWord(id: Word['id']) {
   return apiFetch(`/api/api/v1/words/${id}`, {
     method: 'DELETE',
   })
@@ -101,10 +102,10 @@ export async function getWords100(
 }
 
 export async function updateWord(
-  id: string,
+  id: Word['id'], //string
   data: {
-    content?: string
-    favorite?: boolean
+    content?: Word['content'] //string
+    favorite?: Word['favorite'] //boolean
     tags?: string[]
   }
 ) {

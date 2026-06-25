@@ -15,9 +15,9 @@ export async function getTags(
 }
 
 export async function updateTag(
-  id: string,
+  id: Tag['id'], //string,
   data: {
-    name?: string
+    name?: Tag['name'] //string
   }
 ) {
   return apiFetch<Omit<Tag, 'userId'>>(`/api/api/v1/tags/${id}`, {

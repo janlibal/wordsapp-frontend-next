@@ -7,7 +7,7 @@ export function useDeleteCollection() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: string) => deleteCollection(id),
+    mutationFn: (id: Collection['id']) => deleteCollection(id),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -21,9 +21,9 @@ export function useDeleteCollectionWithOptimisticUpdate() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: string) => deleteCollection(id),
+    mutationFn: (id: Collection['id']) => deleteCollection(id),
 
-    onMutate: async (id: string) => {
+    onMutate: async (id: Collection['id']) => {
       await queryClient.cancelQueries({
         queryKey: queryKeys.collections,
       })

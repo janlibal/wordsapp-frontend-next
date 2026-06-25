@@ -13,9 +13,9 @@ export function useDeleteWord() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: string) => deleteWord(id),
+    mutationFn: (id: Word['id']) => deleteWord(id),
 
-    onMutate: async (id: string) => {
+    onMutate: async (id: Word['id']) => {
       await queryClient.cancelQueries({
         queryKey: queryKeys.words,
       })

@@ -7,8 +7,13 @@ export function useUpdateCollection() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: { name: string } }) =>
-      updateCollection(id, data),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: Collection['id']
+      data: { name: Collection['name'] }
+    }) => updateCollection(id, data),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -22,8 +27,13 @@ export function useUpdateCollectionWithOptimisticUpdate() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: { name: string } }) =>
-      updateCollection(id, data),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: Collection['id']
+      data: { name: Collection['name'] }
+    }) => updateCollection(id, data),
 
     onMutate: async ({ id, data }) => {
       await queryClient.cancelQueries({

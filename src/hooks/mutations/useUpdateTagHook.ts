@@ -13,8 +13,13 @@ export function useUpdateTag() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: { name: string } }) =>
-      updateTag(id, data),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: Tag['id']
+      data: { name: Tag['name'] }
+    }) => updateTag(id, data),
 
     onMutate: async ({ id, data }) => {
       await queryClient.cancelQueries({

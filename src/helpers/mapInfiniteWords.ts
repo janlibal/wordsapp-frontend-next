@@ -1,10 +1,11 @@
 import { InfiniteData } from '@tanstack/react-query'
+import { Word } from '../types/words/word.type'
 
-type Word = {
+/*type Word = {
   id: string
   content: string
   tags: any[]
-}
+}*/
 
 export function mapInfiniteWords(
   data: InfiniteData<Word[]> | undefined,

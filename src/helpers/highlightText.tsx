@@ -1,6 +1,7 @@
 import React from 'react'
+import { Word } from '../types/words/word.type'
 
-export function highlightText(content: string, search?: string) {
+export function highlightText(content: Word['content'], search?: string) {
   if (!search?.trim()) return content
 
   const terms = search.trim().toLowerCase().split(/\s+/).filter(Boolean)

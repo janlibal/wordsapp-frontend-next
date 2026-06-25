@@ -40,19 +40,20 @@ import { highlightText } from '@/src/helpers/highlightText'
 import { useSnackbar } from '@/src/hooks/SnacbarProvider'
 import { useRestoreWord } from '@/src/hooks/mutations/useRestoreWordHook'
 import useCollections from '@/src/hooks/queries/useCollections'
+import { Collection } from '@/src/types/collections/collections.type'
 
 type WordCardProps = {
-  id: string
-  content: string
+  id: Word['id']
+  content: Word['content']
   tags: Tag[]
-  favorite: boolean
+  favorite: Word['favorite']
   search?: string
-  createdAt: string
-  updatedAt: string
-  collectionId?: string
+  createdAt: Word['createdAt']
+  updatedAt: Word['updatedAt']
+  collectionId?: Word['collectionId']
   collection?: {
-    id: string
-    name: string
+    id: Collection['id']
+    name: Collection['name']
   }
 }
 

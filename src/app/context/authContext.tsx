@@ -37,7 +37,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // 🔥 GLOBAL LOGOUT LISTENER
   useEffect(() => {
+    console.log('AuthProvider mounted')
     const handleLogout = () => {
+      console.log('AuthProvider: logout event received')
+
       setUser(null)
       router.push('/login')
     }

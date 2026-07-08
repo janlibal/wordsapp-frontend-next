@@ -49,8 +49,13 @@ export async function apiFetch<T>(
           console.log('[API] ✅ Refresh success')
           return true
         } catch (err) {
-          console.log('[API] ❌ Refresh failed → logout')
+          //console.log('[API] ❌ Refresh failed → logout')
+          //window.dispatchEvent(new Event('auth:logout'))
+          //console.log('[API] ❌ Refresh failed')
+          //return false
 
+          console.log('[API] ❌ Refresh failed')
+          console.log('[API] dispatching auth:logout')
           window.dispatchEvent(new Event('auth:logout'))
           return false
         } finally {

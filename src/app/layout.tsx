@@ -13,6 +13,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  console.log('RootLayout mounted')
   return (
     <html lang="en">
       <body>

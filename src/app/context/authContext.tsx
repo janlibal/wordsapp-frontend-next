@@ -10,7 +10,7 @@ type AuthContextType = {
   user: User | null
   loading: boolean
   logout: () => Promise<void>
-  refetchUser: () => Promise<void>
+  //refetchUser: () => Promise<void>
   refreshAuth: () => Promise<void>
 }
 
@@ -35,9 +35,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  useEffect(() => {
+  /*useEffect(() => {
     fetchUser()
-  }, [])
+  }, [])*/
 
   // 🔥 GLOBAL LOGOUT LISTENER
   useEffect(() => {
@@ -77,7 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         loading,
         logout: logoutUser,
-        refetchUser: fetchUser,
+       // refetchUser: fetchUser,
         refreshAuth: fetchUser,
       }}
     >

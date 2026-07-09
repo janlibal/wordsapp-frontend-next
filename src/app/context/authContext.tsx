@@ -21,13 +21,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const pathname = usePathname()
-  console.log('Current pathname:', pathname)
 
   const fetchUser = async () => {
     setLoading(true)
+
     try {
-      const user = await getCurrentUser()
-      setUser(user)
+      const currentUser = await getCurrentUser()
+      setUser(currentUser)
     } catch {
       setUser(null)
     } finally {

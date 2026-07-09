@@ -55,7 +55,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
-  const { user, logout } = useAuth()
+  const { logout } = useAuth()
 
   const [value, setValue] = useState(searchParams.get('search') || '')
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -63,8 +63,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   const debounced = useDebouncedValue(value, 400)
-
-  console.log('AppLayout user:', user)
 
   // 🔍 sync search with URL
   useEffect(() => {
@@ -153,7 +151,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         icon: <LogoutIcon />,
         action: async () => {
           await logout()
-          router.push('/login')
         },
         showInMenu: true,
         mobileMenu: true,
@@ -194,24 +191,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </Box>
     </Box>
   )
-
-  // 🔒 AUTH GUARD — minimal layout when logged out
-  if (!user) {
-    return (
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          px: 2,
-          background: 'linear-gradient(135deg, #f5f7fa 0%, #e4ecf7 100%)',
-        }}
-      >
-        {children}
-      </Box>
-    )
-  }
 
   return (
     <Box sx={{ display: 'flex' }}>

@@ -2,13 +2,16 @@
 
 import Profile from '@/src/components/auth/profile/Profile'
 import { Typography } from '@mui/material'
-import { useAuth } from '../context/authContext'
+import useProfile from '@/src/hooks/queries/useProfile'
 
 export default function Page() {
-  const { user, loading } = useAuth()
+  const { data, isLoading, error } = useProfile()
 
-  if (loading) return <Typography>Loading...</Typography>
-  if (!user) return <Typography>No user</Typography>
+  if (isLoading) return <Typography>Loading...</Typography>
 
-  return <Profile data={user} />
+  if (error) return <Typography>Failed to load profile.</Typography>
+
+  if (!data) return null
+
+  return <Profile data={data} />
 }

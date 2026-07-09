@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getCurrentUser, logout } from '@/src/services/auth/auth.service'
 import { User } from '@/src/types/auth/auth.types'
+import { usePathname } from 'next/navigation'
 
 type AuthContextType = {
   user: User | null
@@ -18,6 +19,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
+  const pathname = usePathname()
+  console.log('Current pathname:', pathname)
 
   const fetchUser = async () => {
     setLoading(true)
@@ -39,10 +42,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     console.log('AuthProvider mounted')
     const handleLogout = () => {
+      console.log('Logging out from:', pathname)
       console.log('AuthProvider: logout event received')
-
       setUser(null)
-      router.push('/login')
+
+      console.log('Before router.push')
+      router.replace('/login')
+      console.log('After router.push')
     }
 
     window.addEventListener('auth:logout', handleLogout)

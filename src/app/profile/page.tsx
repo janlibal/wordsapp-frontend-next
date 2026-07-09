@@ -1,6 +1,6 @@
 'use client'
 
-import MeInfo from '@/src/components/auth/me/MeInfo'
+import Profile from '@/src/components/auth/profile/Profile'
 import { Typography } from '@mui/material'
 import { useAuth } from '../context/authContext'
 
@@ -10,5 +10,5 @@ export default function Page() {
   if (loading) return <Typography>Loading...</Typography>
   if (!user) return <Typography>No user</Typography>
 
-  return <MeInfo data={user} />
+  return <Profile data={user} />
 }

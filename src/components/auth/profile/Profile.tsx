@@ -18,7 +18,7 @@ type Props = {
   data: User
 }
 
-export default function MeInfo({ data }: Props) {
+export default function Profile({ data }: Props) {
   const [openPasswordDialog, setOpenPasswordDialog] = useState(false)
 
   return (

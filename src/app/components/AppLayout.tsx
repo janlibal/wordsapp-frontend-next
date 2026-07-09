@@ -140,9 +140,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         showInDrawer: true,
       },
       {
-        label: 'Me',
+        label: 'Profile',
         icon: <Person />,
-        href: '/me',
+        href: '/profile',
         showInMenu: true,
         mobileMenu: true,
       },

@@ -4,14 +4,9 @@ import SystemInfo from '@/src/components/system/SystemInfo'
 import { getAppInfo } from '@/src/services/app/app.service'
 import { Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
-import { useAuth } from '../../context/authContext'
 
 export default function Page() {
-  const { user, loading } = useAuth()
-
-  if (loading) return <Typography>Loading...</Typography>
-  if (!user) return <Typography>No user</Typography>
-
+  
   const { data, isLoading, error } = useQuery({
     queryKey: ['system'],
     queryFn: () => getAppInfo(),

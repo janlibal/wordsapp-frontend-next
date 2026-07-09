@@ -3,4 +3,5 @@ export const queryKeys = {
   tags: ['tags'] as const,
   collections: ['collections'] as const,
   profile: ['profile'] as const,
+  system: ['system'] as const,
 }

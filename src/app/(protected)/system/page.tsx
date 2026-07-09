@@ -4,7 +4,7 @@ import SystemInfo from '@/src/components/system/SystemInfo'
 import { getAppInfo } from '@/src/services/app/app.service'
 import { Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
-import { useAuth } from '../context/authContext'
+import { useAuth } from '../../context/authContext'
 
 export default function Page() {
   const { user, loading } = useAuth()

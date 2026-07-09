@@ -16,10 +16,11 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '@/src/app/context/authContext'
 import { login } from '@/src/services/auth/auth.service'
+import { useLogin } from '@/src/hooks/mutations/auth/useLogin'
 
 export default function LoginForm() {
   const router = useRouter()
-  const { refreshAuth } = useAuth()
+  const loginMutation = useLogin()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -53,13 +54,14 @@ export default function LoginForm() {
     setLoading(true)
 
     try {
-      await login({ email, password })
-      await refreshAuth()
+      await loginMutation.mutateAsync({
+        email,
+        password,
+      })
+
       router.push('/')
     } catch (err: any) {
       setError(err.message || 'Invalid credentials')
-    } finally {
-      setLoading(false)
     }
   }
 

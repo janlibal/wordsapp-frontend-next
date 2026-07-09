@@ -19,6 +19,25 @@ export default function RootLayout({
         <AuthProvider>
           <ThemeProvider theme={theme}>
             <CssBaseline />
+            <Providers>{children}</Providers>
+          </ThemeProvider>
+        </AuthProvider>
+      </body>
+    </html>
+  )
+}
+
+export function RootLayoutPRevious({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body>
+        <AuthProvider>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
             <Providers>
               <AppLayout>
                 <SnackbarProvider>{children}</SnackbarProvider>

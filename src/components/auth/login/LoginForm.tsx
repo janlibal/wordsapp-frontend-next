@@ -19,7 +19,7 @@ import { login } from '@/src/services/auth/auth.service'
 
 export default function LoginForm() {
   const router = useRouter()
-  const { refetchUser } = useAuth()
+  const { refreshAuth } = useAuth()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -54,7 +54,7 @@ export default function LoginForm() {
 
     try {
       await login({ email, password })
-      await refetchUser()
+      await refreshAuth()
       router.push('/')
     } catch (err: any) {
       setError(err.message || 'Invalid credentials')

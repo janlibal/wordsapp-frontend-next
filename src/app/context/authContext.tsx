@@ -11,6 +11,7 @@ type AuthContextType = {
   loading: boolean
   logout: () => Promise<void>
   refetchUser: () => Promise<void>
+  refreshAuth: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -77,6 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading,
         logout: logoutUser,
         refetchUser: fetchUser,
+        refreshAuth: fetchUser,
       }}
     >
       {children}

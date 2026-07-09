@@ -64,6 +64,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const debounced = useDebouncedValue(value, 400)
 
+  console.log('AppLayout user:', user)
+
   // 🔍 sync search with URL
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString())

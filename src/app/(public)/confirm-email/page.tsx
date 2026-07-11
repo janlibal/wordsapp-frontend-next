@@ -1,4 +1,10 @@
-type Props = {
+import ConfirmEmailComponent from '@/src/components/auth/confirm-email/ConfirmEmailComponent'
+
+export default function Page() {
+  return <ConfirmEmailComponent />
+}
+
+/*type Props = {
   searchParams: Promise<{
     hash?: string
   }>
@@ -16,4 +22,4 @@ export default async function Page({ searchParams }: Props) {
       <pre>{hash}</pre>
     </div>
   )
-}
+}*/

@@ -1,11 +1,19 @@
 import { apiFetch } from '../../lib/fetcher'
 import {
   ChangePasswordDto,
+  ConfirmEmailDto,
   LoginDto,
   LoginResponse,
   RegisterDto,
   User,
 } from '../../types/auth/auth.types'
+
+export async function confirmEmail(data: ConfirmEmailDto): Promise<void> {
+  await apiFetch('/api/api/v1/auth/email/confirm', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
 
 export async function changePassword(data: ChangePasswordDto): Promise<void> {
   await apiFetch('/api/api/v1/auth/change-password', {

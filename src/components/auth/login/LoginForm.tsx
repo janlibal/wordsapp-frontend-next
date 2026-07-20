@@ -123,6 +123,12 @@ export default function LoginForm() {
             Sign up
           </Button>
         </Typography>
+        <Typography variant="body2" textAlign="center" sx={{ mt: 2 }}>
+          Want to be in?{' '}
+          <Button size="small" onClick={() => router.push('/waitlist')}>
+            Add to waitlist
+          </Button>
+        </Typography>
       </Paper>
     </Fade>
   )

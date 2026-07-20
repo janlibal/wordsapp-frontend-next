@@ -2,6 +2,7 @@ import { apiFetch } from '../../lib/fetcher'
 import {
   ChangePasswordDto,
   ConfirmEmailDto,
+  JoinDto,
   LoginDto,
   LoginResponse,
   RegisterDto,
@@ -38,6 +39,16 @@ export function login(data: LoginDto): Promise<void> {
 
 export function register(data: RegisterDto): Promise<void> {
   return apiFetch<void>('api/api/v1/auth/email/register', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  })
+}
+
+export function join(data: JoinDto): Promise<void> {
+  return apiFetch<void>('api/api/v1/auth/email/join', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

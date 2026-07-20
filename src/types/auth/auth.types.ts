@@ -10,6 +10,12 @@ export type RegisterDto = {
   password: string
 }
 
+export type JoinDto = {
+  firstName: string
+  lastName: string
+  email: string
+}
+
 export type LoginResponse2 = {
   accessToken: string
 }

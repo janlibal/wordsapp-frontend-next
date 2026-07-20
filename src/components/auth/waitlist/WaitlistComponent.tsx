@@ -14,7 +14,7 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import { register } from '@/src/services/auth/auth.service'
+import { join } from '@/src/services/auth/auth.service'
 
 export default function WaitlistComponent() {
   const router = useRouter()
@@ -22,8 +22,6 @@ export default function WaitlistComponent() {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
-  //const [password, setPassword] = useState('')
-  //const [showPassword, setShowPassword] = useState(false)
 
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -54,12 +52,11 @@ export default function WaitlistComponent() {
     setLoading(true)
 
     try {
-      /*await register({
+      await join({
         firstName,
         lastName,
         email,
-        password,
-      })*/
+      })
 
       router.push('/login')
     } catch (err: any) {

@@ -7,7 +7,15 @@ import {
   LoginResponse,
   RegisterDto,
   User,
+  VerifyEmailDto,
 } from '../../types/auth/auth.types'
+
+export async function verifyEmail(data: VerifyEmailDto): Promise<void> {
+  await apiFetch('/api/api/v1/auth/email/verify', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
 
 export async function confirmEmail(data: ConfirmEmailDto): Promise<void> {
   await apiFetch('/api/api/v1/auth/email/confirm', {

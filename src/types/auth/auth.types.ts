@@ -40,3 +40,7 @@ export type ChangePasswordDto = {
 export type ConfirmEmailDto = {
   hash: string
 }
+
+export type VerifyEmailDto = {
+  hash: string
+}

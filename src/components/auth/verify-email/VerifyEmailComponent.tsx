@@ -14,6 +14,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useRef } from 'react'
+import { useVerifyEmail } from '@/src/hooks/mutations/auth/useVerifyEmailHook'
 
 export default function VerifyEmailComponent() {
   const router = useRouter()
@@ -48,11 +49,11 @@ export default function VerifyEmailComponent() {
             <CircularProgress />
 
             <Typography variant="h5" mt={3} mb={1}>
-              Confirming your email...
+              Verifying your email...
             </Typography>
 
             <Typography color="text.secondary">
-              Please wait while we activate your account.
+              Please wait while we verify your email.
             </Typography>
           </>
         )}
@@ -69,17 +70,9 @@ export default function VerifyEmailComponent() {
             </Typography>
 
             <Typography color="text.secondary" mb={4}>
-              Your account has been activated successfully. You can now log in
-              and start using the application.
+              You're now on the waiting list. We'll notify you when access
+              becomes available.
             </Typography>
-
-            <Button
-              variant="contained"
-              size="large"
-              onClick={() => router.push('/login')}
-            >
-              Go to Login
-            </Button>
           </>
         )}
 
@@ -88,7 +81,7 @@ export default function VerifyEmailComponent() {
             <ErrorOutlineIcon color="error" sx={{ fontSize: 72, mb: 2 }} />
 
             <Typography variant="h5" fontWeight={700} gutterBottom>
-              ConVefirmation failed
+              Confirmation failed
             </Typography>
 
             <Alert severity="error" sx={{ mb: 3 }}>

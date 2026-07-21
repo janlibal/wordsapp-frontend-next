@@ -161,13 +161,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         mobileMenu: true,
       },
     ]
-    if (userData?.role === 2) {
+    if (userData?.role === 1) {
       arr.push({
         label: 'Admin',
         href: '/admin',
         icon: <Person />,
         showInMenu: true,
-        mobileMenu: true,
+        mobileMenu: false,
       })
     }
     return arr

@@ -50,3 +50,8 @@ export type ConfirmEmailDto = {
 export type VerifyEmailDto = {
   hash: string
 }
+
+export enum RoleEnum {
+  'admin' = 1,
+  'user' = 2,
+}

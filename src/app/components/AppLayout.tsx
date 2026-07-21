@@ -37,6 +37,7 @@ import { useAuth } from '../context/authContext'
 import TagsSidebar from '@/src/components/tags/TagsSidebar'
 import { useDebouncedValue } from '@/src/hooks/useDebounceValue'
 import useProfile from '@/src/hooks/queries/useProfile'
+import { RoleEnum } from '@/src/types/auth/auth.types'
 
 const drawerWidth = 240
 
@@ -56,11 +57,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
-  const userData = {
-    role: 1,
-  }
-
-  const { logout } = useAuth()
+  const { user, logout } = useAuth()
 
   const [value, setValue] = useState(searchParams.get('search') || '')
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -161,7 +158,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         mobileMenu: true,
       },
     ]
-    if (userData?.role === 1) {
+    if (user?.role?.id === RoleEnum.admin) {
       arr.push({
         label: 'Admin',
         href: '/admin',

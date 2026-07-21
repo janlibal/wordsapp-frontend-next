@@ -15,9 +15,11 @@ import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { join } from '@/src/services/auth/auth.service'
+import { useWaitlist } from '@/src/hooks/mutations/auth/useWaitlistHook'
 
 export default function WaitlistComponent() {
   const router = useRouter()
+  const waitlistMutation = useWaitlist()
 
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
@@ -52,11 +54,8 @@ export default function WaitlistComponent() {
     setLoading(true)
 
     try {
-      await join({
-        firstName,
-        lastName,
-        email,
-      })
+      await waitlistMutation.mutateAsync({ firstName, lastName, email })
+      //  await join({ firstName, lastName, email })
 
       router.push('/login')
     } catch (err: any) {

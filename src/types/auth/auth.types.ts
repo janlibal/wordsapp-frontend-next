@@ -30,6 +30,12 @@ export type User = {
   lastName: string
   email: string
   password: string
+  role?: Role | null
+}
+
+export type Role = {
+  id: number
+  name?: string
 }
 
 export type ChangePasswordDto = {

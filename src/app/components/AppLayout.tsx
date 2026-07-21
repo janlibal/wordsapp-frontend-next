@@ -36,6 +36,7 @@ import Link from 'next/link'
 import { useAuth } from '../context/authContext'
 import TagsSidebar from '@/src/components/tags/TagsSidebar'
 import { useDebouncedValue } from '@/src/hooks/useDebounceValue'
+import useProfile from '@/src/hooks/queries/useProfile'
 
 const drawerWidth = 240
 
@@ -54,6 +55,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+
+  const userData = {
+    role: 1,
+  }
 
   const { logout } = useAuth()
 
@@ -111,7 +116,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   // 🔥 NAV CONFIG
   const navItems: NavItem[] = useMemo(() => {
-    return [
+    const arr = [
       {
         label: 'All Words',
         icon: <FormatQuoteIcon />,
@@ -156,6 +161,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         mobileMenu: true,
       },
     ]
+    if (userData?.role === 2) {
+      arr.push({
+        label: 'Admin',
+        href: '/admin',
+        icon: <Person />,
+        showInMenu: true,
+        mobileMenu: true,
+      })
+    }
+    return arr
   }, [logout, router])
 
   const drawerItems = navItems.filter((i) => i.showInDrawer)

@@ -46,7 +46,7 @@ export default function Profile({ data }: Props) {
                   </Typography>
 
                   <Typography variant="body2" color="text.secondary">
-                    {data.email}
+                    {data.email} (role to be displayed - {data.role?.id})
                   </Typography>
                 </Box>
               </Stack>

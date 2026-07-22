@@ -2,7 +2,7 @@
 
 import { useAuth } from '../context/authContext'
 import { useEffect } from 'react'
-import AppLayout from '../components/AppLayout'
+import UserLayout from './(user)/UserLayout'
 import { Box, CircularProgress } from '@mui/material'
 
 export default function ProtectedLayout({
@@ -35,5 +35,5 @@ export default function ProtectedLayout({
     return null
   }
 
-  return <AppLayout>{children}</AppLayout>
+  return <UserLayout>{children}</UserLayout>
 }

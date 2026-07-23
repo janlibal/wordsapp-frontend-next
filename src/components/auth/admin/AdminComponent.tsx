@@ -1,8 +1,10 @@
+import { useAuth } from '@/src/app/context/authContext'
 import { AppCard } from '@/src/ui/appCard'
 import { PageContainer } from '@/src/ui/pageContainer'
 import { Avatar, Divider, Stack, Typography } from '@mui/material'
 
 export function AdminComponent() {
+  const { refreshAuth, loading, user } = useAuth()
   return (
     <PageContainer>
       <AppCard>
@@ -13,7 +15,7 @@ export function AdminComponent() {
           </Typography>
           <Divider sx={{ width: '100%' }} />
           <Typography variant="body2" color="text.secondary">
-            ...the rest is yet to come...
+            {user?.email}
           </Typography>
         </Stack>
       </AppCard>

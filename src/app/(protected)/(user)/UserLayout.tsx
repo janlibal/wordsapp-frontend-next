@@ -51,7 +51,11 @@ type NavItem = {
   mobileMenu?: boolean
 }
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+export default function UserLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const theme = useTheme()

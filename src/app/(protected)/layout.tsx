@@ -35,5 +35,5 @@ export default function ProtectedLayout({
     return null
   }
 
-  return <UserLayout>{children}</UserLayout>
+  return children
 }

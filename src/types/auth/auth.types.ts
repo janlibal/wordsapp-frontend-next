@@ -31,9 +31,17 @@ export type User = {
   email: string
   password: string
   role?: Role | null
+  status?: Status | null
+  emailVerified: boolean
+  createdAt: Date
 }
 
 export type Role = {
+  id: number
+  name?: string
+}
+
+export type Status = {
   id: number
   name?: string
 }
@@ -54,4 +62,12 @@ export type VerifyEmailDto = {
 export enum RoleEnum {
   'admin' = 1,
   'user' = 2,
+}
+
+export enum StatusEnum {
+  'active' = 1,
+  'inactive' = 2,
+  'pending' = 3,
+  'suspended' = 4,
+  'deleted' = 5,
 }

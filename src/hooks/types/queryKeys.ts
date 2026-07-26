@@ -4,4 +4,7 @@ export const queryKeys = {
   collections: ['collections'] as const,
   profile: ['profile'] as const,
   system: ['system'] as const,
+  admin: {
+    pending: ['admin', 'pending'] as const,
+  },
 }

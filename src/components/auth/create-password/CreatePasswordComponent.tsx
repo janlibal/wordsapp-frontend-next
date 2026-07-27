@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Alert, Box, Button, Stack, TextField, Typography } from '@mui/material'
 import { useCreatePassword } from '@/src/hooks/mutations/admin/useCreatePasswordHook'
@@ -18,6 +18,12 @@ export default function CreatePasswordComponent() {
   const [error, setError] = useState('')
 
   const createPasswordMutation = useCreatePassword()
+
+  const passwordRef = useRef<HTMLInputElement | null>(null)
+
+  useEffect(() => {
+    passwordRef.current?.focus()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -65,6 +71,7 @@ export default function CreatePasswordComponent() {
             <TextField
               label="Password"
               type="password"
+              inputRef={passwordRef}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               fullWidth

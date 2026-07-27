@@ -2,10 +2,20 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Alert, Box, Button, Stack, TextField, Typography } from '@mui/material'
+import {
+  Alert,
+  Box,
+  Button,
+  IconButton,
+  InputAdornment,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material'
 import { useCreatePassword } from '@/src/hooks/mutations/admin/useCreatePasswordHook'
 import { PageContainer } from '@/src/ui/pageContainer'
 import { AppCard } from '@/src/ui/appCard'
+import { Visibility, VisibilityOff } from '@mui/icons-material'
 
 export default function CreatePasswordComponent() {
   const router = useRouter()
@@ -16,6 +26,9 @@ export default function CreatePasswordComponent() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
+
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setConfirmShowPassword] = useState(false)
 
   const createPasswordMutation = useCreatePassword()
 
@@ -75,6 +88,18 @@ export default function CreatePasswordComponent() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               fullWidth
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword((s) => !s)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
 
             <TextField
@@ -83,6 +108,18 @@ export default function CreatePasswordComponent() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               fullWidth
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setConfirmShowPassword((s) => !s)}
+                      edge="end"
+                    >
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
 
             <Button

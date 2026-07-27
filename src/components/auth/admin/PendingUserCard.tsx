@@ -30,10 +30,7 @@ export default function PendingUserCard({ user, onApprove }: Props) {
             </Typography>
           </Box>
 
-          <PendingUserActionsMenu
-            disabled={!user.emailVerified}
-            onApprove={() => onApprove?.(user.id)}
-          />
+          <PendingUserActionsMenu user={user} disabled={false} />
         </Stack>
 
         <Divider />

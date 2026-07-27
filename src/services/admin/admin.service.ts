@@ -7,3 +7,10 @@ export async function getPendingUsers(): Promise<User[]> {
   })
   return res.result
 }
+
+export async function approveUser(id: User['id']): Promise<void> {
+  await apiFetch(`/api/api/v1/admin/waitlist/${id}/approve`, {
+    method: 'PATCH',
+    //body: JSON.stringify(id)
+  })
+}

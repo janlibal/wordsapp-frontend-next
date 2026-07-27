@@ -10,16 +10,28 @@ import {
 } from '@mui/material'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import { useState } from 'react'
+import { User } from '@/src/types/auth/auth.types'
+import { useApproveUser } from '@/src/hooks/mutations/admin/useApproveUserHook'
 
 type Props = {
   disabled: boolean
-  onApprove: () => void
+  user: User
 }
 
-export default function PendingUserActionsMenu({ disabled, onApprove }: Props) {
+export default function PendingUserActionsMenu({ disabled, user }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   const open = Boolean(anchorEl)
+
+  const approveMutation = useApproveUser()
+
+  const handleApprove = async () => {
+    try {
+      await approveMutation.mutateAsync(user.id)
+    } finally {
+      setAnchorEl(null)
+    }
+  }
 
   return (
     <>
@@ -29,18 +41,18 @@ export default function PendingUserActionsMenu({ disabled, onApprove }: Props) {
 
       <Menu anchorEl={anchorEl} open={open} onClose={() => setAnchorEl(null)}>
         <MenuItem
-          disabled={disabled}
-          onClick={() => {
-            setAnchorEl(null)
-            onApprove()
-            console.log('just clicked')
-          }}
+          disabled={
+            disabled || !user.emailVerified || approveMutation.isPending
+          }
+          onClick={handleApprove}
         >
           <ListItemIcon>
             <CheckCircleOutlineIcon fontSize="small" />
           </ListItemIcon>
 
-          <ListItemText>Approve</ListItemText>
+          <ListItemText>
+            {approveMutation.isPending ? 'Approving...' : 'Approve'}
+          </ListItemText>
         </MenuItem>
       </Menu>
     </>

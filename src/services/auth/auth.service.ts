@@ -2,6 +2,7 @@ import { apiFetch } from '../../lib/fetcher'
 import {
   ChangePasswordDto,
   ConfirmEmailDto,
+  CreatePasswordDto,
   JoinDto,
   LoginDto,
   LoginResponse,
@@ -9,6 +10,13 @@ import {
   User,
   VerifyEmailDto,
 } from '../../types/auth/auth.types'
+
+export async function createPassword(dto: CreatePasswordDto): Promise<void> {
+  await apiFetch('/api/api/v1/admin/create-password', {
+    method: 'PATCH',
+    body: JSON.stringify(dto),
+  })
+}
 
 export async function verifyEmail(data: VerifyEmailDto): Promise<void> {
   await apiFetch('/api/api/v1/auth/email/verify', {

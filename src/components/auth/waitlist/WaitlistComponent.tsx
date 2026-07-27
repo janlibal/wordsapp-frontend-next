@@ -37,7 +37,8 @@ export default function WaitlistComponent() {
   const validate = () => {
     if (!email.includes('@')) return 'Invalid email'
     //if (password.length < 6) return 'Password must be at least 6 characters'
-    if (!firstName.trim()) return 'First name is required'
+    if (!firstName.trim()) return 'Firstname is required'
+    if (!lastName.trim()) return 'Lastname is required'
     return null
   }
 

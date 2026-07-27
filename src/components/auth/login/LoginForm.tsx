@@ -37,7 +37,7 @@ export default function LoginForm() {
 
   const validate = () => {
     if (!email.includes('@')) return 'Invalid email'
-    if (password.length < 6) return 'Password must be at least 6 characters'
+    if (!password) return 'Password is required'
     return null
   }
 

@@ -83,7 +83,7 @@ export default function CreatePasswordComponent() {
 
             <TextField
               label="Password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               inputRef={passwordRef}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -92,7 +92,8 @@ export default function CreatePasswordComponent() {
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
-                      onClick={() => setShowPassword((s) => !s)}
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      onMouseDown={(e) => e.preventDefault()}
                       edge="end"
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
@@ -104,7 +105,7 @@ export default function CreatePasswordComponent() {
 
             <TextField
               label="Confirm password"
-              type="password"
+              type={showConfirmPassword ? 'text' : 'password'}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               fullWidth
@@ -112,7 +113,8 @@ export default function CreatePasswordComponent() {
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
-                      onClick={() => setConfirmShowPassword((s) => !s)}
+                      onClick={() => setConfirmShowPassword((prev) => !prev)}
+                      onMouseDown={(e) => e.preventDefault()}
                       edge="end"
                     >
                       {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
@@ -121,7 +123,7 @@ export default function CreatePasswordComponent() {
                 ),
               }}
             />
-
+            
             <Button
               type="submit"
               variant="contained"

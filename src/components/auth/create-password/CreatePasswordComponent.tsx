@@ -123,7 +123,7 @@ export default function CreatePasswordComponent() {
                 ),
               }}
             />
-            
+
             <Button
               type="submit"
               variant="contained"

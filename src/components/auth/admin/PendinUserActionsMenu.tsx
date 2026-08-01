@@ -12,6 +12,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import { useState } from 'react'
 import { User } from '@/src/types/auth/auth.types'
 import { useApproveUser } from '@/src/hooks/mutations/admin/useApproveUserHook'
+import { useSnackbar } from '@/src/hooks/SnacbarProvider'
 
 type Props = {
   disabled: boolean
@@ -25,9 +26,14 @@ export default function PendingUserActionsMenu({ disabled, user }: Props) {
 
   const approveMutation = useApproveUser()
 
+  const showSnackbar = useSnackbar()
+
   const handleApprove = async () => {
     try {
       await approveMutation.mutateAsync(user.id)
+      showSnackbar({
+        message: 'Invitation sent successfully',
+      })
     } finally {
       setAnchorEl(null)
     }

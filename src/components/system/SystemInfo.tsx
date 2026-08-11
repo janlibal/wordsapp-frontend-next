@@ -1,13 +1,13 @@
 import { Box, Divider, Stack, Typography } from '@mui/material'
-import { SystemInfo } from '../../types/app/system.info.types'
 import { PageContainer } from '@/src/ui/pageContainer'
 import { AppCard } from '@/src/ui/appCard'
+import { SystemInfo } from '../../types/app/app.types'
 
 type Props = {
   data: SystemInfo
 }
 
-export default function SystemInfoPage({ data }: Props) {
+export default function SystemInfoComponent({ data }: Props) {
   return (
     <PageContainer>
       <AppCard>

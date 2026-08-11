@@ -1,4 +1,5 @@
 import { apiFetch } from '@/src/lib/fetcher'
+import { CollectionResponse } from '@/src/types/collections/collections.response.type'
 import { Collection } from '@/src/types/collections/collections.type'
 import { CreateCollectionDto } from '@/src/types/collections/create.collection.dto'
 
@@ -11,13 +12,14 @@ export async function getCollections(
   if (search) params.set('search', search)
   if (collectionIds.length) params.set('collections', collectionIds.join(','))
 
-  const res = await apiFetch<{ result: Collection[] }>(
-    `/api/api/v1/collections`,
-    {
-      method: 'GET',
-    }
+  const query = params.toString()
+
+  const res = await apiFetch<CollectionResponse>(
+    query ? `/api/api/v1/collections?${query}` : '/api/api/v1/collections',
+    { method: 'GET' }
   )
-  return res.result
+
+  return res.data
 }
 
 export function createCollection(

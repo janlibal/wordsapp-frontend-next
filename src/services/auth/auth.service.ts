@@ -40,10 +40,10 @@ export async function changePassword(data: ChangePasswordDto): Promise<void> {
 }
 
 export async function getCurrentUser(): Promise<User> {
-  const res = await apiFetch<{ result: User }>('/api/api/v1/auth/me', {
+  const res = await apiFetch<{ data: User }>('/api/api/v1/auth/me', {
     method: 'GET',
   })
-  return res.result
+  return res.data
 }
 
 export function login(data: LoginDto): Promise<void> {

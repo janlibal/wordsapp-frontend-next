@@ -1,6 +1,7 @@
 'use client'
 
-import SystemInfo from '@/src/components/system/SystemInfo'
+import SystemInfoComponent from '@/src/components/system/SystemInfo'
+import SystemInfoPage from '@/src/components/system/SystemInfo'
 import useSystem from '@/src/hooks/queries/useSystem'
 import { Typography } from '@mui/material'
 
@@ -9,9 +10,9 @@ export default function Page() {
 
   if (isLoading) return <Typography>Loading...</Typography>
 
-  if (error) return <Typography>Failed to load profile.</Typography>
+  if (error) return <Typography>Failed to load system info.</Typography>
 
   if (!data) return null
 
-  return <SystemInfo data={data.result} />
+  return <SystemInfoComponent data={data.data} />
 }

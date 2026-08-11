@@ -1,5 +1,18 @@
 import UserLayout from './UserLayout'
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+import UserAppShell from './UserAppShell'
+
+export default function UserRouteLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return <UserAppShell>{children}</UserAppShell>
+}
+
+export function UserRouteLayout1({ children }: { children: React.ReactNode }) {
+  return <>{children}</>
+}
+export function Layout111({ children }: { children: React.ReactNode }) {
   return <UserLayout>{children}</UserLayout>
 }

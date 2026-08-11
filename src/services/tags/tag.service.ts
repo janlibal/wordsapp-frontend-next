@@ -1,5 +1,6 @@
 import { apiFetch } from '@/src/lib/fetcher'
 import { Tag } from '@/src/types/tags/tag.type'
+import { TagsResponse } from '@/src/types/tags/tags.response.type'
 
 export async function getTags(
   search?: string,
@@ -10,8 +11,13 @@ export async function getTags(
   if (search) params.set('search', search)
   if (tagIds.length) params.set('tags', tagIds.join(','))
 
-  const res = await apiFetch<{ result: Tag[] }>(`/api/api/v1/tags`)
-  return res.result
+  const query = params.toString()
+
+  const res = await apiFetch<TagsResponse>(
+    query ? `/api/api/v1/tags?${query}` : '/api/api/v1/tags'
+  )
+
+  return res.data
 }
 
 export async function updateTag(

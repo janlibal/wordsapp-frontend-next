@@ -75,14 +75,14 @@ export async function getWords(
   if (tagIds.length) params.set('tags', tagIds.join(','))
   if (collectionId) params.set('collectionId', collectionId)
 
-  const res = await apiFetch<{ result: Word[] }>(
+  const res = await apiFetch<{ data: Word[] }>(
     `/api/api/v1/words?${params.toString()}`,
     {
       method: 'GET',
     }
   )
 
-  return res.result
+  return res.data
 }
 
 export async function getWords100(

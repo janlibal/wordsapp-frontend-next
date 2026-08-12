@@ -68,7 +68,13 @@ export default function WaitlistComponent() {
 
   return (
     <Fade in timeout={400}>
-      <Paper sx={{ p: 4, width: '100%', maxWidth: 400 }}>
+      <Paper
+        sx={{
+          p: { xs: 2.5, sm: 4 },
+          width: '100%',
+          maxWidth: 400,
+        }}
+      >
         <Typography variant="h5" mb={2} textAlign="center">
           Add to waitlist
         </Typography>

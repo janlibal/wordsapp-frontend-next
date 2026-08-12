@@ -68,7 +68,13 @@ export default function WordsList() {
 
   return (
     <PageContainer>
-      <Stack spacing={2}>
+      <Stack
+        spacing={2}
+        sx={{
+          width: '100%',
+          minWidth: 0,
+        }}
+      >
         {isFetching && <Typography>Loading...</Typography>}
 
         {!words.length && !isFetching && (
@@ -81,8 +87,7 @@ export default function WordsList() {
           <WordCard key={word.id} {...word} search={search} />
         ))}
 
-        {/* 👇 infinite scroll trigger */}
-        <div ref={loadMoreRef} />
+        <Box ref={loadMoreRef} />
 
         {isFetchingNextPage && <Typography>Loading more...</Typography>}
       </Stack>

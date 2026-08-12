@@ -71,7 +71,7 @@ export default function WordCard({
   const [editing, setEditing] = useState(false)
   const [editedContent, setEditedContent] = useState(content)
   const [selectedTags, setSelectedTags] = useState<Tag[]>(tags)
-  const [hovered, setHovered] = useState(false)
+  //const [hovered, setHovered] = useState(false)
   //const [selectedCollectionId, setSelectedCollectionId] = useState(collectionId ?? '')
   const [selectedCollectionId, setSelectedCollectionId] = useState<
     string | null
@@ -94,8 +94,12 @@ export default function WordCard({
     refetchOnWindowFocus: false,
   })*/
 
-  useEffect(() => {
+  /*useEffect(() => {
     ;(setSelectedTags(tags), setSelectedCollectionId(collectionId ?? ''))
+  }, [tags, collectionId])*/
+  useEffect(() => {
+    setSelectedTags(tags)
+    setSelectedCollectionId(collectionId ?? null)
   }, [tags, collectionId])
 
   const handleCollectionChange = (value: string) => {
@@ -229,11 +233,13 @@ export default function WordCard({
 
   return (
     <Card
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       sx={{
+        width: '100%',
+        minWidth: 0,
         borderRadius: 3,
         mb: 2,
+        overflow: 'hidden',
+
         transition: '0.2s',
         border: '1px solid',
         borderColor: favorite ? 'warning.main' : 'divider',
@@ -256,7 +262,13 @@ export default function WordCard({
                 />
               ) : (
                 <>
-                  <Typography sx={{ lineHeight: 1.6 }}>
+                  <Typography
+                    sx={{
+                      lineHeight: 1.6,
+                      overflowWrap: 'anywhere',
+                      wordBreak: 'break-word',
+                    }}
+                  >
                     {highlightText(content, search)}
                   </Typography>
 
@@ -313,7 +325,15 @@ export default function WordCard({
           {/* TAGS */}
           <Collapse in={!editing}>
             <Fade in={!editing}>
-              <Stack direction="row" spacing={1} flexWrap="wrap">
+              <Stack
+                direction="row"
+                spacing={1}
+                useFlexGap
+                flexWrap="wrap"
+                sx={{
+                  minWidth: 0,
+                }}
+              >
                 {tags.map((t) => (
                   <motion.div
                     key={t.id}

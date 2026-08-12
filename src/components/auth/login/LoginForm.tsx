@@ -27,7 +27,7 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
 
   const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  //const [loading, setLoading] = useState(false)
 
   const emailRef = useRef<HTMLInputElement | null>(null)
 
@@ -45,13 +45,13 @@ export default function LoginForm() {
     e.preventDefault()
 
     const validationError = validate()
+
     if (validationError) {
       setError(validationError)
       return
     }
 
     setError(null)
-    setLoading(true)
 
     try {
       await loginMutation.mutateAsync({
@@ -60,14 +60,20 @@ export default function LoginForm() {
       })
 
       router.push('/')
-    } catch (err: any) {
-      setError(err.message || 'Invalid credentials')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Invalid credentials')
     }
   }
 
   return (
     <Fade in timeout={400}>
-      <Paper sx={{ p: 4, width: '100%', maxWidth: 400 }}>
+      <Paper
+        sx={{
+          p: { xs: 2.5, sm: 4 },
+          width: '100%',
+          maxWidth: 400,
+        }}
+      >
         <Typography variant="h5" mb={2} textAlign="center">
           Login
         </Typography>
@@ -81,7 +87,10 @@ export default function LoginForm() {
             margin="normal"
             inputRef={emailRef}
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+  setEmail(e.target.value)
+  if (error) setError(null)
+}}
           />
 
           <TextField
@@ -110,9 +119,9 @@ export default function LoginForm() {
             fullWidth
             variant="contained"
             sx={{ mt: 2 }}
-            disabled={loading}
+            disabled={loginMutation.isPending}
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loginMutation.isPending ? 'Logging in...' : 'Login'}
           </Button>
         </form>
 

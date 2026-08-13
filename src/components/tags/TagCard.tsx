@@ -30,7 +30,6 @@ export default function TagCard({ tag }: Props) {
   }, [tag.name])
 
   const updateMutation = useUpdateTag()
-  const isSaving = updateMutation.isPending
 
   const handleSave = () => {
     updateMutation.mutate(
@@ -88,9 +87,9 @@ export default function TagCard({ tag }: Props) {
                 size="small"
                 variant="contained"
                 onClick={handleSave}
-                disabled={isSaving}
+                disabled={updateMutation.isPending}
               >
-                {isSaving ? 'Saving...' : 'Update'}
+                {updateMutation.isPending ? 'Saving...' : 'Update'}
               </Button>
             </Stack>
           ) : (

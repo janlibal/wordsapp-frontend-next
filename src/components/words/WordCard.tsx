@@ -82,7 +82,6 @@ export default function WordCard({
   const { data: collections = [] } = useCollections()
 
   const updateMutation = useUpdateWord()
-  updateMutation.isPending
   const deleteMutation = useDeleteWord()
   const restoreMutation = useRestoreWord()
   const showSnackbar = useSnackbar()

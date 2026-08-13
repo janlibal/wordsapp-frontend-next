@@ -1,5 +1,9 @@
-import AdminLayout from './AdminLayout'
+import AdminAppShell from './AdminAppShell'
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return <AdminLayout>{children}</AdminLayout>
+export default function AdminRouteLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return <AdminAppShell>{children}</AdminAppShell>
 }

@@ -28,7 +28,6 @@ export default function AddCollection() {
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   const createMutation = useCreateCollection()
-  const isLoading = createMutation.isPending
 
   const showSnackbar = useSnackbar()
 
@@ -123,12 +122,12 @@ export default function AddCollection() {
               <Button
                 type="submit"
                 variant="contained"
-                disabled={isLoading}
+                disabled={createMutation.isPending}
                 sx={{
                   width: { xs: '100%', sm: 'auto' },
                 }}
               >
-                {isLoading ? 'Saving...' : 'Save'}
+                {createMutation.isPending ? 'Saving...' : 'Save'}
               </Button>
             </Box>
           </Stack>

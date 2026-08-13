@@ -35,7 +35,6 @@ export default function CollectionCard({ collection }: Props) {
   const showSnackbar = useSnackbar()
 
   const updateMutation = useUpdateCollection()
-  updateMutation.isPending
   const deleteMutation = useDeleteCollection()
 
   const theme = useTheme()

@@ -36,7 +36,7 @@ export default function AddWord() {
   const { data: collections = [] } = useCollections()
 
   const createMutation = useCreateWord()
-  const isLoading = createMutation.isPending
+  //const isLoading = createMutation.isPending
 
   const showSnackbar = useSnackbar()
 
@@ -157,12 +157,12 @@ export default function AddWord() {
               <Button
                 type="submit"
                 variant="contained"
-                disabled={isLoading}
+                disabled={createMutation.isPending}
                 sx={{
                   width: { xs: '100%', sm: 'auto' },
                 }}
               >
-                {isLoading ? 'Saving...' : 'Save'}
+                {createMutation.isPending ? 'Saving...' : 'Save'}
               </Button>
             </Box>
           </Stack>

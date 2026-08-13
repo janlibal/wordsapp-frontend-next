@@ -26,7 +26,7 @@ export default function WaitlistComponent() {
   const [email, setEmail] = useState('')
 
   const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  //const [loading, setLoading] = useState(false)
 
   const firstNameRef = useRef<HTMLInputElement | null>(null)
 
@@ -52,7 +52,7 @@ export default function WaitlistComponent() {
     }
 
     setError(null)
-    setLoading(true)
+    //setLoading(true)
 
     try {
       await waitlistMutation.mutateAsync({ firstName, lastName, email })
@@ -62,7 +62,7 @@ export default function WaitlistComponent() {
     } catch (err: any) {
       setError(err.message || 'Adding failed')
     } finally {
-      setLoading(false)
+      //setLoading(false)
     }
   }
 
@@ -79,7 +79,11 @@ export default function WaitlistComponent() {
           Add to waitlist
         </Typography>
 
-        {error && <Alert severity="error">{error}</Alert>}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
 
         <form onSubmit={handleSubmit}>
           <TextField
@@ -88,7 +92,13 @@ export default function WaitlistComponent() {
             margin="normal"
             inputRef={firstNameRef}
             value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
+            onChange={(e) => {
+              setFirstName(e.target.value)
+
+              if (error) {
+                setError(null)
+              }
+            }}
           />
 
           <TextField
@@ -96,7 +106,13 @@ export default function WaitlistComponent() {
             fullWidth
             margin="normal"
             value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
+            onChange={(e) => {
+              setLastName(e.target.value)
+
+              if (error) {
+                setError(null)
+              }
+            }}
           />
 
           <TextField
@@ -104,7 +120,13 @@ export default function WaitlistComponent() {
             fullWidth
             margin="normal"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value)
+
+              if (error) {
+                setError(null)
+              }
+            }}
           />
 
           <Button
@@ -112,9 +134,9 @@ export default function WaitlistComponent() {
             fullWidth
             variant="contained"
             sx={{ mt: 2 }}
-            disabled={loading}
+            disabled={waitlistMutation.isPending}
           >
-            {loading ? 'Adding to waitlist...' : 'Add'}
+            {waitlistMutation.isPending ? 'Adding to waitlist...' : 'Add'}
           </Button>
         </form>
 

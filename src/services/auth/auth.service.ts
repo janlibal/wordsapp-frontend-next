@@ -49,6 +49,7 @@ export async function getCurrentUser(): Promise<User> {
 export function login(data: LoginDto): Promise<void> {
   return apiFetch<void>('api/api/v1/auth/email/login', {
     method: 'POST',
+    _skipRefresh: true,
     body: JSON.stringify(data),
   })
 }
@@ -56,9 +57,7 @@ export function login(data: LoginDto): Promise<void> {
 export function register(data: RegisterDto): Promise<void> {
   return apiFetch<void>('api/api/v1/auth/email/register', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    _skipRefresh: true,
     body: JSON.stringify(data),
   })
 }
@@ -66,9 +65,7 @@ export function register(data: RegisterDto): Promise<void> {
 export function join(data: JoinDto): Promise<void> {
   return apiFetch<void>('api/api/v1/auth/email/join', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    _skipRefresh: true,
     body: JSON.stringify(data),
   })
 }

@@ -1,21 +1,18 @@
 'use client'
 
+import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   Alert,
-  Box,
   Button,
+  Fade,
   IconButton,
   InputAdornment,
   Paper,
   TextField,
   Typography,
-  Fade,
 } from '@mui/material'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
-import { useRouter } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
-import { useAuth } from '@/src/app/context/authContext'
-import { login } from '@/src/services/auth/auth.service'
 import { useLogin } from '@/src/hooks/mutations/auth/useLogin'
 
 export default function LoginForm() {
@@ -25,9 +22,7 @@ export default function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-
   const [error, setError] = useState<string | null>(null)
-  //const [loading, setLoading] = useState(false)
 
   const emailRef = useRef<HTMLInputElement | null>(null)
 
@@ -38,6 +33,7 @@ export default function LoginForm() {
   const validate = () => {
     if (!email.includes('@')) return 'Invalid email'
     if (!password) return 'Password is required'
+
     return null
   }
 
@@ -78,7 +74,11 @@ export default function LoginForm() {
           Login
         </Typography>
 
-        {error && <Alert severity="error">{error}</Alert>}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
 
         <form onSubmit={handleSubmit}>
           <TextField
@@ -88,9 +88,12 @@ export default function LoginForm() {
             inputRef={emailRef}
             value={email}
             onChange={(e) => {
-  setEmail(e.target.value)
-  if (error) setError(null)
-}}
+              setEmail(e.target.value)
+
+              if (error) {
+                setError(null)
+              }
+            }}
           />
 
           <TextField
@@ -99,13 +102,22 @@ export default function LoginForm() {
             fullWidth
             margin="normal"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value)
+
+              if (error) {
+                setError(null)
+              }
+            }}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton
                     onClick={() => setShowPassword((s) => !s)}
                     edge="end"
+                    aria-label={
+                      showPassword ? 'Hide password' : 'Show password'
+                    }
                   >
                     {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
@@ -125,13 +137,13 @@ export default function LoginForm() {
           </Button>
         </form>
 
-        {/* 🔁 SWITCH */}
         <Typography variant="body2" textAlign="center" sx={{ mt: 2 }}>
           Don’t have an account?{' '}
           <Button size="small" onClick={() => router.push('/register')}>
             Sign up
           </Button>
         </Typography>
+
         <Typography variant="body2" textAlign="center" sx={{ mt: 2 }}>
           Want to be in?{' '}
           <Button size="small" onClick={() => router.push('/waitlist')}>

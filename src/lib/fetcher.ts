@@ -1,10 +1,17 @@
+import { ApiError } from '../services/api/ApiError'
+
 let refreshPromise: Promise<boolean> | null = null
+
+type ApiFetchOptions = RequestInit & {
+  _retry?: boolean
+  _skipRefresh?: boolean
+}
 
 export async function apiFetch<T>(
   url: string,
-  options: RequestInit & { _retry?: boolean } = {}
+  options: ApiFetchOptions = {}
 ): Promise<T> {
-  const { _retry, ...fetchOptions } = options
+  const { _retry = false, _skipRefresh = false, ...fetchOptions } = options
 
   const doFetch = () =>
     fetch(url, {
@@ -18,18 +25,21 @@ export async function apiFetch<T>(
 
   console.log('[API] → Request:', url, {
     method: fetchOptions.method,
-    retry: _retry || false,
+    retry: _retry,
+    skipRefresh: _skipRefresh,
   })
 
-  let res = await doFetch()
+  const res = await doFetch()
 
   console.log('[API] ← Response:', url, res.status)
 
-  // 🔁 HANDLE 401 + REFRESH
-  if (res.status === 401 && !_retry) {
+  // --------------------------------------------------
+  // 401 → attempt token refresh
+  // --------------------------------------------------
+
+  if (res.status === 401 && !_retry && !_skipRefresh) {
     console.log('[API] ⚠️ 401 detected')
 
-    // 🔒 Start refresh if not already running
     if (!refreshPromise) {
       console.log('[API] 🔒 starting refresh')
 
@@ -47,19 +57,17 @@ export async function apiFetch<T>(
           }
 
           console.log('[API] ✅ Refresh success')
-          return true
-        } catch (err) {
-          //console.log('[API] ❌ Refresh failed → logout')
-          //window.dispatchEvent(new Event('auth:logout'))
-          //console.log('[API] ❌ Refresh failed')
-          //return false
 
+          return true
+        } catch {
           console.log('[API] ❌ Refresh failed')
           console.log('[API] dispatching auth:logout')
+
           window.dispatchEvent(new Event('auth:logout'))
+
           return false
         } finally {
-          refreshPromise = null // 🔑 release lock
+          refreshPromise = null
         }
       })()
     } else {
@@ -69,30 +77,120 @@ export async function apiFetch<T>(
     const success = await refreshPromise
 
     if (!success) {
-      throw new Error('Unauthorized')
+      throw new ApiError('Unauthorized', 401)
     }
 
-    // 🔁 Retry original request ONCE
+    // Retry original request exactly once.
     return apiFetch<T>(url, {
       ...fetchOptions,
       _retry: true,
     })
   }
 
-  // ❌ Non-OK response (not 401 handled above)
-  if (!res.ok) {
+  // --------------------------------------------------
+  // Non-OK response
+  // --------------------------------------------------
+
+  /*if (!res.ok) {
     let message = 'Request failed'
+    let details: unknown
 
     try {
       const err = await res.json()
-      message = err.message || message
-    } catch {}
 
-    console.log('[API] ❌ Error:', message)
-    throw new Error(message)
+      details = err
+
+      if (typeof err?.message === 'string') {
+        message = err.message
+      } else if (Array.isArray(err?.message)) {
+        message = err.message.join(', ')
+      }
+    } catch {
+      // Response wasn't JSON.
+    }
+
+    console.log('[API] ❌ Error:', {
+      status: res.status,
+      message,
+    })
+
+    throw new ApiError(
+      message,
+      res.status,
+      details
+    )
+  }*/
+  if (!res.ok) {
+    let message = 'Request failed'
+    let details: unknown
+
+    try {
+      const err = await res.json()
+
+      details = err
+
+      console.log('[API] ❌ Raw error response:', err)
+
+      // Your backend error format:
+      // {
+      //   status: false,
+      //   result: {
+      //     title: 'Unauthorized',
+      //     errors: [...]
+      //   }
+      // }
+
+      const errors = err?.result?.errors
+
+      if (Array.isArray(errors) && errors.length > 0) {
+        message = errors
+          .map((error: unknown) => {
+            if (typeof error === 'string') {
+              return error
+            }
+
+            if (
+              typeof error === 'object' &&
+              error !== null &&
+              'message' in error &&
+              typeof error.message === 'string'
+            ) {
+              return error.message
+            }
+
+            return null
+          })
+          .filter(Boolean)
+          .join(', ')
+      }
+
+      // Fallbacks
+      if (message === 'Request failed') {
+        if (typeof err?.result?.title === 'string') {
+          message = err.result.title
+        } else if (typeof err?.message === 'string') {
+          message = err.message
+        } else if (typeof err?.error === 'string') {
+          message = err.error
+        }
+      }
+    } catch {
+      // Response wasn't JSON.
+    }
+
+    console.log('[API] ❌ Error:', {
+      status: res.status,
+      message,
+      details,
+    })
+
+    throw new ApiError(message, res.status, details)
   }
 
-  // ✅ Success
+  // --------------------------------------------------
+  // Success
+  // --------------------------------------------------
+
   const text = await res.text()
 
   console.log('[API] ✅ Success:', url)

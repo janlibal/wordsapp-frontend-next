@@ -15,9 +15,11 @@ import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { register } from '@/src/services/auth/auth.service'
+import { useRegister } from '@/src/hooks/mutations/auth/useRegisterHook'
 
 export default function RegisterForm() {
   const router = useRouter()
+  const registertMutation = useRegister()
 
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
@@ -26,7 +28,7 @@ export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false)
 
   const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  //const [loading, setLoading] = useState(false)
 
   const firstNameRef = useRef<HTMLInputElement | null>(null)
 
@@ -42,7 +44,7 @@ export default function RegisterForm() {
     return null
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmitOld = async (e: React.FormEvent) => {
     e.preventDefault()
 
     const validationError = validate()
@@ -52,7 +54,7 @@ export default function RegisterForm() {
     }
 
     setError(null)
-    setLoading(true)
+    //setLoading(true)
 
     try {
       await register({
@@ -66,7 +68,36 @@ export default function RegisterForm() {
     } catch (err: any) {
       setError(err.message || 'Registration failed')
     } finally {
-      setLoading(false)
+      //setLoading(false)
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    const validationError = validate()
+    if (validationError) {
+      setError(validationError)
+      return
+    }
+
+    setError(null)
+    //setLoading(true)
+
+    try {
+      await registertMutation.mutateAsync({
+        firstName,
+        lastName,
+        email,
+        password,
+      })
+      //  await join({ firstName, lastName, email })
+
+      router.push('/login')
+    } catch (err: any) {
+      setError(err.message || 'Registration failed')
+    } finally {
+      //setLoading(false)
     }
   }
 
@@ -83,7 +114,11 @@ export default function RegisterForm() {
           Create Account
         </Typography>
 
-        {error && <Alert severity="error">{error}</Alert>}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
 
         <form onSubmit={handleSubmit}>
           <TextField
@@ -92,7 +127,13 @@ export default function RegisterForm() {
             margin="normal"
             inputRef={firstNameRef}
             value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
+            onChange={(e) => {
+              setFirstName(e.target.value)
+
+              if (error) {
+                setError(null)
+              }
+            }}
           />
 
           <TextField
@@ -100,7 +141,13 @@ export default function RegisterForm() {
             fullWidth
             margin="normal"
             value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
+            onChange={(e) => {
+              setLastName(e.target.value)
+
+              if (error) {
+                setError(null)
+              }
+            }}
           />
 
           <TextField
@@ -108,7 +155,13 @@ export default function RegisterForm() {
             fullWidth
             margin="normal"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value)
+
+              if (error) {
+                setError(null)
+              }
+            }}
           />
 
           <TextField
@@ -117,7 +170,13 @@ export default function RegisterForm() {
             fullWidth
             margin="normal"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value)
+
+              if (error) {
+                setError(null)
+              }
+            }}
             helperText="At least 6 characters"
             InputProps={{
               endAdornment: (
@@ -135,9 +194,11 @@ export default function RegisterForm() {
             fullWidth
             variant="contained"
             sx={{ mt: 2 }}
-            disabled={loading}
+            disabled={registertMutation.isPending}
           >
-            {loading ? 'Creating account...' : 'Register'}
+            {registertMutation.isPending
+              ? 'Registering new user...'
+              : 'Register'}
           </Button>
         </form>
 

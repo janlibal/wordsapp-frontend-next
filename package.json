@@ -14,8 +14,10 @@
     "format": "prettier --write .",
     "dev:up": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d",
     "dev:down": "docker compose -f docker-compose.yml -f docker-compose.dev.yml down",
-    "client:up": "docker compose -p frontend -f docker-compose.yml -f docker-compose.dev.yml up -d --build",
-    "client:down": "docker compose -p frontend -f docker-compose.yml -f docker-compose.dev.yml down",
+    "client:dev:up": "docker compose -p frontend -f docker-compose.yml -f docker-compose.dev.yml up -d --build",
+    "client:dev:down": "docker compose -p frontend -f docker-compose.yml -f docker-compose.dev.yml down",
+    "client:prod:up": "docker compose -p frontend -f docker-compose.yml -f docker-compose.prod.yml up -d --build",
+    "client:prod:down": "docker compose -p frontend -f docker-compose.yml -f docker-compose.prod.yml down",
     "client:logs": "docker compose -p frontend logs -f",
     "client:shell": "docker compose -p frontend exec client sh"
   },

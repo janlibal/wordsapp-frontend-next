@@ -1,6 +1,12 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import {
+  useCallback,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from 'react'
 import { useRouter } from 'next/navigation'
 import { getCurrentUser, logout } from '@/src/services/auth/auth.service'
 import { User } from '@/src/types/auth/auth.types'
@@ -15,6 +21,62 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+  const router = useRouter()
+
+  const refreshAuth = useCallback(async () => {
+    setLoading(true)
+
+    try {
+      const currentUser = await getCurrentUser()
+      setUser(currentUser)
+    } catch {
+      setUser(null)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleLogout = () => {
+      setUser(null)
+      setLoading(false)
+      router.replace('/login')
+    }
+
+    window.addEventListener('auth:logout', handleLogout)
+
+    return () => {
+      window.removeEventListener('auth:logout', handleLogout)
+    }
+  }, [router])
+
+  const logoutUser = async () => {
+    try {
+      await logout()
+    } catch (err) {
+      console.error('Logout failed', err)
+    } finally {
+      window.dispatchEvent(new Event('auth:logout'))
+    }
+  }
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        logout: logoutUser,
+        refreshAuth,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  )
+}
+
+export function AuthProviderOld({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()

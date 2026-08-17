@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // ... other configurations ...
+  output: 'standalone',
 
   webpackDevMiddleware: (config) => {
     config.watchOptions = {

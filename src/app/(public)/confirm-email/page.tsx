@@ -1,7 +1,12 @@
 import ConfirmEmailComponent from '@/src/components/auth/confirm-email/ConfirmEmailComponent'
+import { Suspense } from 'react'
 
 export default function Page() {
-  return <ConfirmEmailComponent />
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ConfirmEmailComponent />
+    </Suspense>
+  )
 }
 
 /*type Props = {

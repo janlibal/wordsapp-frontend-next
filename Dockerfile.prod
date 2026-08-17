@@ -1,27 +1,77 @@
+FROM node:20-slim AS deps
+
+WORKDIR /app
+
+RUN corepack enable
+
+COPY package.json yarn.lock .yarnrc.yml ./
+COPY .yarn .yarn
+
+RUN yarn install --immutable
+
+
 FROM node:20-slim AS builder
 
 WORKDIR /app
 
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+RUN corepack enable
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/.yarn ./.yarn
+COPY --from=deps /app/package.json ./package.json
+COPY --from=deps /app/yarn.lock ./yarn.lock
+COPY --from=deps /app/.yarnrc.yml ./.yarnrc.yml
 
 COPY . .
+
+ENV NODE_ENV=production
+
 RUN yarn build
+
 
 FROM node:20-slim AS runner
 
 WORKDIR /app
+
 ENV NODE_ENV=production
 
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-#COPY --from=builder /app/next.config.js ./
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+
+USER node
 
 EXPOSE 3000
-CMD ["yarn", "start"]
 
+CMD ["node", "server.js"]
+
+#----------------------------
+
+#FROM node:20-slim AS builder
+
+#WORKDIR /app
+
+#COPY package.json yarn.lock ./
+#RUN yarn install --frozen-lockfile
+
+#COPY . .
+#RUN yarn build
+
+#FROM node:20-slim AS runner
+
+#WORKDIR /app
+#ENV NODE_ENV=production
+
+#COPY --from=builder /app/package.json ./
+#COPY --from=builder /app/node_modules ./node_modules
+#COPY --from=builder /app/.next ./.next
+#COPY --from=builder /app/public ./public
+##COPY --from=builder /app/next.config.js ./
+
+#EXPOSE 3000
+#CMD ["yarn", "start"]
+
+#-------------------
 
 # build
 #FROM node:20-slim AS build

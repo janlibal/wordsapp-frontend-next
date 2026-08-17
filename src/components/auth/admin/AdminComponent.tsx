@@ -10,8 +10,6 @@ export function AdminComponent() {
   const { data: users, isLoading, isError } = usePendingUsers()
 
   const handleApprove = (id: string) => {
-    console.log('Approve', id)
-
     // later:
     // approveMutation.mutate(id)
   }

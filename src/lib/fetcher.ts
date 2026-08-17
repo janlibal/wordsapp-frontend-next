@@ -1,4 +1,6 @@
+import { debug } from '../helpers/debug'
 import { ApiError } from '../services/api/ApiError'
+import { API_BASE_PATH } from '@/src/config/api'
 
 let refreshPromise: Promise<boolean> | null = null
 
@@ -23,7 +25,7 @@ export async function apiFetch<T>(
       credentials: 'include',
     })
 
-  console.log('[API] → Request:', url, {
+  debug('[API] → Request:', url, {
     method: fetchOptions.method,
     retry: _retry,
     skipRefresh: _skipRefresh,
@@ -31,52 +33,51 @@ export async function apiFetch<T>(
 
   const res = await doFetch()
 
-  console.log('[API] ← Response:', url, res.status)
+  debug('[API] ← Response:', url, res.status)
 
   // --------------------------------------------------
   // 401 → attempt token refresh
   // --------------------------------------------------
 
   if (res.status === 401 && !_retry && !_skipRefresh) {
-    console.log('[API] ⚠️ 401 detected')
+    debug('[API] ⚠️ 401 detected')
 
     if (!refreshPromise) {
-      console.log('[API] 🔒 starting refresh')
+      debug('[API] 🔒 starting refresh')
 
       refreshPromise = (async () => {
         try {
-          const refreshRes = await fetch('/api/api/v1/auth/refresh', {
+          const refreshRes = await fetch(`${API_BASE_PATH}/auth/refresh`, {
             method: 'POST',
             credentials: 'include',
           })
 
-          console.log('[API] 🔄 Refresh response:', refreshRes.status)
+          debug('[API] 🔄 Refresh response:', refreshRes.status)
 
           if (!refreshRes.ok) {
-            throw new Error('Refresh failed')
+            return false
           }
 
-          console.log('[API] ✅ Refresh success')
+          debug('[API] ✅ Refresh success')
 
           return true
         } catch {
-          console.log('[API] ❌ Refresh failed')
-          console.log('[API] dispatching auth:logout')
-
-          window.dispatchEvent(new Event('auth:logout'))
-
           return false
         } finally {
           refreshPromise = null
         }
       })()
     } else {
-      console.log('[API] ⏳ waiting for ongoing refresh')
+      debug('[API] ⏳ waiting for ongoing refresh')
     }
 
     const success = await refreshPromise
 
     if (!success) {
+      debug('[API] ❌ Refresh failed')
+
+      window.dispatchEvent(new Event('auth:logout'))
+
       throw new ApiError('Unauthorized', 401)
     }
 
@@ -91,35 +92,6 @@ export async function apiFetch<T>(
   // Non-OK response
   // --------------------------------------------------
 
-  /*if (!res.ok) {
-    let message = 'Request failed'
-    let details: unknown
-
-    try {
-      const err = await res.json()
-
-      details = err
-
-      if (typeof err?.message === 'string') {
-        message = err.message
-      } else if (Array.isArray(err?.message)) {
-        message = err.message.join(', ')
-      }
-    } catch {
-      // Response wasn't JSON.
-    }
-
-    console.log('[API] ❌ Error:', {
-      status: res.status,
-      message,
-    })
-
-    throw new ApiError(
-      message,
-      res.status,
-      details
-    )
-  }*/
   if (!res.ok) {
     let message = 'Request failed'
     let details: unknown
@@ -129,16 +101,7 @@ export async function apiFetch<T>(
 
       details = err
 
-      console.log('[API] ❌ Raw error response:', err)
-
-      // Your backend error format:
-      // {
-      //   status: false,
-      //   result: {
-      //     title: 'Unauthorized',
-      //     errors: [...]
-      //   }
-      // }
+      debug('[API] ❌ Raw error response:', err)
 
       const errors = err?.result?.errors
 
@@ -164,7 +127,6 @@ export async function apiFetch<T>(
           .join(', ')
       }
 
-      // Fallbacks
       if (message === 'Request failed') {
         if (typeof err?.result?.title === 'string') {
           message = err.result.title
@@ -178,7 +140,7 @@ export async function apiFetch<T>(
       // Response wasn't JSON.
     }
 
-    console.log('[API] ❌ Error:', {
+    debug('[API] ❌ Error:', {
       status: res.status,
       message,
       details,
@@ -193,7 +155,7 @@ export async function apiFetch<T>(
 
   const text = await res.text()
 
-  console.log('[API] ✅ Success:', url)
+  debug('[API] ✅ Success:', url)
 
   return text ? JSON.parse(text) : (undefined as T)
 }

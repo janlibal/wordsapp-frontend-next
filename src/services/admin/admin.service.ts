@@ -6,9 +6,10 @@ export async function getPendingUsers(): Promise<User[]> {
   const res = await apiFetch<{ data: User[] }>(
     //'/api/api/v1/admin/pending',
     `${API_BASE_PATH}/admin/pending`,
-     {
-    method: 'GET',
-  })
+    {
+      method: 'GET',
+    }
+  )
   return res.data
 }
 

@@ -18,6 +18,8 @@ COPY next.config.mjs ./next.config.mjs
 
 EXPOSE 3000
 
+ENV NODE_ENV=development
+
 ENV CHOKIDAR_USEPOLLING=true
 
 CMD ["yarn", "dev"]

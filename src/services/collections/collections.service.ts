@@ -16,11 +16,10 @@ export async function getCollections(
   const query = params.toString()
 
   const res = await apiFetch<CollectionResponse>(
-    query ? 
-    `${API_BASE_PATH}/collections?${query}`
-    //`/api/api/v1/collections?${query}` 
-    :
-    `${API_BASE_PATH}/collections`, 
+    query
+      ? `${API_BASE_PATH}/collections?${query}`
+      : //`/api/api/v1/collections?${query}`
+        `${API_BASE_PATH}/collections`,
     //'/api/api/v1/collections',
     { method: 'GET' }
   )
@@ -34,10 +33,11 @@ export function createCollection(
   return apiFetch<Collection>(
     `${API_BASE_PATH}/collections`,
     //'/api/api/v1/collections',
-     {
-    method: 'POST',
-    body: JSON.stringify(data),
-  })
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }
+  )
 }
 
 export async function updateCollection(
@@ -49,17 +49,19 @@ export async function updateCollection(
   return apiFetch<Omit<Collection, 'userId'>>(
     `${API_BASE_PATH}/collections/${id}`,
     //`/api/api/v1/collections/${id}`,
-     {
-    method: 'PATCH',
-    body: JSON.stringify(data),
-  })
+    {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }
+  )
 }
 
 export function deleteCollection(id: Collection['id']) {
   return apiFetch(
     `${API_BASE_PATH}/collections/${id}`,
     //`/api/api/v1/collections/${id}`,
-     {
-    method: 'DELETE',
-  })
+    {
+      method: 'DELETE',
+    }
+  )
 }

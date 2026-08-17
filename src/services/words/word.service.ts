@@ -8,37 +8,41 @@ export function createWord(data: CreateWordDto): Promise<void> {
   return apiFetch<void>(
     `${API_BASE_PATH}/words`,
     //'/api/api/v1/words',
-     {
-    method: 'POST',
-    body: JSON.stringify(data),
-  })
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }
+  )
 }
 
 export async function addTagToWord(wordId: Word['id'], tagId: Tag['id']) {
   return apiFetch(
     `${API_BASE_PATH}/words/${wordId}/tags/${tagId}`,
     //`/api/api/v1/words/${wordId}/tags/${tagId}`,
-     {
-    method: 'POST',
-  })
+    {
+      method: 'POST',
+    }
+  )
 }
 
 export async function removeTagFromWord(wordId: Word['id'], tagId: Tag['id']) {
   return apiFetch(
     `${API_BASE_PATH}/words/${wordId}/tags/${tagId}`,
-    //`/api/api/v1/words/${wordId}/tags/${tagId}`, 
+    //`/api/api/v1/words/${wordId}/tags/${tagId}`,
     {
-    method: 'DELETE',
-  })
+      method: 'DELETE',
+    }
+  )
 }
 
 export function deleteWord(id: Word['id']) {
   return apiFetch(
     `${API_BASE_PATH}/words/${id}`,
     //`/api/api/v1/words/${id}`,
-     {
-    method: 'DELETE',
-  })
+    {
+      method: 'DELETE',
+    }
+  )
 }
 
 /*export async function getWords(): Promise<Word[]> {
@@ -126,8 +130,9 @@ export async function updateWord(
   return apiFetch<Omit<Word, 'userId'>>(
     `${API_BASE_PATH}/words/${id}`,
     //`/api/api/v1/words/${id}`,
-     {
-    method: 'PATCH',
-    body: JSON.stringify(data),
-  })
+    {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }
+  )
 }

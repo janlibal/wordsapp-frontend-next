@@ -1,3 +1,4 @@
+import { API_BASE_PATH } from '@/src/config/api'
 import { apiFetch } from '@/src/lib/fetcher'
 import { Tag } from '@/src/types/tags/tag.type'
 import { TagsResponse } from '@/src/types/tags/tags.response.type'
@@ -14,7 +15,8 @@ export async function getTags(
   const query = params.toString()
 
   const res = await apiFetch<TagsResponse>(
-    query ? `/api/api/v1/tags?${query}` : '/api/api/v1/tags'
+    query ? `${API_BASE_PATH}/tags?${query}` : `${API_BASE_PATH}/tags`
+    //query ? `/api/api/v1/tags?${query}` : '/api/api/v1/tags'
   )
 
   return res.data
@@ -26,7 +28,7 @@ export async function updateTag(
     name?: Tag['name'] //string
   }
 ) {
-  return apiFetch<Omit<Tag, 'userId'>>(`/api/api/v1/tags/${id}`, {
+  return apiFetch<Omit<Tag, 'userId'>>(`${API_BASE_PATH}/tags/${id}`, {
     method: 'PATCH',
     body: JSON.stringify(data),
   })

@@ -1,29 +1,42 @@
+import { API_BASE_PATH } from '@/src/config/api'
 import { apiFetch } from '@/src/lib/fetcher'
 import { Tag } from '@/src/types/tags/tag.type'
 import { CreateWordDto } from '@/src/types/words/create.word.dto'
 import { Word } from '@/src/types/words/word.type'
 
 export function createWord(data: CreateWordDto): Promise<void> {
-  return apiFetch<void>('/api/api/v1/words', {
+  return apiFetch<void>(
+    `${API_BASE_PATH}/words`,
+    //'/api/api/v1/words',
+     {
     method: 'POST',
     body: JSON.stringify(data),
   })
 }
 
 export async function addTagToWord(wordId: Word['id'], tagId: Tag['id']) {
-  return apiFetch(`/api/api/v1/words/${wordId}/tags/${tagId}`, {
+  return apiFetch(
+    `${API_BASE_PATH}/words/${wordId}/tags/${tagId}`,
+    //`/api/api/v1/words/${wordId}/tags/${tagId}`,
+     {
     method: 'POST',
   })
 }
 
 export async function removeTagFromWord(wordId: Word['id'], tagId: Tag['id']) {
-  return apiFetch(`/api/api/v1/words/${wordId}/tags/${tagId}`, {
+  return apiFetch(
+    `${API_BASE_PATH}/words/${wordId}/tags/${tagId}`,
+    //`/api/api/v1/words/${wordId}/tags/${tagId}`, 
+    {
     method: 'DELETE',
   })
 }
 
 export function deleteWord(id: Word['id']) {
-  return apiFetch(`/api/api/v1/words/${id}`, {
+  return apiFetch(
+    `${API_BASE_PATH}/words/${id}`,
+    //`/api/api/v1/words/${id}`,
+     {
     method: 'DELETE',
   })
 }
@@ -76,7 +89,8 @@ export async function getWords(
   if (collectionId) params.set('collectionId', collectionId)
 
   const res = await apiFetch<{ data: Word[] }>(
-    `/api/api/v1/words?${params.toString()}`,
+    `${API_BASE_PATH}/words?${params.toString()}`,
+    //`/api/api/v1/words?${params.toString()}`,
     {
       method: 'GET',
     }
@@ -109,7 +123,10 @@ export async function updateWord(
     tags?: string[]
   }
 ) {
-  return apiFetch<Omit<Word, 'userId'>>(`/api/api/v1/words/${id}`, {
+  return apiFetch<Omit<Word, 'userId'>>(
+    `${API_BASE_PATH}/words/${id}`,
+    //`/api/api/v1/words/${id}`,
+     {
     method: 'PATCH',
     body: JSON.stringify(data),
   })

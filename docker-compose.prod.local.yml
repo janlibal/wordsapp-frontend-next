@@ -1,6 +1,8 @@
 services:
   client:
-    image: ghcr.io/janlibal/wordsapp-frontend-next:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
     #expose:
     #  - '3000'
     environment:

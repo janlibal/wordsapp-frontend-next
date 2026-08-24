@@ -18,6 +18,18 @@ dev-logs:
 		-f docker-compose.dev.yml \
 		logs -f
 
+prod-local-up:
+	docker compose -p frontend \
+		-f docker-compose.yml \
+		-f docker-compose.prod.local.yml \
+		up -d --build
+
+prod-local-down:
+	docker compose -p frontend \
+		-f docker-compose.yml \
+		-f docker-compose.prod.local.yml \
+		down
+
 prod-up:
 	docker compose -p frontend \
 		-f docker-compose.yml \

@@ -1,10 +1,22 @@
 {
-  "name": "client",
-  "version": "0.1.0",
+  "name": "wordsapp-frontend",
+  "version": "0.1.3",
+  "description": "Wordsapp frontend app",
   "private": true,
+  "homepage": "https://github.com/janlibal/wordsapp-frontend-next",
   "author": {
     "name": "Jan Libal",
     "email": "jan.libal@yahoo.com"
+  },
+  "contributors": [
+    {
+      "name": "Jan Libal",
+      "email": "jan.libal@yahoo.com"
+    }
+  ],
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">= 14"
   },
   "scripts": {
     "dev": "next dev",

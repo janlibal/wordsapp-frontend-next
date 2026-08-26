@@ -1,4 +1,8 @@
 FROM node:20-slim
+LABEL com.janlibal.image.stage="deps" \
+      com.janlibal.image.title="wordsapp-frontend" \
+      com.janlibal.image.created="2027-08-26" \
+      com.janlibal.image.authors="Jan Libal <jan.libal@yahoo.com>"
 
 WORKDIR /app
 

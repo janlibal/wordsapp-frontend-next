@@ -203,6 +203,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.29.7":
+  version: 7.29.7
+  resolution: "@babel/runtime@npm:7.29.7"
+  checksum: 10c0/ca11572f7146b21e0bde6a9ed4bb6a89eafbee5f0944c7eb54d0d8a2dac962c33638a1d611e14faa71dfbb92b4b5f9236232208568a6b7d5c6f3f39ddb91771e
+  languageName: node
+  linkType: hard
+
 "@babel/template@npm:^7.27.2":
   version: 7.27.2
   resolution: "@babel/template@npm:7.27.2"
@@ -876,6 +883,29 @@ __metadata:
     "@types/react":
       optional: true
   checksum: 10c0/2df04e1f3ee2e7a960bd9f0418ac90d33595ebecf30d121b86e0b84bbffa4b8f6bce803ef66f114b23b164f29ee6357d1e3290a867fd10b3a8db505088f06366
+  languageName: node
+  linkType: hard
+
+"@mui/material-nextjs@npm:^9.3.0":
+  version: 9.3.0
+  resolution: "@mui/material-nextjs@npm:9.3.0"
+  dependencies:
+    "@babel/runtime": "npm:^7.29.7"
+  peerDependencies:
+    "@emotion/cache": ^11.11.0
+    "@emotion/react": ^11.11.4
+    "@emotion/server": ^11.11.0
+    "@types/react": ^17.0.0 || ^18.0.0 || ^19.0.0
+    next: ^13.0.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
+    react: ^17.0.0 || ^18.0.0 || ^19.0.0
+  peerDependenciesMeta:
+    "@emotion/cache":
+      optional: true
+    "@emotion/server":
+      optional: true
+    "@types/react":
+      optional: true
+  checksum: 10c0/6949f4d0756a580d9ec4ec44304adfa874c50e655e07e14654a6f110082dbc057812f7b288ee8e53d88103ddad57b36fe103de8570472f73cfcd49c56fe47b2a
   languageName: node
   linkType: hard
 
@@ -2041,33 +2071,6 @@ __metadata:
   checksum: 10c0/9d6cfd0c19e1c96a434605added99dff48482152af791ec4172fb912a71cff9027ff174efd8cdb2160cc7f377543e0537ffc462d4f279bc4701de3f2a3c4b358
   languageName: node
   linkType: hard
-
-"client@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "client@workspace:."
-  dependencies:
-    "@emotion/react": "npm:^11.14.0"
-    "@emotion/styled": "npm:^11.14.1"
-    "@eslint/eslintrc": "npm:^3"
-    "@mui/icons-material": "npm:^7.3.9"
-    "@mui/material": "npm:^7.3.9"
-    "@tailwindcss/postcss": "npm:^4"
-    "@tanstack/react-query": "npm:^5.97.0"
-    "@types/node": "npm:^20"
-    "@types/react": "npm:^19"
-    "@types/react-dom": "npm:^19"
-    eslint: "npm:^9"
-    eslint-config-next: "npm:16.1.1"
-    framer-motion: "npm:^12.38.0"
-    next: "npm:16.1.1"
-    prettier: "npm:^3.4.2"
-    react: "npm:19.2.3"
-    react-dom: "npm:19.2.3"
-    tailwindcss: "npm:^4"
-    typescript: "npm:^5"
-    use-debounce: "npm:^10.1.1"
-  languageName: unknown
-  linkType: soft
 
 "clsx@npm:^2.1.1":
   version: 2.1.1
@@ -5089,6 +5092,35 @@ __metadata:
   checksum: 10c0/e0e4a1ca27599c92a6ca4c32260e8a92e8a44f4ef6ef93f803f8ed823f486e0889fc0b93be4db59c8d51b3064951d25e43d434e95dc8c960cc3a63d65d00ba20
   languageName: node
   linkType: hard
+
+"wordsapp-frontend@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "wordsapp-frontend@workspace:."
+  dependencies:
+    "@emotion/cache": "npm:^11.14.0"
+    "@emotion/react": "npm:^11.14.0"
+    "@emotion/styled": "npm:^11.14.1"
+    "@eslint/eslintrc": "npm:^3"
+    "@mui/icons-material": "npm:^7.3.9"
+    "@mui/material": "npm:^7.3.9"
+    "@mui/material-nextjs": "npm:^9.3.0"
+    "@tailwindcss/postcss": "npm:^4"
+    "@tanstack/react-query": "npm:^5.97.0"
+    "@types/node": "npm:^20"
+    "@types/react": "npm:^19"
+    "@types/react-dom": "npm:^19"
+    eslint: "npm:^9"
+    eslint-config-next: "npm:16.1.1"
+    framer-motion: "npm:^12.38.0"
+    next: "npm:16.1.1"
+    prettier: "npm:^3.4.2"
+    react: "npm:19.2.3"
+    react-dom: "npm:19.2.3"
+    tailwindcss: "npm:^4"
+    typescript: "npm:^5"
+    use-debounce: "npm:^10.1.1"
+  languageName: unknown
+  linkType: soft
 
 "yallist@npm:^3.0.2":
   version: 3.1.1

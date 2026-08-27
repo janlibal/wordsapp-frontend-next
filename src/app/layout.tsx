@@ -6,8 +6,35 @@ import theme from './theme'
 import { AuthProvider } from './context/authContext'
 import Providers from './providers'
 import { SnackbarProvider } from '../hooks/SnacbarProvider'
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v1X-appRouter'
 
 export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body>
+        <AppRouterCacheProvider>
+          <AuthProvider>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+
+              <Providers>
+                <SnackbarProvider>
+                  {children}
+                </SnackbarProvider>
+              </Providers>
+            </ThemeProvider>
+          </AuthProvider>
+        </AppRouterCacheProvider>
+      </body>
+    </html>
+  )
+}
+
+export function RootLayout2({
   children,
 }: {
   children: React.ReactNode

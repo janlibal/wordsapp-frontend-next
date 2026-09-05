@@ -138,13 +138,6 @@ export default function LoginForm() {
         </form>
 
         <Typography variant="body2" textAlign="center" sx={{ mt: 2 }}>
-          Don’t have an account?{' '}
-          <Button size="small" onClick={() => router.push('/register')}>
-            Sign up
-          </Button>
-        </Typography>
-
-        <Typography variant="body2" textAlign="center" sx={{ mt: 2 }}>
           Want to be in?{' '}
           <Button size="small" onClick={() => router.push('/waitlist')}>
             Add to waitlist
